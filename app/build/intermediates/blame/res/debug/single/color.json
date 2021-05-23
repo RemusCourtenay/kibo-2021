@@ -1,0 +1,90 @@
+[
+    {
+        "merged": "C:\\Users\\Henry\\Desktop\\KiboRobot\\kibo-2021\\2ndKibo-RPC_TemplateAPK\\DefaultApk\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_primary_text_disable_only_material_dark.xml",
+        "source": "C:\\Users\\Henry\\.android\\build-cache\\e601e716338bdb84b67f9fc289bf62db7568abe6\\output\\res\\color\\abc_primary_text_disable_only_material_dark.xml"
+    },
+    {
+        "merged": "C:\\Users\\Henry\\Desktop\\KiboRobot\\kibo-2021\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_secondary_text_material_dark.xml",
+        "source": "C:\\Users\\Henry\\.android\\build-cache\\e601e716338bdb84b67f9fc289bf62db7568abe6\\output\\res\\color\\abc_secondary_text_material_dark.xml"
+    },
+    {
+        "merged": "C:\\Users\\Henry\\Desktop\\KiboRobot\\kibo-2021\\2ndKibo-RPC_TemplateAPK\\DefaultApk\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_primary_text_material_dark.xml",
+        "source": "C:\\Users\\Henry\\.android\\build-cache\\e601e716338bdb84b67f9fc289bf62db7568abe6\\output\\res\\color\\abc_primary_text_material_dark.xml"
+    },
+    {
+        "merged": "C:\\Users\\Henry\\Desktop\\KiboRobot\\kibo-2021\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_secondary_text_material_light.xml",
+        "source": "C:\\Users\\Henry\\.android\\build-cache\\e601e716338bdb84b67f9fc289bf62db7568abe6\\output\\res\\color\\abc_secondary_text_material_light.xml"
+    },
+    {
+        "merged": "C:\\Users\\Henry\\Desktop\\KiboRobot\\kibo-2021\\2ndKibo-RPC_TemplateAPK\\DefaultApk\\app\\build\\intermediates\\res\\merged\\debug\\color\\switch_thumb_material_light.xml",
+        "source": "C:\\Users\\Henry\\.android\\build-cache\\e601e716338bdb84b67f9fc289bf62db7568abe6\\output\\res\\color\\switch_thumb_material_light.xml"
+    },
+    {
+        "merged": "C:\\Users\\Henry\\Desktop\\KiboRobot\\kibo-2021\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_primary_text_material_dark.xml",
+        "source": "C:\\Users\\Henry\\.android\\build-cache\\e601e716338bdb84b67f9fc289bf62db7568abe6\\output\\res\\color\\abc_primary_text_material_dark.xml"
+    },
+    {
+        "merged": "C:\\Users\\Henry\\Desktop\\KiboRobot\\kibo-2021\\2ndKibo-RPC_TemplateAPK\\DefaultApk\\app\\build\\intermediates\\res\\merged\\debug\\color\\switch_thumb_material_dark.xml",
+        "source": "C:\\Users\\Henry\\.android\\build-cache\\e601e716338bdb84b67f9fc289bf62db7568abe6\\output\\res\\color\\switch_thumb_material_dark.xml"
+    },
+    {
+        "merged": "C:\\Users\\Henry\\Desktop\\KiboRobot\\kibo-2021\\2ndKibo-RPC_TemplateAPK\\DefaultApk\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_primary_text_disable_only_material_light.xml",
+        "source": "C:\\Users\\Henry\\.android\\build-cache\\e601e716338bdb84b67f9fc289bf62db7568abe6\\output\\res\\color\\abc_primary_text_disable_only_material_light.xml"
+    },
+    {
+        "merged": "C:\\Users\\Henry\\Desktop\\KiboRobot\\kibo-2021\\2ndKibo-RPC_TemplateAPK\\DefaultApk\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_primary_text_material_light.xml",
+        "source": "C:\\Users\\Henry\\.android\\build-cache\\e601e716338bdb84b67f9fc289bf62db7568abe6\\output\\res\\color\\abc_primary_text_material_light.xml"
+    },
+    {
+        "merged": "C:\\Users\\Henry\\Desktop\\KiboRobot\\kibo-2021\\2ndKibo-RPC_TemplateAPK\\DefaultApk\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_hint_foreground_material_dark.xml",
+        "source": "C:\\Users\\Henry\\.android\\build-cache\\e601e716338bdb84b67f9fc289bf62db7568abe6\\output\\res\\color\\abc_hint_foreground_material_dark.xml"
+    },
+    {
+        "merged": "C:\\Users\\Henry\\Desktop\\KiboRobot\\kibo-2021\\app\\build\\intermediates\\res\\merged\\debug\\color\\switch_thumb_material_dark.xml",
+        "source": "C:\\Users\\Henry\\.android\\build-cache\\e601e716338bdb84b67f9fc289bf62db7568abe6\\output\\res\\color\\switch_thumb_material_dark.xml"
+    },
+    {
+        "merged": "C:\\Users\\Henry\\Desktop\\KiboRobot\\kibo-2021\\2ndKibo-RPC_TemplateAPK\\DefaultApk\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_search_url_text.xml",
+        "source": "C:\\Users\\Henry\\.android\\build-cache\\e601e716338bdb84b67f9fc289bf62db7568abe6\\output\\res\\color\\abc_search_url_text.xml"
+    },
+    {
+        "merged": "C:\\Users\\Henry\\Desktop\\KiboRobot\\kibo-2021\\2ndKibo-RPC_TemplateAPK\\DefaultApk\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_secondary_text_material_light.xml",
+        "source": "C:\\Users\\Henry\\.android\\build-cache\\e601e716338bdb84b67f9fc289bf62db7568abe6\\output\\res\\color\\abc_secondary_text_material_light.xml"
+    },
+    {
+        "merged": "C:\\Users\\Henry\\Desktop\\KiboRobot\\kibo-2021\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_primary_text_disable_only_material_light.xml",
+        "source": "C:\\Users\\Henry\\.android\\build-cache\\e601e716338bdb84b67f9fc289bf62db7568abe6\\output\\res\\color\\abc_primary_text_disable_only_material_light.xml"
+    },
+    {
+        "merged": "C:\\Users\\Henry\\Desktop\\KiboRobot\\kibo-2021\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_primary_text_material_light.xml",
+        "source": "C:\\Users\\Henry\\.android\\build-cache\\e601e716338bdb84b67f9fc289bf62db7568abe6\\output\\res\\color\\abc_primary_text_material_light.xml"
+    },
+    {
+        "merged": "C:\\Users\\Henry\\Desktop\\KiboRobot\\kibo-2021\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_primary_text_disable_only_material_dark.xml",
+        "source": "C:\\Users\\Henry\\.android\\build-cache\\e601e716338bdb84b67f9fc289bf62db7568abe6\\output\\res\\color\\abc_primary_text_disable_only_material_dark.xml"
+    },
+    {
+        "merged": "C:\\Users\\Henry\\Desktop\\KiboRobot\\kibo-2021\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_hint_foreground_material_light.xml",
+        "source": "C:\\Users\\Henry\\.android\\build-cache\\e601e716338bdb84b67f9fc289bf62db7568abe6\\output\\res\\color\\abc_hint_foreground_material_light.xml"
+    },
+    {
+        "merged": "C:\\Users\\Henry\\Desktop\\KiboRobot\\kibo-2021\\2ndKibo-RPC_TemplateAPK\\DefaultApk\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_hint_foreground_material_light.xml",
+        "source": "C:\\Users\\Henry\\.android\\build-cache\\e601e716338bdb84b67f9fc289bf62db7568abe6\\output\\res\\color\\abc_hint_foreground_material_light.xml"
+    },
+    {
+        "merged": "C:\\Users\\Henry\\Desktop\\KiboRobot\\kibo-2021\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_hint_foreground_material_dark.xml",
+        "source": "C:\\Users\\Henry\\.android\\build-cache\\e601e716338bdb84b67f9fc289bf62db7568abe6\\output\\res\\color\\abc_hint_foreground_material_dark.xml"
+    },
+    {
+        "merged": "C:\\Users\\Henry\\Desktop\\KiboRobot\\kibo-2021\\app\\build\\intermediates\\res\\merged\\debug\\color\\switch_thumb_material_light.xml",
+        "source": "C:\\Users\\Henry\\.android\\build-cache\\e601e716338bdb84b67f9fc289bf62db7568abe6\\output\\res\\color\\switch_thumb_material_light.xml"
+    },
+    {
+        "merged": "C:\\Users\\Henry\\Desktop\\KiboRobot\\kibo-2021\\2ndKibo-RPC_TemplateAPK\\DefaultApk\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_secondary_text_material_dark.xml",
+        "source": "C:\\Users\\Henry\\.android\\build-cache\\e601e716338bdb84b67f9fc289bf62db7568abe6\\output\\res\\color\\abc_secondary_text_material_dark.xml"
+    },
+    {
+        "merged": "C:\\Users\\Henry\\Desktop\\KiboRobot\\kibo-2021\\app\\build\\intermediates\\res\\merged\\debug\\color\\abc_search_url_text.xml",
+        "source": "C:\\Users\\Henry\\.android\\build-cache\\e601e716338bdb84b67f9fc289bf62db7568abe6\\output\\res\\color\\abc_search_url_text.xml"
+    }
+]

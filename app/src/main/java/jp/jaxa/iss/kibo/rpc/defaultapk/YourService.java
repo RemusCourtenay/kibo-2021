@@ -36,7 +36,7 @@ public class YourService extends KiboRpcService {
         api.startMission();
 
         // move astrobee from dock station to point A
-        moveToWrapper(11.21, -9.7578, 4.8726, 0, 0, -0.707, 0.707);
+        moveToWrapper(11.21+0.0422, -9.80, 4.79+0.0826, 0, 0, -0.707, 0.707);
 
         // scan QR code
         final double[]Adash_pos = scanQR(3);

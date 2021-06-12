@@ -21,6 +21,7 @@ import org.opencv.imgproc.Imgproc;
 import org.opencv.core.Size;
 import static org.opencv.android.Utils.matToBitmap;
 
+import java.util.concurrent.TimeUnit;
 
 /**
  * Class meant to handle commands from the Ground Data System and execute them in Astrobee
@@ -39,8 +40,28 @@ public class YourService extends KiboRpcService {
         moveToWrapper(11.21+0.0422, -9.80, 4.79+0.0826, 0, 0, -0.707, 0.707);
 
         // scan QR code
-        final double[]Adash_pos = scanQR(3);
+        final double[]A_dash = scanQR(3);
 
+        // get position and KOZ pattern
+        double A_dash_x = A_dash[0], A_dash_y = A_dash[1], A_dash_z = A_dash[2], koz = A_dash[3];
+
+        //
+        // MOVE TO POINT A' WHILE AVOIDING KOZ AND GET ROBOT IN CORRECT ORIENTATION FOR LASER
+        //
+
+        // turn laser on
+        api.laserControl(true);
+
+        // take 10 snapshots at 1-second intervals
+        int num_snaps = 10;
+        int i = 0;
+        while (i < num_snaps) {
+            api.takeSnapshot();
+            wait(1000);
+        }
+
+        // turn laser off
+        api.laserControl(false);
     }
 
     @Override
@@ -70,16 +91,16 @@ public class YourService extends KiboRpcService {
         }
     }
 
+    // scan QR code
     public double[] scanQR(int loop_max) {
-
         String contents = null;
         int count = 0;
         double koz_pattern = 0; // KOZ pattern between 1 and 8
-        double x = 0, y = 0, z = 0; // not getting orientation of point A' since it's always (0, 0, -0.707, 0.707)
+        double x = 0, y = 0, z = 0; // don't need orientation of point A' since it's always (0, 0, -0.707, 0.707)
 
         while (contents == null && count < loop_max) {
             api.flashlightControlFront(1f);
-            Mat src_mat = new Mat(undistord(api.getMatNavCam()), cropImage(40));
+            Mat src_mat = new Mat(undistort(api.getMatNavCam()), cropImage(40));
             Bitmap bMap = resizeImage(src_mat, 2000, 1500);
 
             int[] intArray = new int[bMap.getWidth() * bMap.getHeight()];
@@ -112,7 +133,8 @@ public class YourService extends KiboRpcService {
         return new double[] {x, y, z, koz_pattern};
     }
 
-    public Mat undistord(Mat src) {
+    // undistort image to reduce time taken for QR scanning
+    public Mat undistort(Mat src) {
         Mat dst = new Mat(1280, 960, CvType.CV_8UC1);
         Mat cameraMatrix = new Mat(3, 3, CvType.CV_32FC1);
         Mat distCoeffs = new Mat(1, 5, CvType.CV_32FC1);
@@ -125,6 +147,7 @@ public class YourService extends KiboRpcService {
         return dst;
     }
 
+    // crop image to reduce time taken for QR scanning
     public Rect cropImage(int percent_crop) {
         double ratio = NAV_MAX_COL / NAV_MAX_ROW;
 
@@ -139,6 +162,7 @@ public class YourService extends KiboRpcService {
         return new Rect(offset_col, offset_row, (int) cols, (int) rows);
     }
 
+    // resize image to reduce time taken for QR scanning
     public Bitmap resizeImage(Mat src, int width, int height) {
         Size size = new Size(width, height);
         Imgproc.resize(src, src, size);
@@ -146,5 +170,17 @@ public class YourService extends KiboRpcService {
         Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         matToBitmap(src, bitmap, false);
         return bitmap;
+    }
+
+    //
+    public static void wait(int ms) {
+        try
+        {
+            Thread.sleep(ms);
+        }
+        catch(InterruptedException ex)
+        {
+            Thread.currentThread().interrupt();
+        }
     }
 }

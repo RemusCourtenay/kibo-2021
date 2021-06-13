@@ -43,7 +43,7 @@ public class YourService extends KiboRpcService {
         final double[]A_dash = scanQR(3);
 
         // get position and KOZ pattern
-        double A_dash_x = A_dash[0], A_dash_y = A_dash[1], A_dash_z = A_dash[2], koz = A_dash[3];
+        double koz = A_dash[0], A_dash_x = A_dash[1], A_dash_y = A_dash[2], A_dash_z = A_dash[3];
 
         //
         // MOVE TO POINT A' WHILE AVOIDING KOZ AND GET ROBOT IN CORRECT ORIENTATION FOR LASER
@@ -91,46 +91,43 @@ public class YourService extends KiboRpcService {
         }
     }
 
-    // scan QR code
+    /**
+     * scanQR scans the QR code.
+     * @param loop_max
+     * @return double array of x,y,z coordinates and kox-pattern
+     */
     public double[] scanQR(int loop_max) {
         String contents = null;
         int count = 0;
         double koz_pattern = 0; // KOZ pattern between 1 and 8
         double x = 0, y = 0, z = 0; // don't need orientation of point A' since it's always (0, 0, -0.707, 0.707)
 
+        api.flashlightControlFront(1f);
         while (contents == null && count < loop_max) {
-            api.flashlightControlFront(1f);
-            Mat src_mat = new Mat(undistort(api.getMatNavCam()), cropImage(40));
-            Bitmap bMap = resizeImage(src_mat, 2000, 1500);
-
-            int[] intArray = new int[bMap.getWidth() * bMap.getHeight()];
-            bMap.getPixels(intArray, 0, bMap.getWidth(), 0, 0, bMap.getWidth(), bMap.getHeight());
-
-            LuminanceSource source = new RGBLuminanceSource(bMap.getWidth(), bMap.getHeight(), intArray);
-            BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
-
+            BinaryBitmap bitmap = getImgBinBitmap();
             try {
                 com.google.zxing.Result result = new QRCodeReader().decode(bitmap);
                 contents = result.getText();
                 Log.d("QR[status]:", " Detected");
-
-                String[] multi_contents = contents.split(", ");
-                koz_pattern = Double.parseDouble(multi_contents[1]);
-                x = Double.parseDouble(multi_contents[3]);
-                y = Double.parseDouble(multi_contents[5]);
-                z = Double.parseDouble(multi_contents[7]);
+                String[] format_split = contents.split(",");
+                String[] p_multi_contents = format_split[0].split(":");
+                String[] x_multi_contents = format_split[1].split(":");
+                String[] y_multi_contents = format_split[2].split(":");
+                String[] z_multi_contents = format_split[3].split(":");
+                koz_pattern = Double.parseDouble(p_multi_contents[1]);
+                x = Double.parseDouble(x_multi_contents[1]);
+                y = Double.parseDouble(y_multi_contents[1]);
+                z = Double.parseDouble(z_multi_contents[1]);
             }
             catch (Exception e) {
                 Log.d("QR[status]:", " Not detected");
             }
-
-            ++count;
+            count++;
         }
-
         api.flashlightControlFront(0f);
-        api.sendDiscoveredQR(contents); // send the content of QR code for judge
 
-        return new double[] {x, y, z, koz_pattern};
+        api.sendDiscoveredQR(contents); // send the content of QR code for judge
+        return new double[] {koz_pattern, x, y, z};
     }
 
     // undistort image to reduce time taken for QR scanning
@@ -169,6 +166,22 @@ public class YourService extends KiboRpcService {
 
         Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         matToBitmap(src, bitmap, false);
+        return bitmap;
+    }
+
+    /**
+     * getImgBinBitmap gets the image from the camera, and returns a binary bitmap for it.
+     * @return BinaryBitmap for camera image
+     */
+    public BinaryBitmap getImgBinBitmap() {
+        Mat src_mat = new Mat(undistort(api.getMatNavCam()), cropImage(40));
+        Bitmap bMap = resizeImage(src_mat, 2000, 1500);
+
+        int[] intArray = new int[bMap.getWidth() * bMap.getHeight()];
+        bMap.getPixels(intArray, 0, bMap.getWidth(), 0, 0, bMap.getWidth(), bMap.getHeight());
+
+        LuminanceSource source = new RGBLuminanceSource(bMap.getWidth(), bMap.getHeight(), intArray);
+        BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
         return bitmap;
     }
 

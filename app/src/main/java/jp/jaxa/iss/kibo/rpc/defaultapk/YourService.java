@@ -1,11 +1,13 @@
 package jp.jaxa.iss.kibo.rpc.defaultapk;
 
+import gov.nasa.arc.astrobee.Kinematics;
 import jp.jaxa.iss.kibo.rpc.api.KiboRpcService;
 import gov.nasa.arc.astrobee.Result;
 import gov.nasa.arc.astrobee.types.Point;
 import gov.nasa.arc.astrobee.types.Quaternion;
 
 import android.graphics.Bitmap;
+import android.os.SystemClock;
 import android.util.Log;
 
 import com.google.zxing.BinaryBitmap;
@@ -14,6 +16,8 @@ import com.google.zxing.RGBLuminanceSource;
 import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.qrcode.QRCodeReader;
 
+import org.opencv.aruco.Aruco;
+import org.opencv.aruco.Dictionary;
 import org.opencv.core.Rect;
 import org.opencv.core.Mat;
 import org.opencv.core.CvType;
@@ -21,6 +25,8 @@ import org.opencv.imgproc.Imgproc;
 import org.opencv.core.Size;
 import static org.opencv.android.Utils.matToBitmap;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -40,7 +46,7 @@ public class YourService extends KiboRpcService {
         moveToWrapper(11.21+0.0422, -9.80, 4.79+0.0826, 0, 0, -0.707, 0.707);
 
         // scan QR code
-        final double[]A_dash = scanQR(3);
+        final double[]A_dash = scanQR(40);
 
         // get position and KOZ pattern
         double koz = A_dash[0], A_dash_x = A_dash[1], A_dash_y = A_dash[2], A_dash_z = A_dash[3];
@@ -97,40 +103,29 @@ public class YourService extends KiboRpcService {
      * @return double array of x,y,z coordinates and kox-pattern
      */
     public double[] scanQR(int loop_max) {
-        String contents = null;
-        int count = 0;
         double koz_pattern = 0; // KOZ pattern between 1 and 8
         double x = 0, y = 0, z = 0; // don't need orientation of point A' since it's always (0, 0, -0.707, 0.707)
-
-        api.flashlightControlFront(1f);
-        while (contents == null && count < loop_max) {
-            BinaryBitmap bitmap = getImgBinBitmap();
-            try {
-                com.google.zxing.Result result = new QRCodeReader().decode(bitmap);
-                contents = result.getText();
-                Log.d("QR[status]:", " Detected");
-                String[] format_split = contents.split(",");
-                String[] p_multi_contents = format_split[0].split(":");
-                String[] x_multi_contents = format_split[1].split(":");
-                String[] y_multi_contents = format_split[2].split(":");
-                String[] z_multi_contents = format_split[3].split(":");
-                koz_pattern = Double.parseDouble(p_multi_contents[1]);
-                x = Double.parseDouble(x_multi_contents[1]);
-                y = Double.parseDouble(y_multi_contents[1]);
-                z = Double.parseDouble(z_multi_contents[1]);
-            }
-            catch (Exception e) {
-                Log.d("QR[status]:", " Not detected");
-            }
-            count++;
+        String contents = readQR(loop_max);
+        if (contents != null) {
+            String[] format_split = contents.split(",");
+            String[] p_multi_contents = format_split[0].split(":");
+            String[] x_multi_contents = format_split[1].split(":");
+            String[] y_multi_contents = format_split[2].split(":");
+            String[] z_multi_contents = format_split[3].split(":");
+            koz_pattern = Double.parseDouble(p_multi_contents[1]);
+            x = Double.parseDouble(x_multi_contents[1]);
+            y = Double.parseDouble(y_multi_contents[1]);
+            z = Double.parseDouble(z_multi_contents[1]);
+            api.sendDiscoveredQR(contents); // send the content of QR code for judge
         }
-        api.flashlightControlFront(0f);
-
-        api.sendDiscoveredQR(contents); // send the content of QR code for judge
         return new double[] {koz_pattern, x, y, z};
     }
 
-    // undistort image to reduce time taken for QR scanning
+    /**
+     * undistort undistorts image to reduce time taken for QR scanning
+     * @param src
+     * @return Mat dst
+     */
     public Mat undistort(Mat src) {
         Mat dst = new Mat(1280, 960, CvType.CV_8UC1);
         Mat cameraMatrix = new Mat(3, 3, CvType.CV_32FC1);
@@ -144,8 +139,12 @@ public class YourService extends KiboRpcService {
         return dst;
     }
 
-    // crop image to reduce time taken for QR scanning
-    public Rect cropImage(int percent_crop) {
+    /**
+     * cropImage crops image to reduce time taken for QR scanning
+     * @param percent_crop
+     * @return Cropped image
+     */
+    private Rect cropImage(int percent_crop) {
         double ratio = NAV_MAX_COL / NAV_MAX_ROW;
 
         double percent_row = percent_crop/2;
@@ -159,8 +158,14 @@ public class YourService extends KiboRpcService {
         return new Rect(offset_col, offset_row, (int) cols, (int) rows);
     }
 
-    // resize image to reduce time taken for QR scanning
-    public Bitmap resizeImage(Mat src, int width, int height) {
+    /**
+     * resizeImage resizes image to reduce time taken for QR scanning
+     * @param src
+     * @param width
+     * @param height
+     * @return Bitmap of resized image
+     */
+    private Bitmap resizeImage(Mat src, int width, int height) {
         Size size = new Size(width, height);
         Imgproc.resize(src, src, size);
 
@@ -173,7 +178,7 @@ public class YourService extends KiboRpcService {
      * getImgBinBitmap gets the image from the camera, and returns a binary bitmap for it.
      * @return BinaryBitmap for camera image
      */
-    public BinaryBitmap getImgBinBitmap() {
+    private BinaryBitmap getImgBinBitmap() {
         Mat src_mat = new Mat(undistort(api.getMatNavCam()), cropImage(40));
         Bitmap bMap = resizeImage(src_mat, 2000, 1500);
 
@@ -185,7 +190,147 @@ public class YourService extends KiboRpcService {
         return bitmap;
     }
 
-    //
+    /**
+     * readQR is used to read a QR code
+     * @param loop_max
+     * @return String content of the QR code
+     */
+    public String readQR(int loop_max) {
+        int count = 0;
+        String contents = null;
+        api.flashlightControlFront(0f);
+        while (contents == null && count < loop_max) {
+            if (count < 40) {
+                api.flashlightControlFront((count+1)*0.025f);
+            }
+            BinaryBitmap bitmap = getImgBinBitmap();
+            try {
+                com.google.zxing.Result result = new QRCodeReader().decode(bitmap);
+                contents = result.getText();
+                Log.d("QR[status]:", " Detected");
+
+            }
+            catch (Exception e) {
+                Log.d("QR[status]:", " Not detected");
+            }
+            count++;
+        }
+        api.flashlightControlFront(0f);
+        return contents;
+    }
+
+    /**
+     * Intersection is used in AR_event
+     * @param p
+     * @return
+     */
+    private double[] Intersection(double p[][])
+    {
+        /*float AR_diagonal = 0.07071067812f;*/
+        float AR_diagonal = 0.1199103832f;
+        double[] center = new double[3];
+
+        double a = (p[1][0] - p[0][0]) * (p[3][0] - p[2][0]);
+        double b = (p[1][0] - p[0][0]) * (p[3][1] - p[2][1]);
+        double c = (p[3][0] - p[2][0]) * (p[1][1] - p[0][1]);
+
+        center[0] = (a * p[0][1] + b * p[2][0] - a * p[2][1] - c * p[0][0]) / (b - c);
+        center[1] = ((p[1][1] - p[0][1]) * (center[0] - p[0][0]) / (p[1][0] - p[0][0])) + p[0][1];
+
+        double x_l1 = Math.pow(p[0][0] - p[1][0], 2);
+        double y_l1 = Math.pow(p[0][1] - p[1][1], 2);
+        double x_l2 = Math.pow(p[3][0] - p[2][0], 2);
+        double y_l2 = Math.pow(p[3][1] - p[2][1], 2);
+        double avg = (Math.sqrt(x_l1 + y_l1) + Math.sqrt(x_l2 + y_l2)) / 2;
+
+        center[2] = avg / AR_diagonal;
+        Log.d("AR[info]: ", center[0] + ", " + center[1] + ", " + center[2]);
+        return center;
+    }
+
+    /**
+     * AR_event used for AR stuff
+     * @param px
+     * @param py
+     * @param pz
+     * @param qx
+     * @param qy
+     * @param qz
+     * @param qw
+     * @param count_max
+     * @return
+     */
+    public double[] AR_event(float px, float py, float pz, float qx, float qy, float qz, float qw, int count_max)
+    {
+        int contents = 0, count = 0;
+        double result[] = new double[3];
+
+        while (contents == 0 && count < count_max)
+        {
+            Log.d("AR[status]:", " start");
+            long start_time = SystemClock.elapsedRealtime();
+            //                                            //
+            moveToWrapper(px, py, pz, qx, qy, qz, qw);
+
+
+
+            //////////////////////////////////////////////////////////////////////////////////////////////////////
+            Mat source = undistort(api.getMatNavCam());
+            Kinematics robot = api.getTrustedRobotKinematics();
+            Mat ids = new Mat();
+            Dictionary dictionary = Aruco.getPredefinedDictionary(Aruco.DICT_5X5_250);
+            List<Mat> corners = new ArrayList<>();
+
+            try
+            {
+                Aruco.detectMarkers(source, dictionary, corners, ids);
+                contents = (int) ids.get(0, 0)[0];
+
+                /*if(sent_AR) api.judgeSendDiscoveredAR(Integer.toString(contents));*/
+                Log.d("AR[status]:", " Detected");
+
+
+                double[][] AR_corners =
+                        {
+                                {(int) corners.get(0).get(0, 0)[0], (int) corners.get(0).get(0, 0)[1]},
+                                {(int) corners.get(0).get(0, 2)[0], (int) corners.get(0).get(0, 2)[1]},
+                                {(int) corners.get(0).get(0, 1)[0], (int) corners.get(0).get(0, 1)[1]},
+                                {(int) corners.get(0).get(0, 3)[0], (int) corners.get(0).get(0, 3)[1]}
+                        };
+                double[] AR_info = Intersection(AR_corners);
+
+
+                Point point = new Point(px, py, pz);
+                if(robot != null)
+                {
+                    point = robot.getPosition();
+                    Log.d("getKinematics[status]:"," Finished");
+                }
+                result[0] = point.getX() + (AR_info[0]- NAV_MAX_COL/2) / AR_info[2];
+                result[1] = point.getY();
+                result[2] = point.getZ() + (AR_info[1]- NAV_MAX_ROW/2) / AR_info[2];
+            }
+            catch (Exception e)
+            {
+                Log.d("AR[status]:", " Not detected");
+            }
+            //////////////////////////////////////////////////////////////////////////////////////////////////////
+            Log.d("AR[status]:", " stop");
+            long stop_time = SystemClock.elapsedRealtime();
+
+
+
+            Log.d("AR[count]:", " " + count);
+            Log.d("AR[total_time]:"," "+ (stop_time-start_time)/1000);
+            count++;
+        }
+        return result;
+    }
+
+    /**
+     * Stops the thread for a second
+     * @param ms
+     */
     public static void wait(int ms) {
         try
         {

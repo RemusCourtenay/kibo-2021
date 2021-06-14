@@ -3,6 +3,7 @@ package jp.jaxa.iss.kibo.rpc.defaultapk;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Logger;
 
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.RobotOrder;
 
@@ -24,6 +25,7 @@ public class ExpeditionWrapper {
     private final List<RobotOrder> orders;
     // Index of currently active order
     private int currentOrder = 0;
+
 
     /**
      * Sole constructor. The orders parameter must contain a full array of orders representing an

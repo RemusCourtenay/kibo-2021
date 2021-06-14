@@ -2,9 +2,9 @@ package jp.jaxa.iss.kibo.rpc.defaultapk;
 
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.RobotOrder;
 
-public class MovementWrapper {
+public class ExpeditionWrapper {
 
-    public MovementWrapper(RobotOrder[] orders) {
+    public ExpeditionWrapper(RobotOrder[] orders) {
 
 
     }

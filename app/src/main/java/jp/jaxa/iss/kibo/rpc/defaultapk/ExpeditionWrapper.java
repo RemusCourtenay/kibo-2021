@@ -2,10 +2,15 @@ package jp.jaxa.iss.kibo.rpc.defaultapk;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.RobotOrder;
+import jp.jaxa.iss.kibo.rpc.defaultapk.orders.RobotOrderBuilder;
+import jp.jaxa.iss.kibo.rpc.defaultapk.orders.RobotOrderType;
 
 
 /**
@@ -21,6 +26,24 @@ import jp.jaxa.iss.kibo.rpc.defaultapk.orders.RobotOrder;
  */
 public class ExpeditionWrapper {
 
+    private static final HashMap<String, RobotOrderType> STRING_ORDER_TYPE_MAP;
+    static {
+        STRING_ORDER_TYPE_MAP = new HashMap<>();
+        STRING_ORDER_TYPE_MAP.put("START_MISSION", RobotOrderType.START_MISSION_ORDER);
+        STRING_ORDER_TYPE_MAP.put("Do not use this, use the bracket format instead", RobotOrderType.MOVE_ORDER);
+        STRING_ORDER_TYPE_MAP.put("SCAN_AR_CODE", RobotOrderType.SCAN_AR_CODE_ORDER);
+        STRING_ORDER_TYPE_MAP.put("FIRE_LASER", RobotOrderType.FIRE_LASER_ORDER);
+        STRING_ORDER_TYPE_MAP.put("PLAY_SOUND", RobotOrderType.PLAY_SOUND_ORDER);
+    }
+    private static final String MOVE_ORDER_PATTERN =
+                    // Regex pattern for move order format, allows decimals
+                    "(?:\\{\\[)" +                                      // {[
+                    "((\\d+([\\.]\\d+)?)[,]){2}(\\d+([\\.]\\d+)?){1}" + // 1,2,3
+                    "(?:\\]\\[)" +                                      // ][
+                    "((\\d+([\\.]\\d+)?)[,]){3}(\\d+([\\.]\\d+)?){1}" + // 1,2,3,4
+                    "(?:\\]\\})";                                       // ]}
+
+    private static final String SPLIT_ORDER_CHARACTER = "|";
     // Immutable list of orders
     private final List<RobotOrder> orders;
     // Index of currently active order
@@ -28,15 +51,20 @@ public class ExpeditionWrapper {
 
 
     /**
-     * Sole constructor. The orders parameter must contain a full array of orders representing an
-     * entire expedition as the order array cannot be changed once instantiated. The expedition
-     * will attempt each order in the array sequentially so ordering must be retained.
+     * Sole constructor. The orders parameter must contain a full string representation of the orders for
+     * an entire expedition as the order array cannot be changed once instantiated. The expedition
+     * will attempt each order in the string sequentially so ordering must be retained.
      *
-     * @param orders    an array of orders for the robot to follow
-     * @see             RobotOrder
+     * @param fullOrderString    A full string containing all orders correctly formatted
+     * @see   RobotOrder
      */
-    public ExpeditionWrapper(RobotOrder[] orders) {
-        this.orders = Collections.unmodifiableList(Arrays.asList(orders));
+    public ExpeditionWrapper(String fullOrderString) {
+        RobotOrderBuilder orderBuilder = new RobotOrderBuilder(
+                STRING_ORDER_TYPE_MAP,
+                MOVE_ORDER_PATTERN,
+                SPLIT_ORDER_CHARACTER
+        );
+        this.orders = Collections.unmodifiableList(orderBuilder.buildOrders(fullOrderString));
         // TODO...
     }
 

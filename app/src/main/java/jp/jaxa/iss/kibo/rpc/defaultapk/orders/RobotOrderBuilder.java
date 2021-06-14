@@ -42,7 +42,9 @@ public class RobotOrderBuilder {
             RobotOrderType type;
             if ((type = this.stringOrderTypeMap.get(orderText)) != null) {
                 RobotOrder order;
-                if (type == RobotOrderType.SCAN_AR_CODE_ORDER) {
+                if (type == RobotOrderType.START_MISSION_ORDER) {
+                    order = buildStartMissionOrder();
+                } else if (type == RobotOrderType.SCAN_AR_CODE_ORDER) {
                     order = buildScanARCodeOrder();
                 } else if (type == RobotOrderType.FIRE_LASER_ORDER) {
                     order = buildFireLaserOrder();
@@ -63,6 +65,10 @@ public class RobotOrderBuilder {
     }
 
     RobotMoveOrder buildMoveOrder() {
+        return null; // TODO...
+    }
+
+    RobotMoveOrder buildStartMissionOrder() {
         return null; // TODO...
     }
 

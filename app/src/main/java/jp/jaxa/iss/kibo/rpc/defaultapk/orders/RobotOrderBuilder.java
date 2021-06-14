@@ -6,4 +6,20 @@ public class RobotOrderBuilder {
         return null; // TODO...
     }
 
+    private static RobotMoveOrder buildMoveOrder() {
+        return null; // TODO...
+    }
+
+    private static RobotFireLaserOrder buildFireLaserOrder() {
+        return null; // TODO...
+    }
+
+    private static RobotScanARCodeOrder buildScanARCodeOrder() {
+        return null; // TODO...
+    }
+
+    private static RobotPlaySoundOrder buildPlaySoundOrder() {
+        return null; // TODO...
+    }
+
 }

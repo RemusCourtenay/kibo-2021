@@ -22,14 +22,13 @@ class RobotMoveOrder extends RobotOrder {
 
     @Override
     public Result attemptOrder() {
-        MoveToHack move = new MoveToHack();
-        Result result = move.moveTo(targetPoint, targetQuaternion, true);
+        Result result = api.moveTo(targetPoint, targetQuaternion, true);
 
         for(int i = 0; i < LOOP_MAX; i++){
             if(result.hasSucceeded()){
                 break;
             }
-            result = move.moveTo(targetPoint, targetQuaternion, true);
+            result = api.moveTo(targetPoint, targetQuaternion, true);
         }
 
         return result; // TODO...

@@ -124,12 +124,12 @@ public class RobotOrderBuilder {
     private Map<String, RobotOrderType> buildStringOrderTypeMapFromStringsFile() {
         HashMap<String, RobotOrderType> stringOrderTypeMap = new HashMap<>();
 
-        // Big shoutout to android for making me have to do this....
-        stringOrderTypeMap.put(context.getString(R.string.start_mission_order_key), RobotOrderType.START_MISSION_ORDER);
-        stringOrderTypeMap.put(context.getString(R.string.move_order_key), RobotOrderType.MOVE_ORDER);
-        stringOrderTypeMap.put(context.getString(R.string.scan_ar_code_order_key), RobotOrderType.SCAN_AR_CODE_ORDER);
-        stringOrderTypeMap.put(context.getString(R.string.fire_laser_order_key), RobotOrderType.FIRE_LASER_ORDER);
-        stringOrderTypeMap.put(context.getString(R.string.play_sound_order_key), RobotOrderType.PLAY_SOUND_ORDER);
+        for (RobotOrderType orderType: RobotOrderType.values()) {
+            stringOrderTypeMap.put(
+                    this.context.getString(orderType.getOrderKey()),
+                    orderType
+            );
+        }
 
         return stringOrderTypeMap;
     }

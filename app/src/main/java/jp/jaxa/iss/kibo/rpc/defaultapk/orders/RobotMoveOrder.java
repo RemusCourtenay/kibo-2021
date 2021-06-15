@@ -9,7 +9,7 @@ class RobotMoveOrder extends RobotOrder {
 
     private final Point targetPoint;
     private final Quaternion targetQuaternion;
-    final int LOOP_MAX;
+    private final int LOOP_MAX;
 
 
 
@@ -21,7 +21,7 @@ class RobotMoveOrder extends RobotOrder {
     }
 
     @Override
-    public Result attemptOrder() {
+    protected Result attemptOrderImplementation() {
         Result result = api.moveTo(targetPoint, targetQuaternion, true);
 
         for(int i = 0; i < LOOP_MAX; i++){
@@ -31,7 +31,7 @@ class RobotMoveOrder extends RobotOrder {
             result = api.moveTo(targetPoint, targetQuaternion, true);
         }
 
-        return result; // TODO...
+        return result;
     }
 
 }

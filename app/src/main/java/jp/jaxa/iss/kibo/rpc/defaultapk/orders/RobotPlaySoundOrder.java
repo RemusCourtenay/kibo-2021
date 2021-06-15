@@ -5,7 +5,7 @@ import gov.nasa.arc.astrobee.Result;
 class RobotPlaySoundOrder extends RobotOrder {
 
     @Override
-    public Result attemptOrder() {
+    protected Result attemptOrderImplementation() {
         return null; // TODO...
     }
 }

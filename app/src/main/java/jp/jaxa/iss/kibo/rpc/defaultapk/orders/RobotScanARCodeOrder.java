@@ -4,9 +4,19 @@ import gov.nasa.arc.astrobee.Result;
 
 class RobotScanARCodeOrder extends RobotOrder {
 
+    private int scanResult;
+
     @Override
-    public Result attemptOrder() {
+    protected Result attemptOrderImplementation() {
+
+        scanResult = 0; // Get result from other teams code here
+
         return null; // TODO...
+    }
+
+    @Override
+    public RobotOrderResult attemptOrder() {
+        return new RobotOrderResult(attemptOrderImplementation(), this.scanResult);
     }
 
 }

@@ -5,6 +5,9 @@ import jp.jaxa.iss.kibo.rpc.api.KiboRpcService;
 
 public abstract class RobotOrder extends KiboRpcService {
 
-    public abstract Result attemptOrder();
+    public RobotOrderResult attemptOrder() {
+        return new RobotOrderResult(attemptOrderImplementation());
+    }
 
+    protected abstract Result attemptOrderImplementation();
 }

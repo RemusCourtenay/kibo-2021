@@ -75,7 +75,7 @@ public class RobotOrderBuilder {
 
             // If it's not in the map then it's probably a move order, checking it fits the format so we don't get errors later
             } else if (fitsMoveOrderFormat(orderText)) {
-                orders.add(buildMoveOrder());
+                orders.add(buildMoveOrder(orderText));
 
             // Doesn't fit any of the mapped values and isn't a correctly formatted move order so throwing exception
             } else {
@@ -89,8 +89,24 @@ public class RobotOrderBuilder {
      * Constructors for each order type
      */
 
-    private RobotMoveOrder buildMoveOrder() {
-        return null; // TODO...
+    private RobotMoveOrder buildMoveOrder(String orderText) {
+
+        //Maximum number of times Kibo Robot will attempt to move
+        int LOOP_MAX = 3;
+
+        //Separates orderText into two strings, one for position arguments and one for quaternion arguments
+        String posStr = orderText.substring(2, orderText.indexOf("]"));
+        String quatStr = orderText.substring(orderText.indexOf("[", 2) + 1, orderText.length() - 2);
+
+        //Creates arrays to store arguments
+        String[] pos = posStr.split(",");
+        String[] quat = quatStr.split(",");
+
+        //Uses argument arrays to create a moveOrder
+        RobotMoveOrder moveOrder = new RobotMoveOrder(LOOP_MAX, Double.parseDouble(pos[0]), Double.parseDouble(pos[1]), Double.parseDouble(pos[2]), Float.parseFloat(quat[0]),
+                Float.parseFloat(quat[1]), Float.parseFloat(quat[2]), Float.parseFloat(quat[3]));
+
+        return moveOrder; // TODO...
     }
 
     private RobotStartMissionOrder buildStartMissionOrder() {

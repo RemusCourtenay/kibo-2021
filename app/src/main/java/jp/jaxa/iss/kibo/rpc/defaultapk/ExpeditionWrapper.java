@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.RobotOrder;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.RobotOrderBuilder;
+import jp.jaxa.iss.kibo.rpc.defaultapk.orders.RobotOrderResult;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.RobotOrderType;
 
 
@@ -28,33 +29,42 @@ import jp.jaxa.iss.kibo.rpc.defaultapk.orders.RobotOrderType;
  */
 public class ExpeditionWrapper {
 
-
-    private final List<RobotOrder> orders;
-
+    // Builder object for translating order strings into lists of RobotOrders
+    private final RobotOrderBuilder orderBuilder;
 
     /**
-     * Sole constructor. The orders parameter must contain a full string representation of the orders for
-     * an entire expedition as the order array cannot be changed once instantiated. The expedition
-     * will attempt each order in the string sequentially so ordering must be retained.
-     *
-     * @param fullOrderString    A full string containing all orders correctly formatted
-     * @see   RobotOrder
+     * Sole constructor. Requires the Context of the Activity it's called from to access data
+     * stored in the resources folders.
      */
-    public ExpeditionWrapper(Context context, String fullOrderString) {
-        RobotOrderBuilder orderBuilder = new RobotOrderBuilder(context);
-        this.orders = Collections.unmodifiableList(orderBuilder.buildOrders(fullOrderString));
+    public ExpeditionWrapper(Context context) {
+        this.orderBuilder = new RobotOrderBuilder(context);
     }
 
     /**
      * Starts the wrapper iterating through it's orders. Will cause it's caller to block for a
      * long period as multithreading of orders is not implemented.
+     * The orders parameter must contain a full string representation of the orders for
+     * an entire expedition stage as the order array cannot be changed once instantiated.
+     * The expedition will attempt each order in the string sequentially so ordering must be
+     * retained.
+     *
+     * @param fullOrderString a single string containing a full set of orders using correct formatting
+     * @return the RobotOrderResult of the final command in the order string
      */
-    public void startExpedition() {
+    public RobotOrderResult attemptExpeditionStage(String fullOrderString) { // Should probably throw a specific exception when an order fails rather than RuntimeException but whatever
+        List<RobotOrder> orders = this.orderBuilder.buildOrders(fullOrderString);
 
+        RobotOrderResult result = null;
         // Should probably have more going on here but whatever
         for (RobotOrder order: orders) {
-            order.attemptOrder();
+            result = order.attemptOrder();
         }
 
+        // Added so that the IDE will stop telling me that result might be null...
+        if (result != null) {
+            return result;
+        } else {
+            throw new RuntimeException("Order string: \"" + fullOrderString + "\" returned a null result for it's final order");
+        }
     }
 }

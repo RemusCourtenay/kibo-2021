@@ -14,6 +14,9 @@ class RobotScanARCodeOrder extends RobotOrder {
         return null; // TODO...
     }
 
+    /**
+     * Overriding the standard attemptOrder() method to allow for the addition of the scan result
+     */
     @Override
     public RobotOrderResult attemptOrder() {
         return new RobotOrderResult(attemptOrderImplementation(), this.scanResult);

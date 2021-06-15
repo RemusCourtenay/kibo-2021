@@ -12,7 +12,6 @@ class RobotMoveOrder extends RobotOrder {
     private final int LOOP_MAX;
 
 
-
     public RobotMoveOrder(int loopMax, double posX, double posY, double posZ, float quaX, float quaY, float quaZ, float quaW){
         targetPoint = new Point(posX, posY, posZ);
         targetQuaternion = new Quaternion(quaX, quaY, quaZ, quaW);

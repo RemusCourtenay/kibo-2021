@@ -1,3 +1,39 @@
 <resources>
     <string name="app_name">DefaultApk</string>
+
+    <string name="start_mission_order_key">START_MISSION</string>
+    <string name="move_order_key">Do not use this, use the bracket format instead</string>
+    <string name="scan_ar_code_order_key">SCAN_AR_CODE</string>
+    <string name="fire_laser_order_key">FIRE_LASER</string>
+    <string name="play_sound_order_key">PLAY_SOUND</string>
+
+    <!-- Regex for move orders, fits decimal and non decimal variants of the following:
+         {[1,2,3][1,2,3,4]}
+         {[1.00,2,3][1.12,2.09,3.45,6.78910]}
+         Does not allow for spaces!
+    -->
+    <string name="move_order_regex_pattern">(?:\\{\\[)((\\d+([\\.]\\d+)?)[,]){2}(\\d+([\\.]\\d+)?){1}(?:\\]\\[)((\\d+([\\.]\\d+)?)[,]){3}(\\d+([\\.]\\d+)?){1}(?:\\]\\})</string>
+
+    <!-- Character used to split orders, doesn't allow for spaces. Expected look is:
+     {[1,2,3][1,2,3,4]}|SCAN_AR_CODE|{[1,2,3][1,2,3,4]}
+    -->
+    <string name="order_split_character">|</string>
+
+    <!--
+    Order String section, Order strings consist of multiple robot orders following the formatting
+    described above, separated by the order split character
+    -->
+    <string name="move_to_scan_order_string">Put order string for first stage of mission here</string>
+
+    <string name="move_to_laser_order_string_variant_1">Order string for variant 1</string>
+    <string name="move_to_laser_order_string_variant_2">Order string for variant 2</string>
+    <string name="move_to_laser_order_string_variant_3">Order string for variant 3</string>
+    <string name="move_to_laser_order_string_variant_4">Order string for variant 4</string>
+    <string name="move_to_laser_order_string_variant_5">Order string for variant 5</string>
+    <string name="move_to_laser_order_string_variant_6">Order string for variant 6</string>
+    <string name="move_to_laser_order_string_variant_7">Order string for variant 7</string>
+    <string name="move_to_laser_order_string_variant_8">Order string for variant 8</string>
+
+    <string name="move_to_finish_order_string">Put order string for final stage of mission here</string>
+
 </resources>

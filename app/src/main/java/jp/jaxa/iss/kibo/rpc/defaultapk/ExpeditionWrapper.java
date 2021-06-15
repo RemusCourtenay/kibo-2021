@@ -37,11 +37,7 @@ public class ExpeditionWrapper {
     }
     private static final String MOVE_ORDER_PATTERN =
                     // Regex pattern for move order format, allows decimals
-                    "(?:\\{\\[)" +                                      // {[
-                    "((\\d+([\\.]\\d+)?)[,]){2}(\\d+([\\.]\\d+)?){1}" + // 1,2,3
-                    "(?:\\]\\[)" +                                      // ][
-                    "((\\d+([\\.]\\d+)?)[,]){3}(\\d+([\\.]\\d+)?){1}" + // 1,2,3,4
-                    "(?:\\]\\})";                                       // ]}
+                    "(?:\\{\\[)((\\d+([\\.]\\d+)?)[,]){2}(\\d+([\\.]\\d+)?){1}(?:\\]\\[)((\\d+([\\.]\\d+)?)[,]){3}(\\d+([\\.]\\d+)?){1}(?:\\]\\})";
 
     private static final String SPLIT_ORDER_CHARACTER = "|";
     // Immutable list of orders

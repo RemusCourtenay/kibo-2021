@@ -54,6 +54,8 @@ public class RobotOrderBuilder {
             // if .get() returns null then the type isn't in the string to order map
             if ((type = this.stringOrderTypeMap.get(orderText)) != null) {
                 RobotOrder order;
+
+                // Wish I could use a switch statement..
                 if (type == RobotOrderType.START_MISSION_ORDER) {
                     order = buildStartMissionOrder();
                 } else if (type == RobotOrderType.SCAN_AR_CODE_ORDER) {
@@ -62,6 +64,8 @@ public class RobotOrderBuilder {
                     order = buildFireLaserOrder();
                 } else if (type == RobotOrderType.PLAY_SOUND_ORDER) {
                     order = buildPlaySoundOrder();
+                } else if (type == RobotOrderType.FINISH_MISSION_ORDER) {
+                    order = buildFinishMissionOrder();
                 } else if (type == RobotOrderType.MOVE_ORDER) {
                     throw new RuntimeException("Move orders should be written using bracket format");
                 } else {
@@ -89,8 +93,8 @@ public class RobotOrderBuilder {
         return null; // TODO...
     }
 
-    private RobotMoveOrder buildStartMissionOrder() {
-        return null; // TODO...
+    private RobotStartMissionOrder buildStartMissionOrder() {
+        return new RobotStartMissionOrder();
     }
 
     private RobotScanARCodeOrder buildScanARCodeOrder() {
@@ -103,6 +107,10 @@ public class RobotOrderBuilder {
 
     private RobotPlaySoundOrder buildPlaySoundOrder() {
         return null; // TODO...
+    }
+
+    private RobotFinishMissionOrder buildFinishMissionOrder() {
+        return new RobotFinishMissionOrder();
     }
 
 

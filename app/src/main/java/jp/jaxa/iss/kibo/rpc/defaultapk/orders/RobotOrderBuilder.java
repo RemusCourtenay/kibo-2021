@@ -46,8 +46,12 @@ public class RobotOrderBuilder {
         ArrayList<RobotOrder> orders = new ArrayList<>();
         String[] orderTexts = fullOrderString.split(this.orderSplitCharacter);
 
+
+        // Trying to figure out what type of order each chunk of the string is
         for (String orderText: orderTexts) {
             RobotOrderType type;
+
+            // if .get() returns null then the type isn't in the string to order map
             if ((type = this.stringOrderTypeMap.get(orderText)) != null) {
                 RobotOrder order;
                 if (type == RobotOrderType.START_MISSION_ORDER) {
@@ -64,36 +68,51 @@ public class RobotOrderBuilder {
                     throw new RuntimeException("RobotOrderType: " + type.name() + " not implemented in buildOrders");
                 }
                 orders.add(order);
+
+            // If it's not in the map then it's probably a move order, checking it fits the format so we don't get errors later
             } else if (fitsMoveOrderFormat(orderText)) {
                 orders.add(buildMoveOrder());
+
+            // Doesn't fit any of the mapped values and isn't a correctly formatted move order so throwing exception
             } else {
                 throw new RuntimeException("Order: " + orderText + " doesn't fit any format described by the strings.xml file");
             }
         }
-
         return orders;
     }
 
-    RobotMoveOrder buildMoveOrder() {
+    /**
+     * Constructors for each order type
+     */
+
+    private RobotMoveOrder buildMoveOrder() {
         return null; // TODO...
     }
 
-    RobotMoveOrder buildStartMissionOrder() {
+    private RobotMoveOrder buildStartMissionOrder() {
         return null; // TODO...
     }
 
-    RobotScanARCodeOrder buildScanARCodeOrder() {
+    private RobotScanARCodeOrder buildScanARCodeOrder() {
         return null; // TODO...
     }
 
-    RobotFireLaserOrder buildFireLaserOrder() {
+    private RobotFireLaserOrder buildFireLaserOrder() {
         return null; // TODO...
     }
 
-    RobotPlaySoundOrder buildPlaySoundOrder() {
+    private RobotPlaySoundOrder buildPlaySoundOrder() {
         return null; // TODO...
     }
 
+
+    /**
+     * Helper function for building the order string decoder. Maps strings from the strings.xml
+     * file to orderTypes. Maps a value to moveOrderType but this value shouldn't be used, move
+     * orders should be written using the bracket format instead.
+     *
+     * @return A map of strings to order types for decoding order strings
+     */
     private Map<String, RobotOrderType> buildStringOrderTypeMapFromStringsFile() {
         HashMap<String, RobotOrderType> stringOrderTypeMap = new HashMap<>();
 
@@ -107,6 +126,13 @@ public class RobotOrderBuilder {
         return stringOrderTypeMap;
     }
 
+    /**
+     * Helper function that checks if possible move order strings fit the format defined in the
+     * strings.xml file.
+     *
+     * @param orderText An order chunk that is possibly a move order
+     * @return          whether or not the chunk was a valid move order
+     */
     private boolean fitsMoveOrderFormat(String orderText) {
         Matcher moveOrderMatcher = this.moveOrderPattern.matcher(orderText);
         return moveOrderMatcher.matches();

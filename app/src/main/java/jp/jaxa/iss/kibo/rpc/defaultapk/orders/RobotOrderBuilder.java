@@ -3,12 +3,15 @@ package jp.jaxa.iss.kibo.rpc.defaultapk.orders;
 import android.content.Context;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import gov.nasa.arc.astrobee.types.Point;
+import gov.nasa.arc.astrobee.types.Quaternion;
 import jp.jaxa.iss.kibo.rpc.defaultapk.R;
 
 /**
@@ -25,13 +28,21 @@ public class RobotOrderBuilder {
 
     private final Map<String, RobotOrderType> stringOrderTypeMap;
     private final Pattern moveOrderPattern;
+
+    // Character that splits orders
     private final String orderSplitCharacter;
+    // Character that splits numbers within the brackets inside move orders
+    private final String orderInnerSplitCharacter;
+    // Max number of times the move command will loop
+    private final int moveLoopMax;
 
     public RobotOrderBuilder(Context context) {
         this.context = context;
         this.stringOrderTypeMap = buildStringOrderTypeMapFromStringsFile();
         this.moveOrderPattern = Pattern.compile(context.getString(R.string.move_order_regex_pattern)); // TODO... add error check
         this.orderSplitCharacter = context.getString(R.string.order_split_character);
+        this.orderInnerSplitCharacter = context.getString(R.string.order_inner_split_character);
+        this.moveLoopMax = context.getResources().getInteger(R.integer.max_movement_loop_attempts);
     }
 
     /**
@@ -42,7 +53,7 @@ public class RobotOrderBuilder {
      * @param fullOrderString   the full string containing each movement order within the section
      * @return                  an array of robot orders
      */
-    public List<RobotOrder> buildOrders(String fullOrderString) { // TODO... Comment
+    public List<RobotOrder> buildOrders(String fullOrderString) {
         ArrayList<RobotOrder> orders = new ArrayList<>();
         String[] orderTexts = fullOrderString.split(this.orderSplitCharacter);
 
@@ -90,23 +101,15 @@ public class RobotOrderBuilder {
      */
 
     private RobotMoveOrder buildMoveOrder(String orderText) {
-
-        //Maximum number of times Kibo Robot will attempt to move
-        int LOOP_MAX = 3;
-
         //Separates orderText into two strings, one for position arguments and one for quaternion arguments
         String posStr = orderText.substring(2, orderText.indexOf("]"));
         String quatStr = orderText.substring(orderText.indexOf("[", 2) + 1, orderText.length() - 2);
 
-        //Creates arrays to store arguments
-        String[] pos = posStr.split(",");
-        String[] quat = quatStr.split(",");
+        //Creating arguments with helper functions
+        Point point = buildPointFromString(posStr);
+        Quaternion quat = buildQuaternionFromString(quatStr);
 
-        //Uses argument arrays to create a moveOrder
-        RobotMoveOrder moveOrder = new RobotMoveOrder(LOOP_MAX, Double.parseDouble(pos[0]), Double.parseDouble(pos[1]), Double.parseDouble(pos[2]), Float.parseFloat(quat[0]),
-                Float.parseFloat(quat[1]), Float.parseFloat(quat[2]), Float.parseFloat(quat[3]));
-
-        return moveOrder; // TODO...
+        return new RobotMoveOrder(this.moveLoopMax, point, quat);
     }
 
     private RobotStartMissionOrder buildStartMissionOrder() {
@@ -161,5 +164,36 @@ public class RobotOrderBuilder {
         Matcher moveOrderMatcher = this.moveOrderPattern.matcher(orderText);
         return moveOrderMatcher.matches();
     }
+
+
+    /** Helper methods for building kibo api objects from string arrays. Would've been way easier
+     * if I could've used streams but the IDE said that wasn't available in this project's Java
+     * version
+     */
+
+    private Point buildPointFromString(String posStr) {
+        int numArgs = 3;
+        String[] posStrings = posStr.split(this.orderInnerSplitCharacter);
+        double[] posDoubles = new double[numArgs];
+
+        for (int i = 0; i < numArgs; i++) {
+            posDoubles[i] = Double.parseDouble(posStrings[i]);
+        }
+
+        return new Point(posDoubles[0], posDoubles[1], posDoubles[2]);
+    }
+
+    private Quaternion buildQuaternionFromString(String quatString) {
+       int numArgs = 4;
+       String[] posStrings = quatString.split(this.orderInnerSplitCharacter);
+       float[] posFloats = new float[numArgs];
+
+       for (int i = 0; i < numArgs; i++) {
+           posFloats[i] = Float.parseFloat(posStrings[i]);
+       }
+
+       return new Quaternion(posFloats[0], posFloats[1], posFloats[2], posFloats[3]);
+    }
+
 
 }

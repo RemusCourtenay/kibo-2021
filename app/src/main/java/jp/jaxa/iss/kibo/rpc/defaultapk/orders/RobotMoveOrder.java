@@ -9,13 +9,13 @@ class RobotMoveOrder extends RobotOrder {
 
     private final Point targetPoint;
     private final Quaternion targetQuaternion;
-    private final int LOOP_MAX;
+    private final int loopMax;
 
 
-    public RobotMoveOrder(int loopMax, double posX, double posY, double posZ, float quaX, float quaY, float quaZ, float quaW){
-        targetPoint = new Point(posX, posY, posZ);
-        targetQuaternion = new Quaternion(quaX, quaY, quaZ, quaW);
-        LOOP_MAX = loopMax;
+    public RobotMoveOrder(int loopMax, Point targetPoint, Quaternion targetQuaternion){
+        this.targetPoint = targetPoint;
+        this.targetQuaternion = targetQuaternion;
+        this.loopMax = loopMax;
 
     }
 
@@ -23,7 +23,7 @@ class RobotMoveOrder extends RobotOrder {
     protected Result attemptOrderImplementation() {
         Result result = api.moveTo(targetPoint, targetQuaternion, true);
 
-        for(int i = 0; i < LOOP_MAX; i++){
+        for(int i = 0; i < loopMax; i++){
             if(result.hasSucceeded()){
                 break;
             }

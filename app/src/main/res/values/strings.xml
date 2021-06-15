@@ -20,6 +20,9 @@
     -->
     <string name="order_split_character">|</string>
 
+    <!-- Character used to split numbers within brackets in move orders. Doesn't allow spaces -->
+    <string name="order_inner_split_character">,</string>
+
     <!--
     Order String section, Order strings consist of multiple robot orders following the formatting
     described above, separated by the order split character

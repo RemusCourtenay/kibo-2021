@@ -7,7 +7,6 @@ public enum RobotOrderType {
     MOVE_ORDER(R.string.move_order_key),
     SCAN_AR_CODE_ORDER(R.string.scan_ar_code_order_key),
     FIRE_LASER_ORDER(R.string.fire_laser_order_key),
-    PLAY_SOUND_ORDER(R.string.play_sound_order_key),
     FINISH_MISSION_ORDER(R.string.finish_mission_order_key);
 
     private final int orderKey;

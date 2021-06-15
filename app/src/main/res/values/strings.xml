@@ -5,7 +5,6 @@
     <string name="move_order_key">Do not use this, use the bracket format instead</string>
     <string name="scan_ar_code_order_key">SCAN_AR_CODE</string>
     <string name="fire_laser_order_key">FIRE_LASER</string>
-    <string name="play_sound_order_key">PLAY_SOUND</string>
     <string name="finish_mission_order_key">FINISH_MISSION</string>
 
     <!-- Regex for move orders, fits decimal and non decimal variants of the following:

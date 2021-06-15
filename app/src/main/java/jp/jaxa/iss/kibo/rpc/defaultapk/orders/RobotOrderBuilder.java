@@ -73,8 +73,6 @@ public class RobotOrderBuilder {
                     order = buildScanARCodeOrder();
                 } else if (type == RobotOrderType.FIRE_LASER_ORDER) {
                     order = buildFireLaserOrder();
-                } else if (type == RobotOrderType.PLAY_SOUND_ORDER) {
-                    order = buildPlaySoundOrder();
                 } else if (type == RobotOrderType.FINISH_MISSION_ORDER) {
                     order = buildFinishMissionOrder();
                 } else if (type == RobotOrderType.MOVE_ORDER) {
@@ -96,10 +94,10 @@ public class RobotOrderBuilder {
         return orders;
     }
 
+
     /**
      * Constructors for each order type
      */
-
     private RobotMoveOrder buildMoveOrder(String orderText) {
         //Separates orderText into two strings, one for position arguments and one for quaternion arguments
         String posStr = orderText.substring(2, orderText.indexOf("]"));
@@ -121,10 +119,6 @@ public class RobotOrderBuilder {
     }
 
     private RobotFireLaserOrder buildFireLaserOrder() {
-        return null; // TODO...
-    }
-
-    private RobotPlaySoundOrder buildPlaySoundOrder() {
         return null; // TODO...
     }
 
@@ -153,6 +147,7 @@ public class RobotOrderBuilder {
         return stringOrderTypeMap;
     }
 
+
     /**
      * Helper function that checks if possible move order strings fit the format defined in the
      * strings.xml file.
@@ -170,7 +165,6 @@ public class RobotOrderBuilder {
      * if I could've used streams but the IDE said that wasn't available in this project's Java
      * version
      */
-
     private Point buildPointFromString(String posStr) {
         int numArgs = 3;
         String[] posStrings = posStr.split(this.orderInnerSplitCharacter);

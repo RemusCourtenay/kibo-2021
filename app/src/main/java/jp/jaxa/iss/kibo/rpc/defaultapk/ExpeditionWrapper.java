@@ -30,8 +30,6 @@ public class ExpeditionWrapper {
 
 
     private final List<RobotOrder> orders;
-    // Index of currently active order
-    private int currentOrder = 0;
 
 
     /**
@@ -45,7 +43,6 @@ public class ExpeditionWrapper {
     public ExpeditionWrapper(Context context, String fullOrderString) {
         RobotOrderBuilder orderBuilder = new RobotOrderBuilder(context);
         this.orders = Collections.unmodifiableList(orderBuilder.buildOrders(fullOrderString));
-        // TODO...
     }
 
     /**
@@ -53,6 +50,11 @@ public class ExpeditionWrapper {
      * long period as multithreading of orders is not implemented.
      */
     public void startExpedition() {
-        // TODO...
+
+        // Should probably have more going on here but whatever
+        for (RobotOrder order: orders) {
+            order.attemptOrder();
+        }
+
     }
 }

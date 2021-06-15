@@ -43,6 +43,10 @@ build/
 captures/
 output.json
 
+# Gradle folder
+gradle/
+.gradle/
+
 # NDK
 obj/
 .externalNativeBuild

@@ -1,10 +1,15 @@
 package jp.jaxa.iss.kibo.rpc.defaultapk.orders;
 
+import android.content.Context;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import jp.jaxa.iss.kibo.rpc.defaultapk.R;
 
 /**
  * Standard builder class for setting up RobotOrder objects. Exists so that specific robot order
@@ -16,14 +21,17 @@ import java.util.regex.Pattern;
  */
 public class RobotOrderBuilder {
 
+    private final Context context;
+
     private final Map<String, RobotOrderType> stringOrderTypeMap;
     private final Pattern moveOrderPattern;
     private final String orderSplitCharacter;
 
-    public RobotOrderBuilder(Map<String, RobotOrderType> stringOrderTypeMap, String moveOrderPattern, String orderSplitCharacter) {
-        this.stringOrderTypeMap = stringOrderTypeMap;
-        this.moveOrderPattern = Pattern.compile(moveOrderPattern); // TODO... add error check
-        this.orderSplitCharacter = orderSplitCharacter;
+    public RobotOrderBuilder(Context context) {
+        this.context = context;
+        this.stringOrderTypeMap = buildStringOrderTypeMapFromStringsFile();
+        this.moveOrderPattern = Pattern.compile(context.getString(R.string.move_order_regex_pattern)); // TODO... add error check
+        this.orderSplitCharacter = context.getString(R.string.order_split_character);
     }
 
     /**
@@ -58,6 +66,8 @@ public class RobotOrderBuilder {
                 orders.add(order);
             } else if (fitsMoveOrderFormat(orderText)) {
                 orders.add(buildMoveOrder());
+            } else {
+                throw new RuntimeException("Order: " + orderText + " doesn't fit any format described by the strings.xml file");
             }
         }
 
@@ -82,6 +92,19 @@ public class RobotOrderBuilder {
 
     RobotPlaySoundOrder buildPlaySoundOrder() {
         return null; // TODO...
+    }
+
+    private Map<String, RobotOrderType> buildStringOrderTypeMapFromStringsFile() {
+        HashMap<String, RobotOrderType> stringOrderTypeMap = new HashMap<>();
+
+        // Big shoutout to android for making me have to do this....
+        stringOrderTypeMap.put(context.getString(R.string.start_mission_order_key), RobotOrderType.START_MISSION_ORDER);
+        stringOrderTypeMap.put(context.getString(R.string.move_order_key), RobotOrderType.MOVE_ORDER);
+        stringOrderTypeMap.put(context.getString(R.string.scan_ar_code_order_key), RobotOrderType.SCAN_AR_CODE_ORDER);
+        stringOrderTypeMap.put(context.getString(R.string.fire_laser_order_key), RobotOrderType.FIRE_LASER_ORDER);
+        stringOrderTypeMap.put(context.getString(R.string.play_sound_order_key), RobotOrderType.PLAY_SOUND_ORDER);
+
+        return stringOrderTypeMap;
     }
 
     private boolean fitsMoveOrderFormat(String orderText) {

@@ -12,7 +12,7 @@
          {[1.00,2,3][1.12,2.09,3.45,6.78910]}
          Does not allow for spaces!
     -->
-    <string name="move_order_regex_pattern">(?:\\{\\[)((\\d+([\\.]\\d+)?)[,]){2}(\\d+([\\.]\\d+)?){1}(?:\\]\\[)((\\d+([\\.]\\d+)?)[,]){3}(\\d+([\\.]\\d+)?){1}(?:\\]\\})</string>
+    <string name="move_order_regex_pattern">(?:\\{\\[)(([+|-]?\\d+([\\.]\\d+)?)[,]){2}([+|-]?\\d+([\\.]\\d+)?){1}(?:\\]\\[)(([+|-]?\\d+([\\.]\\d+)?)[,]){3}([+|-]?\\d+([\\.]\\d+)?){1}(?:\\]\\})</string>
 
     <!-- Character used to split orders, doesn't allow for spaces. Expected look is:
      {[1,2,3][1,2,3,4]}|SCAN_AR_CODE|{[1,2,3][1,2,3,4]}

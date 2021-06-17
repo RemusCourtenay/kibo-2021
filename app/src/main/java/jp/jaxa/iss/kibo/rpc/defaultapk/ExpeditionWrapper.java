@@ -36,8 +36,8 @@ public class ExpeditionWrapper {
      * Sole constructor. Requires the Context of the Activity it's called from to access data
      * stored in the resources folders.
      */
-    public ExpeditionWrapper(Context context) {
-        this.orderBuilder = new RobotOrderBuilder(context);
+    public ExpeditionWrapper(RobotOrderBuilder orderBuilder) {
+        this.orderBuilder = orderBuilder;
     }
 
     /**

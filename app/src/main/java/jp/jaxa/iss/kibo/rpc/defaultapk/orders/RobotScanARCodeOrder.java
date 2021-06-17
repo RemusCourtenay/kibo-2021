@@ -1,10 +1,15 @@
 package jp.jaxa.iss.kibo.rpc.defaultapk.orders;
 
 import gov.nasa.arc.astrobee.Result;
+import jp.jaxa.iss.kibo.rpc.api.KiboRpcApi;
 
 class RobotScanARCodeOrder extends RobotOrder {
 
     private int scanResult;
+
+    RobotScanARCodeOrder(KiboRpcApi api) {
+        super(api);
+    }
 
     @Override
     protected Result attemptOrderImplementation() {

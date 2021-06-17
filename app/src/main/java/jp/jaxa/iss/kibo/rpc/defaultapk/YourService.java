@@ -3,6 +3,7 @@ package jp.jaxa.iss.kibo.rpc.defaultapk;
 import android.content.Context;
 
 import jp.jaxa.iss.kibo.rpc.api.KiboRpcService;
+import jp.jaxa.iss.kibo.rpc.defaultapk.orders.RobotOrderBuilder;
 
 /**
  * Class meant to handle commands from the Ground Data System and execute them in Astrobee
@@ -13,7 +14,7 @@ public class YourService extends KiboRpcService {
     protected void runPlan1(){
 
         Context context = getBaseContext();
-        ExpeditionWrapper wrapper = new ExpeditionWrapper(context);
+        ExpeditionWrapper wrapper = new ExpeditionWrapper(new RobotOrderBuilder(context, this.api));
         wrapper.attemptExpeditionStage(context.getString(R.string.test_order_string));
 
     }

@@ -1,6 +1,7 @@
 package jp.jaxa.iss.kibo.rpc.defaultapk.orders;
 
 import gov.nasa.arc.astrobee.Result;
+import jp.jaxa.iss.kibo.rpc.api.KiboRpcApi;
 import jp.jaxa.iss.kibo.rpc.api.KiboRpcService;
 
 /**
@@ -14,7 +15,13 @@ import jp.jaxa.iss.kibo.rpc.api.KiboRpcService;
  * @since 1.8
  */
 
-public abstract class RobotOrder extends KiboRpcService {
+public abstract class RobotOrder {
+
+    final KiboRpcApi api;
+
+    RobotOrder(KiboRpcApi api) {
+        this.api = api;
+    }
 
     /**
      * Public method for starting the order, wraps the private implementation specific method to

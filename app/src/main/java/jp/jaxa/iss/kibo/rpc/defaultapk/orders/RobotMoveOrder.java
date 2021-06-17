@@ -4,6 +4,7 @@ package jp.jaxa.iss.kibo.rpc.defaultapk.orders;
 import gov.nasa.arc.astrobee.Result;
 import gov.nasa.arc.astrobee.types.Point;
 import gov.nasa.arc.astrobee.types.Quaternion;
+import jp.jaxa.iss.kibo.rpc.api.KiboRpcApi;
 
 class RobotMoveOrder extends RobotOrder {
 
@@ -12,7 +13,8 @@ class RobotMoveOrder extends RobotOrder {
     private final int loopMax;
 
 
-    public RobotMoveOrder(int loopMax, Point targetPoint, Quaternion targetQuaternion){
+    RobotMoveOrder(KiboRpcApi api, int loopMax, Point targetPoint, Quaternion targetQuaternion){
+        super(api);
         this.targetPoint = targetPoint;
         this.targetQuaternion = targetQuaternion;
         this.loopMax = loopMax;

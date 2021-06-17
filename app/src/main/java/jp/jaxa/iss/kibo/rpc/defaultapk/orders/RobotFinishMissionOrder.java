@@ -1,6 +1,7 @@
 package jp.jaxa.iss.kibo.rpc.defaultapk.orders;
 
 import gov.nasa.arc.astrobee.Result;
+import jp.jaxa.iss.kibo.rpc.api.KiboRpcApi;
 
 /**
  * Implementation of RobotOrder concerning the order for the Kibo Robot to announce that it has
@@ -13,6 +14,10 @@ import gov.nasa.arc.astrobee.Result;
  * @since 1.8
  */
 public class RobotFinishMissionOrder extends RobotOrder {
+
+    RobotFinishMissionOrder(KiboRpcApi api) {
+        super(api);
+    }
 
     /**
      * Implementation of the specific order. Attempts to run the API's reportMissionCompletion
@@ -28,6 +33,6 @@ public class RobotFinishMissionOrder extends RobotOrder {
 
     @Override
     public String printOrderInfo() {
-        return null;
+        return "Finish mission order:";
     }
 }

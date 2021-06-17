@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 
 import gov.nasa.arc.astrobee.types.Point;
 import gov.nasa.arc.astrobee.types.Quaternion;
+import jp.jaxa.iss.kibo.rpc.api.KiboRpcApi;
 import jp.jaxa.iss.kibo.rpc.defaultapk.R;
 
 /**
@@ -25,6 +26,7 @@ import jp.jaxa.iss.kibo.rpc.defaultapk.R;
 public class RobotOrderBuilder {
 
     private final Context context;
+    private final KiboRpcApi api;
 
     private final Map<String, RobotOrderType> stringOrderTypeMap;
     private final Pattern moveOrderPattern;
@@ -36,8 +38,9 @@ public class RobotOrderBuilder {
     // Max number of times the move command will loop
     private final int moveLoopMax;
 
-    public RobotOrderBuilder(Context context) {
+    public RobotOrderBuilder(Context context, KiboRpcApi api) {
         this.context = context;
+        this.api = api;
         this.stringOrderTypeMap = buildStringOrderTypeMapFromStringsFile();
         this.moveOrderPattern = Pattern.compile(context.getString(R.string.move_order_regex_pattern)); // TODO... add error check
         this.orderSplitCharacter = context.getString(R.string.order_split_character);
@@ -107,11 +110,11 @@ public class RobotOrderBuilder {
         Point point = buildPointFromString(posStr);
         Quaternion quat = buildQuaternionFromString(quatStr);
 
-        return new RobotMoveOrder(this.moveLoopMax, point, quat);
+        return new RobotMoveOrder(api, this.moveLoopMax, point, quat);
     }
 
     private RobotStartMissionOrder buildStartMissionOrder() {
-        return new RobotStartMissionOrder();
+        return new RobotStartMissionOrder(api);
     }
 
     private RobotScanARCodeOrder buildScanARCodeOrder() {
@@ -123,7 +126,7 @@ public class RobotOrderBuilder {
     }
 
     private RobotFinishMissionOrder buildFinishMissionOrder() {
-        return new RobotFinishMissionOrder();
+        return new RobotFinishMissionOrder(api);
     }
 
 

@@ -1,8 +1,13 @@
 package jp.jaxa.iss.kibo.rpc.defaultapk.orders;
 
 import gov.nasa.arc.astrobee.Result;
+import jp.jaxa.iss.kibo.rpc.api.KiboRpcApi;
 
 class RobotStartMissionOrder extends RobotOrder {
+
+    RobotStartMissionOrder(KiboRpcApi api) {
+        super(api);
+    }
 
     @Override
     protected Result attemptOrderImplementation() {
@@ -14,6 +19,6 @@ class RobotStartMissionOrder extends RobotOrder {
 
     @Override
     public String printOrderInfo() {
-        return null;
+        return "Start mission order:";
     }
 }

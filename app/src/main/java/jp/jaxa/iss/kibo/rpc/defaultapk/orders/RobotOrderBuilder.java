@@ -38,6 +38,9 @@ public class RobotOrderBuilder {
     // Max number of times the move command will loop
     private final int moveLoopMax;
 
+    // Should get set by the method setPointADash at some point
+    private Point pointADash;
+
     public RobotOrderBuilder(Context context, KiboRpcApi api) {
         this.context = context;
         this.api = api;
@@ -69,7 +72,7 @@ public class RobotOrderBuilder {
             if ((type = this.stringOrderTypeMap.get(orderText)) != null) {
                 RobotOrder order;
 
-                // Wish I could use a switch statement..
+                // Wish I could use a switch statement.. turns out i could have...
                 if (type == RobotOrderType.START_MISSION_ORDER) {
                     order = buildStartMissionOrder();
                 } else if (type == RobotOrderType.SCAN_AR_CODE_ORDER) {
@@ -80,6 +83,8 @@ public class RobotOrderBuilder {
                     order = buildFinishMissionOrder();
                 } else if (type == RobotOrderType.MOVE_ORDER) {
                     throw new RobotOrderException("Move orders should be written using bracket format");
+                } else if (type == RobotOrderType.APPROACH_FIRING_POSITION_ORDER) {
+                    order = buildApproachFiringPositionOrder();
                 } else {
                     throw new RobotOrderException("RobotOrderType: " + type.name() + " not implemented in buildOrders");
                 }
@@ -98,6 +103,11 @@ public class RobotOrderBuilder {
     }
 
 
+    public void setPointADash(float x, float y, float z) {
+        this.pointADash = new Point(x, y, z);
+    }
+
+
     /**
      * Constructors for each order type
      */
@@ -111,6 +121,16 @@ public class RobotOrderBuilder {
         Quaternion quat = buildQuaternionFromString(quatStr);
 
         return new RobotMoveOrder(api, this.moveLoopMax, point, quat);
+    }
+
+    private RobotApproachFiringPositionOrder buildApproachFiringPositionOrder() {
+        if (this.pointADash != null) {
+            return new RobotApproachFiringPositionOrder(api, this.moveLoopMax, this.pointADash);
+        } else {
+            throw new RobotOrderException("Attempting to build ApproachFiringPositionOrder but Point A' hasn't been set");
+        }
+
+
     }
 
     private RobotStartMissionOrder buildStartMissionOrder() {

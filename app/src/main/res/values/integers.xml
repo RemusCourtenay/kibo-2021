@@ -3,8 +3,16 @@
     <integer name="max_movement_loop_attempts">3</integer>
 
     <!--
-    Temporary variable used to choose which path to test while we wait for AR team to finish
+    Temporary variable used to choose which path to test while we wait for QR team to finish
     Valid values between 1 - 8 correlate to which of the 8 different paths you wish to test
     -->
     <integer name="chosen_path_to_test">1</integer>
+
+
+    <!--
+    Temporary variables used to choose the location of point A' while we wait for the QR team to finish
+    -->
+    <integer name="chosen_point_a_dash_x_value">0</integer>
+    <integer name="chosen_point_a_dash_y_value">0</integer>
+    <integer name="chosen_point_a_dash_z_value">0</integer>
 </resources>

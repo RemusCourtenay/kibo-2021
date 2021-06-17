@@ -90,11 +90,11 @@ public class YourService extends KiboRpcService {
         // Attempting the final stage
         wrapper.attemptExpeditionStage(context.getString(R.string.move_to_finish_order_string));
 
-        // astrobee is undocked and the mission starts
-        api.startMission();
 
-        // move astrobee from dock station to point A
-        moveToWrapper(11.21+0.0422, -9.80, 4.79+0.0826, 0, 0, -0.707, 0.707);
+
+
+
+        // ------------------------------- NEW STUFF -------------------------------------- //
 
         // scan QR code
         final double[]A_dash = scanQR(40);
@@ -127,25 +127,6 @@ public class YourService extends KiboRpcService {
 
     @Override
     protected void runPlan3(){
-    }
-
-    // add custom methods here
-    private void moveToWrapper(double pos_x, double pos_y, double pos_z,
-                               double qua_x, double qua_y, double qua_z,
-                               double qua_w){
-
-        final int LOOP_MAX = 3;
-        final Point point = new Point(pos_x, pos_y, pos_z);
-        final Quaternion quaternion = new Quaternion((float)qua_x, (float)qua_y,
-                (float)qua_z, (float)qua_w);
-
-        Result result = api.moveTo(point, quaternion, true);
-
-        int loopCounter = 0;
-        while(!result.hasSucceeded() || loopCounter < LOOP_MAX){
-            result = api.moveTo(point, quaternion, true);
-            ++loopCounter;
-        }
     }
 
     /**
@@ -320,8 +301,11 @@ public class YourService extends KiboRpcService {
         {
             Log.d("AR[status]:", " start");
             long start_time = SystemClock.elapsedRealtime();
-            //                                            //
-            moveToWrapper(px, py, pz, qx, qy, qz, qw);
+            //
+
+
+            // COMMENTED OUT BECAUSE METHOD NO LONGER EXISTS
+            //moveToWrapper(px, py, pz, qx, qy, qz, qw);
 
 
 

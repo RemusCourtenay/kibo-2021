@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <integer name="max_movement_loop_attempts">3</integer>
+
+    <!--
+    Temporary variable used to choose which path to test while we wait for AR team to finish
+    Valid values between 1 - 8 correlate to which of the 8 different paths you wish to test
+    -->
+    <integer name="chosen_path_to_test">1</integer>
 </resources>

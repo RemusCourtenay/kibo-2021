@@ -5,14 +5,14 @@ import gov.nasa.arc.astrobee.Result;
 public class RobotOrderResult {
 
     private final Result result;
-    private final int returnValue;
+    private final double[] returnValue;
 
     RobotOrderResult(Result result) {
         this.result = result;
-        this.returnValue = 0;
+        this.returnValue = null;
     }
 
-    RobotOrderResult(Result result, int returnValue) {
+    RobotOrderResult(Result result, double[] returnValue) {
         this.result = result;
         this.returnValue = returnValue;
     }
@@ -21,7 +21,7 @@ public class RobotOrderResult {
         return result;
     }
 
-    public int getReturnValue() {
+    public double[] getReturnValue() {
         return returnValue;
-    }
+    } // TODO... throw error if null
 }

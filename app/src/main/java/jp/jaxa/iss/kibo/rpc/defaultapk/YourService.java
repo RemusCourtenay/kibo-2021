@@ -97,7 +97,7 @@ public class YourService extends KiboRpcService {
         // ------------------------------- NEW STUFF -------------------------------------- //
 
         // scan QR code
-        final double[]A_dash = scanQR(40);
+        final double[]A_dash = scanQR(40); // Has been moved to RobotScanARCodeOrder
 
         // get position and KOZ pattern
         double koz = A_dash[0], A_dash_x = A_dash[1], A_dash_y = A_dash[2], A_dash_z = A_dash[3];

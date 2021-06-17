@@ -1,39 +1,49 @@
 package jp.jaxa.iss.kibo.rpc.defaultapk.orders;
 
-import android.graphics.Bitmap;
 import android.util.Log;
 
 import com.google.zxing.BinaryBitmap;
-import com.google.zxing.LuminanceSource;
-import com.google.zxing.RGBLuminanceSource;
-import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.qrcode.QRCodeReader;
 
-import org.opencv.core.Mat;
-import org.opencv.core.Size;
-import org.opencv.imgproc.Imgproc;
+import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import gov.nasa.arc.astrobee.Result;
 import jp.jaxa.iss.kibo.rpc.api.KiboRpcApi;
 
 import static jp.jaxa.iss.kibo.rpc.defaultapk.ImageHelper.getImgBinBitmap;
-import static org.opencv.android.Utils.matToBitmap;
 
 class RobotScanARCodeOrder extends RobotOrder {
 
     private final int loopMax;
+    private final Pattern qrCodeScanResultPattern;
 
     private double[] scanResult;
 
-    RobotScanARCodeOrder(KiboRpcApi api, int loopMax) {
+    RobotScanARCodeOrder(KiboRpcApi api, int loopMax, Pattern qrCodeScanResultPattern) {
         super(api);
         this.loopMax = loopMax;
+        this.qrCodeScanResultPattern = qrCodeScanResultPattern;
     }
 
     @Override
     protected Result attemptOrderImplementation() {
 
-        scanResult = scanQR(this.loopMax); // Get result from other teams code here
+        String scanResultString = readQR(); // Get result from other teams code here
+
+        if (isValidQRCodeOutput(scanResultString)) {
+            api.sendDiscoveredQR(scanResultString); // send the content of QR code for judge
+            scanResult = decodeQRCodeString(scanResultString);
+        } else {
+            throw new RobotOrderException(
+                    "Result of QR code scan does not fit the format described in strings.xml\n" +
+                            "Result for reference: " + scanResultString);
+        }
+
+
+
 
         return null; // TODO... should return a Result
     }
@@ -52,58 +62,46 @@ class RobotScanARCodeOrder extends RobotOrder {
     }
 
 
-    /**
-     * scanQR scans the QR code.
-     * @param loop_max
-     * @return double array of x,y,z coordinates and kox-pattern
-     */
-    private double[] scanQR(int loop_max) {
-        double koz_pattern = 0; // KOZ pattern between 1 and 8
-        double x = 0, y = 0, z = 0; // don't need orientation of point A' since it's always (0, 0, -0.707, 0.707)
-        String contents = readQR(loop_max);
-        if (contents != null) {
-            String[] format_split = contents.split(",");
-            String[] p_multi_contents = format_split[0].split(":");
-            String[] x_multi_contents = format_split[1].split(":");
-            String[] y_multi_contents = format_split[2].split(":");
-            String[] z_multi_contents = format_split[3].split(":");
-            koz_pattern = Double.parseDouble(p_multi_contents[1]);
-            x = Double.parseDouble(x_multi_contents[1]);
-            y = Double.parseDouble(y_multi_contents[1]);
-            z = Double.parseDouble(z_multi_contents[1]);
-            api.sendDiscoveredQR(contents); // send the content of QR code for judge
-        }
-        return new double[] {koz_pattern, x, y, z};
+    private double[] decodeQRCodeString(String scanResultString) {
+
+        return Arrays.stream(scanResultString.split(",")) // TODO... Add to strings.xml
+                .mapToDouble(i ->
+                        Double.parseDouble(
+                                i.split(":")[1])) // TODO... Add to strings.xml
+                .toArray();
+
+    }
+
+    private boolean isValidQRCodeOutput(String scanResultString) {  // TODO... Comment
+        Matcher qrCodeScanResultMatcher = this.qrCodeScanResultPattern.matcher(scanResultString);
+        return qrCodeScanResultMatcher.matches();
     }
 
 
 
     /**
      * readQR is used to read a QR code
-     * @param loop_max
      * @return String content of the QR code
      */
-    private String readQR(int loop_max) {
+    private String readQR() { // TODO... Comment
         int count = 0;
         String contents = null;
         api.flashlightControlFront(0f);
-        while (contents == null && count < loop_max) {
-            if (count < 40) {
+        while (contents == null && count < this.loopMax) {
+            if (count < 40) { // Magic number
                 api.flashlightControlFront((count+1)*0.025f);
             }
-            BinaryBitmap bitmap = getImgBinBitmap(api.getMatNavCam(), api.getDockCamIntrinsics());
+            BinaryBitmap bitmap = getImgBinBitmap(api.getMatNavCam(), api.getDockCamIntrinsics()); // Different cameras?
             try {
-                com.google.zxing.Result result = new QRCodeReader().decode(bitmap);
+                com.google.zxing.Result result = new QRCodeReader().decode(bitmap); // Different type of Result?
                 contents = result.getText();
-                Log.d("QR[status]:", " Detected");
-
             }
-            catch (Exception e) {
+            catch (Exception e) { // Catch Exception??
                 Log.d("QR[status]:", " Not detected");
             }
             count++;
         }
-        api.flashlightControlFront(0f);
+        api.flashlightControlFront(0f); // Turning flashlight on twice?
         return contents;
     }
 

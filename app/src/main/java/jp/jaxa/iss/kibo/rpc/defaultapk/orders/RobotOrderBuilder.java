@@ -30,6 +30,7 @@ public class RobotOrderBuilder {
 
     private final Map<String, RobotOrderType> stringOrderTypeMap;
     private final Pattern moveOrderPattern;
+    private final Pattern qrCodeScanResultPattern;
 
     // Character that splits orders
     private final String orderSplitCharacter;
@@ -47,7 +48,8 @@ public class RobotOrderBuilder {
         this.context = context;
         this.api = api;
         this.stringOrderTypeMap = buildStringOrderTypeMapFromStringsFile();
-        this.moveOrderPattern = Pattern.compile(context.getString(R.string.move_order_regex_pattern)); // TODO... add error check
+        this.moveOrderPattern = Pattern.compile(context.getString(R.string.move_order_regex_pattern));
+        this.qrCodeScanResultPattern = Pattern.compile(context.getString(R.string.qr_code_scan_result_pattern));
         this.orderSplitCharacter = context.getString(R.string.order_split_character);
         this.orderInnerSplitCharacter = context.getString(R.string.order_inner_split_character);
         this.moveLoopMax = context.getResources().getInteger(R.integer.max_movement_loop_attempts);
@@ -141,7 +143,7 @@ public class RobotOrderBuilder {
     }
 
     private RobotScanARCodeOrder buildScanARCodeOrder() {
-        return new RobotScanARCodeOrder(this.api, this.scanARCodeLoopMax);
+        return new RobotScanARCodeOrder(this.api, this.scanARCodeLoopMax, this.qrCodeScanResultPattern);
     }
 
     private RobotFireLaserOrder buildFireLaserOrder() {

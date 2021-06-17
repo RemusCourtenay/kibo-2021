@@ -15,7 +15,7 @@
          Does not allow for spaces!
     -->
     <string name="move_order_regex_pattern">(?:\\{\\[)(([+|-]?\\d+([\\.]\\d+)?)[,]){2}([+|-]?\\d+([\\.]\\d+)?){1}(?:\\]\\[)(([+|-]?\\d+([\\.]\\d+)?)[,]){3}([+|-]?\\d+([\\.]\\d+)?){1}(?:\\]\\})</string>
-
+    <string name="qr_code_scan_result_pattern" />
     <!-- Character used to split orders, doesn't allow for spaces. Expected look is:
      {[1,2,3][1,2,3,4]}|SCAN_AR_CODE|{[1,2,3][1,2,3,4]}
     -->
@@ -43,5 +43,6 @@
 
     <!-- For testing purposes -->
     <string name="test_order_string">START_MISSION|{[11.71,-9.53,5.35][0,0,0,1]}|{[10.275,-10.314,4.295][0,-0.7071068,0,0.7071068]}|FINISH_MISSION</string>
+
 
 </resources>

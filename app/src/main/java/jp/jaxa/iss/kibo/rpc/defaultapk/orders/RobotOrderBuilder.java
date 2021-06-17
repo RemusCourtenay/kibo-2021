@@ -36,6 +36,9 @@ public class RobotOrderBuilder {
     private final String orderSplitCharacter;
     // Character that splits numbers within the brackets inside move orders
     private final String orderInnerSplitCharacter;
+
+    private final String qrCodeScanResultSplitCharacter;
+    private final String qrCodeScanResultInnerSplitCharacter;
     // Max number of times the move command will loop
     private final int moveLoopMax;
     // Max number of times the scan AR Code command will loop
@@ -52,6 +55,8 @@ public class RobotOrderBuilder {
         this.qrCodeScanResultPattern = Pattern.compile(context.getString(R.string.qr_code_scan_result_pattern));
         this.orderSplitCharacter = context.getString(R.string.order_split_character);
         this.orderInnerSplitCharacter = context.getString(R.string.order_inner_split_character);
+        this.qrCodeScanResultSplitCharacter = context.getString(R.string.qr_code_scan_result_split_character);
+        this.qrCodeScanResultInnerSplitCharacter = context.getString(R.string.qr_code_scan_result_inner_split_character);
         this.moveLoopMax = context.getResources().getInteger(R.integer.max_movement_loop_attempts);
         this.scanARCodeLoopMax = context.getResources().getInteger(R.integer.max_scan_ar_code_loop_attempts);
     }
@@ -143,7 +148,13 @@ public class RobotOrderBuilder {
     }
 
     private RobotScanARCodeOrder buildScanARCodeOrder() {
-        return new RobotScanARCodeOrder(this.api, this.scanARCodeLoopMax, this.qrCodeScanResultPattern);
+        return new RobotScanARCodeOrder(
+                this.api,
+                this.scanARCodeLoopMax,
+                this.qrCodeScanResultPattern,
+                this.qrCodeScanResultSplitCharacter,
+                this.qrCodeScanResultInnerSplitCharacter
+        );
     }
 
     private RobotFireLaserOrder buildFireLaserOrder() {

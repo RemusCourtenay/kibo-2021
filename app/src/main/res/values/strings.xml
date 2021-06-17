@@ -15,14 +15,27 @@
          Does not allow for spaces!
     -->
     <string name="move_order_regex_pattern">(?:\\{\\[)(([+|-]?\\d+([\\.]\\d+)?)[,]){2}([+|-]?\\d+([\\.]\\d+)?){1}(?:\\]\\[)(([+|-]?\\d+([\\.]\\d+)?)[,]){3}([+|-]?\\d+([\\.]\\d+)?){1}(?:\\]\\})</string>
-    <string name="qr_code_scan_result_pattern" />
+
     <!-- Character used to split orders, doesn't allow for spaces. Expected look is:
-     {[1,2,3][1,2,3,4]}|SCAN_AR_CODE|{[1,2,3][1,2,3,4]}
+         {[1,2,3][1,2,3,4]}|SCAN_AR_CODE|{[1,2,3][1,2,3,4]}
     -->
     <string name="order_split_character">\\|</string>
-
     <!-- Character used to split numbers within brackets in move orders. Doesn't allow spaces -->
     <string name="order_inner_split_character">,</string>
+
+    <!-- Regex for QR code scan results, fits decimal, non-decimal, negative, and positive sign
+         variants of the following:
+         {"p":1,"x":10.23,"y":-8.12,"z":5.45}
+         Does not allow for spaces!
+    -->
+    <string name="qr_code_scan_result_pattern">{\"p\":[1–8],\"x\":[+|-]?\\d+(\\.\\d+)?,\"y\":[+|-]?\\d+(\\.\\d+)?,\"z\":[+|-]?\\d+(\\.\\d+)?}</string>
+
+    <!-- Character used to split the sections of QR code scan results -->
+    <string name="qr_code_scan_result_split_character">,</string>
+    <!-- Character used to split the inner sections of QR code scan results -->
+    <string name="qr_code_scan_result_inner_split_character">:</string>
+
+
 
     <!--
     Order String section, Order strings consist of multiple robot orders following the formatting

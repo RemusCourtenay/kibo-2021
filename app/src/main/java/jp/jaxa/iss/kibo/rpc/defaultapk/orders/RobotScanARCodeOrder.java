@@ -19,13 +19,17 @@ class RobotScanARCodeOrder extends RobotOrder {
 
     private final int loopMax;
     private final Pattern qrCodeScanResultPattern;
+    private final String qrCodeScanResultSplitCharacter;
+    private final String qrCodeScanResultInnerSplitCharacter;
 
     private double[] scanResult;
 
-    RobotScanARCodeOrder(KiboRpcApi api, int loopMax, Pattern qrCodeScanResultPattern) {
+    RobotScanARCodeOrder(KiboRpcApi api, int loopMax, Pattern qrCodeScanResultPattern, String qrCodeScanResultSplitCharacter, String qrCodeScanResultInnerSplitCharacter) {
         super(api);
         this.loopMax = loopMax;
         this.qrCodeScanResultPattern = qrCodeScanResultPattern;
+        this.qrCodeScanResultSplitCharacter = qrCodeScanResultSplitCharacter;
+        this.qrCodeScanResultInnerSplitCharacter = qrCodeScanResultInnerSplitCharacter;
     }
 
     @Override
@@ -64,10 +68,10 @@ class RobotScanARCodeOrder extends RobotOrder {
 
     private double[] decodeQRCodeString(String scanResultString) {
 
-        return Arrays.stream(scanResultString.split(",")) // TODO... Add to strings.xml
+        return Arrays.stream(scanResultString.split(this.qrCodeScanResultSplitCharacter)) // TODO... Add to strings.xml
                 .mapToDouble(i ->
                         Double.parseDouble(
-                                i.split(":")[1])) // TODO... Add to strings.xml
+                                i.split(this.qrCodeScanResultInnerSplitCharacter)[1])) // TODO... Add to strings.xml
                 .toArray();
 
     }

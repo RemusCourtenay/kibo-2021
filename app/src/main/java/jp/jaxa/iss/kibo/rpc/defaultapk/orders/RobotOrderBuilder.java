@@ -37,6 +37,8 @@ public class RobotOrderBuilder {
     private final String orderInnerSplitCharacter;
     // Max number of times the move command will loop
     private final int moveLoopMax;
+    // Max number of times the scan AR Code command will loop
+    private final int scanARCodeLoopMax;
 
     // Should get set by the method setPointADash at some point
     private Point pointADash;
@@ -49,6 +51,7 @@ public class RobotOrderBuilder {
         this.orderSplitCharacter = context.getString(R.string.order_split_character);
         this.orderInnerSplitCharacter = context.getString(R.string.order_inner_split_character);
         this.moveLoopMax = context.getResources().getInteger(R.integer.max_movement_loop_attempts);
+        this.scanARCodeLoopMax = context.getResources().getInteger(R.integer.max_scan_ar_code_loop_attempts);
     }
 
     /**
@@ -138,7 +141,7 @@ public class RobotOrderBuilder {
     }
 
     private RobotScanARCodeOrder buildScanARCodeOrder() {
-        return null; // TODO...
+        return new RobotScanARCodeOrder(this.api, this.scanARCodeLoopMax);
     }
 
     private RobotFireLaserOrder buildFireLaserOrder() {

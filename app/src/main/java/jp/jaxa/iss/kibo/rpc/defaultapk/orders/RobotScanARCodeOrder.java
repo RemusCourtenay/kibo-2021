@@ -35,7 +35,7 @@ class RobotScanARCodeOrder extends RobotOrder {
 
         scanResult = scanQR(this.loopMax); // Get result from other teams code here
 
-        return null; // TODO...
+        return null; // TODO... should return a Result
     }
 
     @Override

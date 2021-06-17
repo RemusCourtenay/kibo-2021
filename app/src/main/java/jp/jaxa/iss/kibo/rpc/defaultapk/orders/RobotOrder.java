@@ -33,4 +33,6 @@ public abstract class RobotOrder extends KiboRpcService {
      * @return a Result object stating whether or not the order succeeded.
      */
     protected abstract Result attemptOrderImplementation();
+
+    public abstract String printOrderInfo();
 }

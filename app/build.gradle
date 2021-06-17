@@ -13,6 +13,12 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled  true
+        jackOptions {
+            enabled true
+        }
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
     }
     buildTypes {
         release {
@@ -32,6 +38,10 @@ android {
         exclude 'META-INF/dependencies.txt'
         exclude 'META-INF/LGPL2.1'
     }
+    compileOptions {
+        sourceCompatibility = '1.8'
+        targetCompatibility = '1.8'
+    }
 }
 
 dependencies {
@@ -49,5 +59,6 @@ dependencies {
         exclude group: 'junit'
     }
     testCompile 'junit:junit:4.12'
+    testCompile "org.mockito:mockito-core:1.9.5"
     compile 'com.quickbirdstudios:opencv:3.4.4-contrib'
 }

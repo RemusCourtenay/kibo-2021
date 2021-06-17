@@ -21,8 +21,13 @@ public class RobotFinishMissionOrder extends RobotOrder {
     @Override
     protected Result attemptOrderImplementation() {
         if (!api.reportMissionCompletion()) {
-            throw new RuntimeException("Failed to report mission completion");
+            throw new RobotOrderException("Failed to report mission completion");
         }
         return null; // Kinda cursed, unfortunately startMission returns a bool not a Result
+    }
+
+    @Override
+    public String printOrderInfo() {
+        return null;
     }
 }

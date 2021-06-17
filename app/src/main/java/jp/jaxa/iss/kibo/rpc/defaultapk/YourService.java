@@ -1,5 +1,7 @@
 package jp.jaxa.iss.kibo.rpc.defaultapk;
 
+import android.content.Context;
+
 import jp.jaxa.iss.kibo.rpc.api.KiboRpcService;
 
 /**
@@ -9,7 +11,11 @@ import jp.jaxa.iss.kibo.rpc.api.KiboRpcService;
 public class YourService extends KiboRpcService {
     @Override
     protected void runPlan1(){
-        // write here your plan 1
+
+        Context context = getBaseContext();
+        ExpeditionWrapper wrapper = new ExpeditionWrapper(context);
+        wrapper.attemptExpeditionStage(context.getString(R.string.test_order_string));
+
     }
 
     @Override

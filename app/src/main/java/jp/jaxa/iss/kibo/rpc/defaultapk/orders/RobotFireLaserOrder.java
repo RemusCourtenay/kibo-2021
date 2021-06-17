@@ -8,4 +8,9 @@ class RobotFireLaserOrder extends RobotOrder {
     protected Result attemptOrderImplementation() {
         return null; // TODO...
     }
+
+    @Override
+    public String printOrderInfo() {
+        return null;
+    }
 }

@@ -76,9 +76,9 @@ public class RobotOrderBuilder {
                 } else if (type == RobotOrderType.FINISH_MISSION_ORDER) {
                     order = buildFinishMissionOrder();
                 } else if (type == RobotOrderType.MOVE_ORDER) {
-                    throw new RuntimeException("Move orders should be written using bracket format");
+                    throw new RobotOrderException("Move orders should be written using bracket format");
                 } else {
-                    throw new RuntimeException("RobotOrderType: " + type.name() + " not implemented in buildOrders");
+                    throw new RobotOrderException("RobotOrderType: " + type.name() + " not implemented in buildOrders");
                 }
                 orders.add(order);
 
@@ -88,7 +88,7 @@ public class RobotOrderBuilder {
 
             // Doesn't fit any of the mapped values and isn't a correctly formatted move order so throwing exception
             } else {
-                throw new RuntimeException("Order: " + orderText + " doesn't fit any format described by the strings.xml file");
+                throw new RobotOrderException("Order: " + orderText + " doesn't fit any format described by the strings.xml file");
             }
         }
         return orders;

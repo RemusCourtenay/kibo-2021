@@ -17,7 +17,7 @@
     <!-- Character used to split orders, doesn't allow for spaces. Expected look is:
      {[1,2,3][1,2,3,4]}|SCAN_AR_CODE|{[1,2,3][1,2,3,4]}
     -->
-    <string name="order_split_character">|</string>
+    <string name="order_split_character">\\|</string>
 
     <!-- Character used to split numbers within brackets in move orders. Doesn't allow spaces -->
     <string name="order_inner_split_character">,</string>
@@ -38,5 +38,8 @@
     <string name="move_to_laser_order_string_variant_8">Order string for variant 8</string>
 
     <string name="move_to_finish_order_string">Put order string for final stage of mission here</string>
+
+    <!-- For testing purposes -->
+    <string name="test_order_string">START_MISSION|{[11.71,-9.53,5.35][0,0,0,1]}|{[10.275,-10.314,4.295][0,-0.7071068,0,0.7071068]}|FINISH_MISSION</string>
 
 </resources>

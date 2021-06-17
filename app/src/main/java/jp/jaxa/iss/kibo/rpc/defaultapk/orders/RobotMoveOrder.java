@@ -33,4 +33,11 @@ class RobotMoveOrder extends RobotOrder {
         return result;
     }
 
+    @Override
+    public String printOrderInfo() {
+        return "Move order:\n" +
+                "Target point: ["+targetPoint.getX()+"]["+targetPoint.getY()+"]["+targetPoint.getZ()+"]\n" +
+                "Target quaternion: ["+targetQuaternion.getX()+"]["+targetQuaternion.getY()+"]["+targetQuaternion.getZ()+"]["+targetQuaternion.getW()+"]";
+    }
+
 }

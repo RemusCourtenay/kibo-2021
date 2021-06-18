@@ -1,9 +1,9 @@
-package jp.jaxa.iss.kibo.rpc.defaultapk;
+package jp.jaxa.iss.kibo.rpc.defaultapk.orders;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 
 import com.google.zxing.BinaryBitmap;
-import com.google.zxing.LuminanceSource;
 import com.google.zxing.RGBLuminanceSource;
 import com.google.zxing.common.HybridBinarizer;
 
@@ -13,40 +13,54 @@ import org.opencv.core.Rect;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
+import jp.jaxa.iss.kibo.rpc.defaultapk.R;
+
 import static org.opencv.android.Utils.matToBitmap;
 
 public class ImageHelper {
 
     // TODO... Move all to integers.xml
-    private static final int KIBO_CAM_IMAGE_HEIGHT = 1280; // True for both nav and dock cam
-    private static final int KIBO_CAM_IMAGE_WIDTH = 960;
+    private final int kiboCamImageHeight; // True for both nav and dock cam
+    private final int kiboCamImageWidth;
+    private final int percentThatCropRemoves;
+    private final int resizeImageHeight;
+    private final int resizeImageWidth;
 
-    private static final int PERCENT_THAT_CROP_REMOVES = 40;
-    private static final int RESIZE_IMAGE_WIDTH = KIBO_CAM_IMAGE_HEIGHT * PERCENT_THAT_CROP_REMOVES /2; // Picked at random
-    private static final int RESIZE_IMAGE_HEIGHT = KIBO_CAM_IMAGE_WIDTH * PERCENT_THAT_CROP_REMOVES /2; // Picked at random
+
+
+    ImageHelper(Context context) {
+        this.kiboCamImageHeight = context.getResources().getInteger(R.integer.kibo_cam_image_height);
+        this.kiboCamImageWidth = context.getResources().getInteger(R.integer.kibo_cam_image_width);
+        this.percentThatCropRemoves = context.getResources().getInteger(R.integer.percent_of_image_that_crop_removes);
+        this.resizeImageHeight = context.getResources().getInteger(R.integer.resize_image_height);
+        this.resizeImageWidth = context.getResources().getInteger(R.integer.resize_image_width);
+    }
+
 
     /**
-     * getBinaryBitmapFromMatImage gets the image from the camera, and returns a binary bitmap for it.
+     * getBinaryBitmapFromMatImage takes a camera image, and returns a binary bitmap for it.
      * @return BinaryBitmap for camera image
      */
-    public static BinaryBitmap getBinaryBitmapFromMatImage(Mat matFromCam, double[][] camIntrinsics) { // TODO... Comment
+    public BinaryBitmap getBinaryBitmapFromMatImage(Mat matFromCam, double[][] camIntrinsics) { // TODO... Comment
         Mat undistortedMat = undistort(matFromCam, camIntrinsics);
-        Mat croppedMat = new Mat(undistortedMat, getCroppedImageRectangleArea(PERCENT_THAT_CROP_REMOVES, KIBO_CAM_IMAGE_HEIGHT, KIBO_CAM_IMAGE_WIDTH));
-        Mat scaledMat = scaleMatDown(croppedMat, RESIZE_IMAGE_WIDTH, RESIZE_IMAGE_HEIGHT);
+        Mat croppedMat = new Mat(undistortedMat, getCroppedImageRectangleArea(percentThatCropRemoves, kiboCamImageHeight, kiboCamImageWidth));
 
-        Bitmap bitmap = getBitmapFromMat(scaledMat);
+        // Commented out as unsure if needed
+        // Mat scaledMat = scaleMatDown(croppedMat, resizeImageWidth, resizeImageHeight);
+
+        Bitmap bitmap = getBitmapFromMat(croppedMat); // Move this into separate method?
 
         int bitmapWidth = bitmap.getWidth();
         int bitmapHeight = bitmap.getHeight();
 
         int[] pixelArray = new int[bitmapWidth * bitmapHeight];
-        bitmap.getPixels(pixelArray, 0, bitmapWidth, 0, 0, bitmapWidth, bitmapHeight); // Magic numbers
+        bitmap.getPixels(pixelArray, 0, bitmapWidth, 0, 0, bitmapWidth, bitmapHeight);
 
         // Lot of OpenCV stuff that I don't understand
         return new BinaryBitmap(new HybridBinarizer(new RGBLuminanceSource(bitmapWidth, bitmapHeight, pixelArray)));
     }
 
-    public static Mat scaleMatDown(Mat originalMat, int newWidth, int newHeight) { // TODO... Comment
+    public Mat scaleMatDown(Mat originalMat, int newWidth, int newHeight) { // TODO... Comment
         Mat newMat = new Mat();
 
         double widthScale = (double)newWidth/(double)originalMat.width(); // getting width from here rather than static variable because of image cropping
@@ -56,7 +70,7 @@ public class ImageHelper {
         return newMat;
     }
 
-    public static Bitmap getBitmapFromMat(Mat mat) { // TODO... Comment
+    public Bitmap getBitmapFromMat(Mat mat) { // TODO... Comment
         Bitmap bitmap = Bitmap.createBitmap(mat.width(), mat.height(), Bitmap.Config.ARGB_8888);
         matToBitmap(mat, bitmap, false);
         return bitmap;
@@ -65,7 +79,7 @@ public class ImageHelper {
     /**
      * undistorts image to reduce time taken for QR scanning
      */
-    public static Mat undistort(Mat src, double[][] camIntrinsics) {
+    public Mat undistort(Mat src, double[][] camIntrinsics) { // Not sure about any of this
         Mat dst = new Mat(1280, 960, CvType.CV_8UC1);
         Mat cameraMatrix = new Mat(3, 3, CvType.CV_32FC1);
         Mat distCoeffs = new Mat(1, 5, CvType.CV_32FC1);
@@ -78,7 +92,7 @@ public class ImageHelper {
     }
 
     // TODO... Javadoc comment
-    public static Rect getCroppedImageRectangleArea(double percentRemoved, int numRows, int numColumns) {
+    public Rect getCroppedImageRectangleArea(double percentRemoved, int numRows, int numColumns) {
         // Ratio of image width:height
         double ratio = (double)numColumns / (double)numRows;
 

@@ -26,6 +26,7 @@ public class RobotOrderBuilder {
 
     private final Context context;
     private final KiboRpcApi api;
+    private final ImageHelper imageHelper;
 
     // Honestly could've all been done in the order constructors..
 
@@ -53,6 +54,7 @@ public class RobotOrderBuilder {
     public RobotOrderBuilder(Context context, KiboRpcApi api) {
         this.context = context;
         this.api = api;
+        this.imageHelper = new ImageHelper(context);
         this.stringOrderTypeMap = buildStringOrderTypeMapFromStringsFile();
         this.moveOrderPattern = Pattern.compile(context.getString(R.string.move_order_regex_pattern));
         this.qrCodeScanResultPattern = Pattern.compile(context.getString(R.string.qr_code_scan_result_pattern));
@@ -152,9 +154,10 @@ public class RobotOrderBuilder {
         return new RobotStartMissionOrder(api);
     }
 
-    private RobotScanARCodeOrder buildScanARCodeOrder() {
-        return new RobotScanARCodeOrder(
+    private RobotScanQRCodeOrder buildScanARCodeOrder() {
+        return new RobotScanQRCodeOrder(
                 this.api,
+                this.imageHelper,
                 this.scanARCodeLoopMax,
                 this.qrCodeScanResultPattern,
                 this.qrCodeScanResultSplitCharacter,

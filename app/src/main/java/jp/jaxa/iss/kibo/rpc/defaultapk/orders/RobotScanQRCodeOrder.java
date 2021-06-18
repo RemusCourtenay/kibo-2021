@@ -13,9 +13,9 @@ import java.util.regex.Pattern;
 import gov.nasa.arc.astrobee.Result;
 import jp.jaxa.iss.kibo.rpc.api.KiboRpcApi;
 
-import static jp.jaxa.iss.kibo.rpc.defaultapk.ImageHelper.getBinaryBitmapFromMatImage;
+class RobotScanQRCodeOrder extends RobotOrder { // TODO... Comment
 
-class RobotScanARCodeOrder extends RobotOrder { // TODO... Comment
+    private final ImageHelper imageHelper;
 
     private final int loopMax;
     private final Pattern qrCodeScanResultPattern;
@@ -28,8 +28,9 @@ class RobotScanARCodeOrder extends RobotOrder { // TODO... Comment
 
     private double[] scanResult;
 
-    RobotScanARCodeOrder(KiboRpcApi api, int loopMax, Pattern qrCodeScanResultPattern, String qrCodeScanResultSplitCharacter, String qrCodeScanResultInnerSplitCharacter, double flashlightOriginalBrightnessForScan, double flashlightFinalBrightnessForScan) {
+    RobotScanQRCodeOrder(KiboRpcApi api, ImageHelper imageHelper, int loopMax, Pattern qrCodeScanResultPattern, String qrCodeScanResultSplitCharacter, String qrCodeScanResultInnerSplitCharacter, double flashlightOriginalBrightnessForScan, double flashlightFinalBrightnessForScan) {
         super(api);
+        this.imageHelper = imageHelper;
         this.loopMax = loopMax;
         this.qrCodeScanResultPattern = qrCodeScanResultPattern;
         this.qrCodeScanResultSplitCharacter = qrCodeScanResultSplitCharacter;
@@ -102,7 +103,7 @@ class RobotScanARCodeOrder extends RobotOrder { // TODO... Comment
             api.flashlightControlFront(getCalculatedBrightness(loopMax, count));
 
             // Getting image from nav cam as bitmap
-            BinaryBitmap bitmap = getBinaryBitmapFromMatImage(api.getMatNavCam(), api.getNavCamIntrinsics());
+            BinaryBitmap bitmap = this.imageHelper.getBinaryBitmapFromMatImage(api.getMatNavCam(), api.getNavCamIntrinsics());
 
             // If read successful then return
             if ((contents = readQRCodeFromBitmap(bitmap)) != null) {

@@ -8,35 +8,17 @@ import jp.jaxa.iss.kibo.rpc.defaultapk.orders.RobotOrderBuilder;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.RobotOrderResult;
 
 import gov.nasa.arc.astrobee.Kinematics;
-import jp.jaxa.iss.kibo.rpc.api.KiboRpcService;
-import gov.nasa.arc.astrobee.Result;
 import gov.nasa.arc.astrobee.types.Point;
-import gov.nasa.arc.astrobee.types.Quaternion;
 
-import android.graphics.Bitmap;
 import android.os.SystemClock;
 import android.util.Log;
 
-import com.google.zxing.BinaryBitmap;
-import com.google.zxing.LuminanceSource;
-import com.google.zxing.RGBLuminanceSource;
-import com.google.zxing.common.HybridBinarizer;
-import com.google.zxing.qrcode.QRCodeReader;
-
 import org.opencv.aruco.Aruco;
 import org.opencv.aruco.Dictionary;
-import org.opencv.core.Rect;
 import org.opencv.core.Mat;
-import org.opencv.core.CvType;
-import org.opencv.imgproc.Imgproc;
-import org.opencv.core.Size;
-
-import static jp.jaxa.iss.kibo.rpc.defaultapk.ImageHelper.undistort;
-import static org.opencv.android.Utils.matToBitmap;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Class meant to handle commands from the Ground Data System and execute them in Astrobee
@@ -52,14 +34,32 @@ public class YourService extends KiboRpcService {
         RobotOrderBuilder orderBuilder = new RobotOrderBuilder(context, this.api);
         ExpeditionWrapper wrapper = new ExpeditionWrapper(orderBuilder);
 
-        // Attempting first stage
+        // Attempting first stage (move to QR Code and scan)
         RobotOrderResult result = wrapper.attemptExpeditionStage(context.getString(R.string.move_to_scan_order_string));
+        double[] scanResults = result.getReturnValue();
 
         // Ignoring result rn while we wait for the scan team to finish their section
+        //int nextPathNum = (int)scanResults[0];
+        // Getting which path to follow from the testing variable located in /app/src/main/res/values/integers.xml instead
+        int nextPathNum = context.getResources().getInteger(R.integer.chosen_path_to_test);
 
-        // Getting which path to follow from the testing variable located in /app/src/main/res/values/integers.xml
+        // Ignoring result rn while we wait for the scan team to finish their section
+        //float pointADashXValue = (float)scanResults[1];
+        //float pointADashYValue = (float)scanResults[2];
+        //float pointADashZValue = (float)scanResults[3];
+        // Getting which point A' is in from the testing variable located in /app/src/main/res/values/integers.xml instead
+        float pointADashXValue = (float)context.getResources().getInteger(R.integer.chosen_point_a_dash_x_value);
+        float pointADashYValue = (float)context.getResources().getInteger(R.integer.chosen_point_a_dash_y_value);
+        float pointADashZValue = (float)context.getResources().getInteger(R.integer.chosen_point_a_dash_z_value);
+
+        orderBuilder.setPointADash(
+                pointADashXValue,
+                pointADashYValue,
+                pointADashZValue
+        );
+
         String nextStageOrderString;
-        switch (context.getResources().getInteger(R.integer.chosen_path_to_test)) {
+        switch (nextPathNum) {
             case 1: nextStageOrderString = context.getString(R.string.move_to_laser_order_string_variant_1); break;
             case 2: nextStageOrderString = context.getString(R.string.move_to_laser_order_string_variant_2); break;
             case 3: nextStageOrderString = context.getString(R.string.move_to_laser_order_string_variant_3); break;
@@ -74,20 +74,10 @@ public class YourService extends KiboRpcService {
                     "Value should be between 1 and 8");
         }
 
-        // Ignoring result rn while we wait for the scan team to finish their section
-
-        // Getting which point A' is in from the testing variable located in /app/src/main/res/values/integers.xml
-
-        orderBuilder.setPointADash(
-                (float)context.getResources().getInteger(R.integer.chosen_point_a_dash_x_value),
-                (float)context.getResources().getInteger(R.integer.chosen_point_a_dash_y_value),
-                (float)context.getResources().getInteger(R.integer.chosen_point_a_dash_z_value)
-        );
-
-        // Attempting the second stage
+        // Attempting the second stage (move to point A' and fire laser)
         wrapper.attemptExpeditionStage(nextStageOrderString);
 
-        // Attempting the final stage
+        // Attempting the final stage (move to finish)
         wrapper.attemptExpeditionStage(context.getString(R.string.move_to_finish_order_string));
 
 

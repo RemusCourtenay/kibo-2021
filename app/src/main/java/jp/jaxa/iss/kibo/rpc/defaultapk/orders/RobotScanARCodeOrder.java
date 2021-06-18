@@ -3,12 +3,14 @@ package jp.jaxa.iss.kibo.rpc.defaultapk.orders;
 import android.util.Log;
 
 import com.google.zxing.BinaryBitmap;
+import com.google.zxing.ChecksumException;
+import com.google.zxing.FormatException;
+import com.google.zxing.NotFoundException;
 import com.google.zxing.qrcode.QRCodeReader;
 
 import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import gov.nasa.arc.astrobee.Result;
 import jp.jaxa.iss.kibo.rpc.api.KiboRpcApi;
@@ -22,6 +24,8 @@ class RobotScanARCodeOrder extends RobotOrder {
     private final String qrCodeScanResultSplitCharacter;
     private final String qrCodeScanResultInnerSplitCharacter;
 
+    private final QRCodeReader qrCodeReader;
+
     private double[] scanResult;
 
     RobotScanARCodeOrder(KiboRpcApi api, int loopMax, Pattern qrCodeScanResultPattern, String qrCodeScanResultSplitCharacter, String qrCodeScanResultInnerSplitCharacter) {
@@ -30,6 +34,7 @@ class RobotScanARCodeOrder extends RobotOrder {
         this.qrCodeScanResultPattern = qrCodeScanResultPattern;
         this.qrCodeScanResultSplitCharacter = qrCodeScanResultSplitCharacter;
         this.qrCodeScanResultInnerSplitCharacter = qrCodeScanResultInnerSplitCharacter;
+        this.qrCodeReader = new QRCodeReader();
     }
 
     @Override
@@ -68,10 +73,10 @@ class RobotScanARCodeOrder extends RobotOrder {
 
     private double[] decodeQRCodeString(String scanResultString) {
 
-        return Arrays.stream(scanResultString.split(this.qrCodeScanResultSplitCharacter)) // TODO... Add to strings.xml
+        return Arrays.stream(scanResultString.split(this.qrCodeScanResultSplitCharacter))
                 .mapToDouble(i ->
                         Double.parseDouble(
-                                i.split(this.qrCodeScanResultInnerSplitCharacter)[1])) // TODO... Add to strings.xml
+                                i.split(this.qrCodeScanResultInnerSplitCharacter)[1]))
                 .toArray();
 
     }
@@ -88,23 +93,28 @@ class RobotScanARCodeOrder extends RobotOrder {
      * @return String content of the QR code
      */
     private String readQR() { // TODO... Comment
-        int count = 0;
         String contents = null;
-        api.flashlightControlFront(0f);
-        while (contents == null && count < this.loopMax) {
+
+        // Immediately overwritten in while loop?
+        api.flashlightControlFront(0f); // TODO... Move to values.xml
+
+        for (int count = 0; count < loopMax; count++) {
             if (count < 40) { // Magic number
                 api.flashlightControlFront((count+1)*0.025f);
             }
             BinaryBitmap bitmap = getImgBinBitmap(api.getMatNavCam(), api.getDockCamIntrinsics()); // Different cameras?
             try {
-                com.google.zxing.Result result = new QRCodeReader().decode(bitmap); // Different type of Result?
-                contents = result.getText();
+                qrCodeReader.reset();
+                com.google.zxing.Result result = qrCodeReader.decode(bitmap);
+                if ((contents = result.getText()) != null) {
+                    break;
+                }
             }
-            catch (Exception e) { // Catch Exception??
-                Log.d("QR[status]:", " Not detected");
+            catch (NotFoundException | FormatException | ChecksumException e) {
+                Log.d("QR[status]:", e.getMessage());
             }
-            count++;
         }
+
         api.flashlightControlFront(0f); // Turning flashlight on twice?
         return contents;
     }

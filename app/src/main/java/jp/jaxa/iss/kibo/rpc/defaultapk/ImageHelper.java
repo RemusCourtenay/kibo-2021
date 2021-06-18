@@ -17,23 +17,25 @@ import static org.opencv.android.Utils.matToBitmap;
 
 public class ImageHelper {
 
-    private static final int NAV_MAX_COL = 1280; // TODO... Move to Integers.xml
+    private static final int NAV_MAX_COL = 1280; // TODO... Move all to Integers.xml
     private static final int NAV_MAX_ROW =  960;
+    private static final int PERCENT_CROP = 40;
+    private static final int RESIZE_IMAGE_WIDTH = 2000;
+    private static final int RESIZE_IMAGE_HEIGHT = 1500;
 
     /**
      * getImgBinBitmap gets the image from the camera, and returns a binary bitmap for it.
      * @return BinaryBitmap for camera image
      */
     public static BinaryBitmap getImgBinBitmap(Mat matNavCam, double[][] dockCamIntrinsics) {
-        Mat src_mat = new Mat(undistort(matNavCam, dockCamIntrinsics), cropImage(40));
-        Bitmap bMap = resizeImage(src_mat, 2000, 1500);
+        Mat src_mat = new Mat(undistort(matNavCam, dockCamIntrinsics), cropImage(PERCENT_CROP));
+        Bitmap bMap = resizeImage(src_mat, RESIZE_IMAGE_WIDTH, RESIZE_IMAGE_HEIGHT);
 
         int[] intArray = new int[bMap.getWidth() * bMap.getHeight()];
-        bMap.getPixels(intArray, 0, bMap.getWidth(), 0, 0, bMap.getWidth(), bMap.getHeight());
+        bMap.getPixels(intArray, 0, bMap.getWidth(), 0, 0, bMap.getWidth(), bMap.getHeight()); // Magic numbers
 
         LuminanceSource source = new RGBLuminanceSource(bMap.getWidth(), bMap.getHeight(), intArray);
-        BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
-        return bitmap;
+        return new BinaryBitmap(new HybridBinarizer(source));
     }
 
     /**
@@ -57,13 +59,13 @@ public class ImageHelper {
      * @param src
      * @return Mat dst
      */
-    public static Mat undistort(Mat src, double[][] dockCamIntrisics) {
+    public static Mat undistort(Mat src, double[][] dockCamIntrinsics) {
         Mat dst = new Mat(1280, 960, CvType.CV_8UC1);
         Mat cameraMatrix = new Mat(3, 3, CvType.CV_32FC1);
         Mat distCoeffs = new Mat(1, 5, CvType.CV_32FC1);
 
-        cameraMatrix.put(0, 0, dockCamIntrisics[0]);
-        distCoeffs.put(0, 1, dockCamIntrisics[1]);
+        cameraMatrix.put(0, 0, dockCamIntrinsics[0]);
+        distCoeffs.put(0, 1, dockCamIntrinsics[1]);
 
         Imgproc.undistort(src, dst, cameraMatrix, distCoeffs);
         return dst;
@@ -75,7 +77,7 @@ public class ImageHelper {
      * @return Cropped image
      */
     public static Rect cropImage(int percent_crop) {
-        double ratio = NAV_MAX_COL / NAV_MAX_ROW;
+        double ratio = NAV_MAX_COL / NAV_MAX_ROW;  // Is this supposed to be integer division?
 
         double percent_row = percent_crop/2; // Is this supposed to be integer division?
         double percent_col = percent_row * ratio;

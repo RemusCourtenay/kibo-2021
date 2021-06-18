@@ -3,7 +3,6 @@ package jp.jaxa.iss.kibo.rpc.defaultapk.orders;
 import android.content.Context;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

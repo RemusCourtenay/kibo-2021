@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 import gov.nasa.arc.astrobee.Result;
 import jp.jaxa.iss.kibo.rpc.api.KiboRpcApi;
 
-import static jp.jaxa.iss.kibo.rpc.defaultapk.ImageHelper.getImgBinBitmap;
+import static jp.jaxa.iss.kibo.rpc.defaultapk.ImageHelper.getBinaryBitmapFromMatImage;
 
 class RobotScanARCodeOrder extends RobotOrder { // TODO... Comment
 
@@ -102,7 +102,7 @@ class RobotScanARCodeOrder extends RobotOrder { // TODO... Comment
             api.flashlightControlFront(getCalculatedBrightness(loopMax, count));
 
             // Getting image from nav cam as bitmap
-            BinaryBitmap bitmap = getImgBinBitmap(api.getMatNavCam(), api.getNavCamIntrinsics());
+            BinaryBitmap bitmap = getBinaryBitmapFromMatImage(api.getMatNavCam(), api.getNavCamIntrinsics());
 
             // If read successful then return
             if ((contents = readQRCodeFromBitmap(bitmap)) != null) {

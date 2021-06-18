@@ -94,7 +94,7 @@ class RobotScanARCodeOrder extends RobotOrder { // TODO... Comment
      * @return String content of the QR code
      */
     private String readQR() { // TODO... Comment
-        String contents = null;
+        String contents;
 
         for (int count = 0; count < loopMax; count++) {
 

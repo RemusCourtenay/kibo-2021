@@ -27,8 +27,8 @@ public class ImageHelper {
      * getImgBinBitmap gets the image from the camera, and returns a binary bitmap for it.
      * @return BinaryBitmap for camera image
      */
-    public static BinaryBitmap getImgBinBitmap(Mat matNavCam, double[][] dockCamIntrinsics) {
-        Mat src_mat = new Mat(undistort(matNavCam, dockCamIntrinsics), cropImage(PERCENT_CROP));
+    public static BinaryBitmap getImgBinBitmap(Mat matCam, double[][] camIntrinsics) {
+        Mat src_mat = new Mat(undistort(matCam, camIntrinsics), cropImage(PERCENT_CROP));
         Bitmap bMap = resizeImage(src_mat, RESIZE_IMAGE_WIDTH, RESIZE_IMAGE_HEIGHT);
 
         int[] intArray = new int[bMap.getWidth() * bMap.getHeight()];

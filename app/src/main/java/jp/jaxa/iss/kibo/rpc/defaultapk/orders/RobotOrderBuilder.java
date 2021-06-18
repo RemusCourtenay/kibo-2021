@@ -41,6 +41,7 @@ public class RobotOrderBuilder {
     private final String qrCodeScanResultSplitCharacter;
     private final String qrCodeScanResultInnerSplitCharacter;
     private final double flashlightOriginalBrightnessForScan;
+    private final double flashlightFinalBrightnessForScan;
     // Max number of times the move command will loop
     private final int moveLoopMax;
     // Max number of times the scan AR Code command will loop
@@ -60,6 +61,7 @@ public class RobotOrderBuilder {
         this.qrCodeScanResultSplitCharacter = context.getString(R.string.qr_code_scan_result_split_character);
         this.qrCodeScanResultInnerSplitCharacter = context.getString(R.string.qr_code_scan_result_inner_split_character);
         this.flashlightOriginalBrightnessForScan = context.getResources().getInteger(R.integer.flashlight_original_brightness_percent_for_scan)/(double)100;
+        this.flashlightFinalBrightnessForScan = context.getResources().getInteger(R.integer.flashlight_final_brightness_percent_for_scan)/(double)100;
         this.moveLoopMax = context.getResources().getInteger(R.integer.max_movement_loop_attempts);
         this.scanARCodeLoopMax = context.getResources().getInteger(R.integer.max_scan_ar_code_loop_attempts);
     }
@@ -157,7 +159,8 @@ public class RobotOrderBuilder {
                 this.qrCodeScanResultPattern,
                 this.qrCodeScanResultSplitCharacter,
                 this.qrCodeScanResultInnerSplitCharacter,
-                this.flashlightOriginalBrightnessForScan
+                this.flashlightOriginalBrightnessForScan,
+                this.flashlightFinalBrightnessForScan
         );
     }
 

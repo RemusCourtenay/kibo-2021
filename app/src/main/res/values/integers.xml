@@ -3,6 +3,7 @@
     <integer name="max_movement_loop_attempts">3</integer>
     <integer name="max_scan_ar_code_loop_attempts">3</integer>
     <integer name="flashlight_original_brightness_percent_for_scan">50</integer>
+    <integer name="flashlight_final_brightness_percent_for_scan">90</integer>
 
     <!--
     Temporary variable used to choose which path to test while we wait for QR team to finish

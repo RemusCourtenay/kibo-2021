@@ -17,23 +17,25 @@ import jp.jaxa.iss.kibo.rpc.api.KiboRpcApi;
 
 import static jp.jaxa.iss.kibo.rpc.defaultapk.ImageHelper.getImgBinBitmap;
 
-class RobotScanARCodeOrder extends RobotOrder {
+class RobotScanARCodeOrder extends RobotOrder { // TODO... Comment
 
     private final int loopMax;
     private final Pattern qrCodeScanResultPattern;
     private final String qrCodeScanResultSplitCharacter;
     private final String qrCodeScanResultInnerSplitCharacter;
+    private final double flashlightOriginalBrightnessForScan;
 
     private final QRCodeReader qrCodeReader;
 
     private double[] scanResult;
 
-    RobotScanARCodeOrder(KiboRpcApi api, int loopMax, Pattern qrCodeScanResultPattern, String qrCodeScanResultSplitCharacter, String qrCodeScanResultInnerSplitCharacter) {
+    RobotScanARCodeOrder(KiboRpcApi api, int loopMax, Pattern qrCodeScanResultPattern, String qrCodeScanResultSplitCharacter, String qrCodeScanResultInnerSplitCharacter, double flashlightOriginalBrightnessForScan) {
         super(api);
         this.loopMax = loopMax;
         this.qrCodeScanResultPattern = qrCodeScanResultPattern;
         this.qrCodeScanResultSplitCharacter = qrCodeScanResultSplitCharacter;
         this.qrCodeScanResultInnerSplitCharacter = qrCodeScanResultInnerSplitCharacter;
+        this.flashlightOriginalBrightnessForScan = flashlightOriginalBrightnessForScan;
         this.qrCodeReader = new QRCodeReader();
     }
 
@@ -94,32 +96,36 @@ class RobotScanARCodeOrder extends RobotOrder {
      */
     private String readQR() { // TODO... Comment
         String contents = null;
-
-        // Immediately overwritten in while loop?
-        api.flashlightControlFront(0f); // TODO... Move to values.xml
+        double lightDecrease = 1 - this.flashlightOriginalBrightnessForScan;
+        double originalBrightness = 1; // Probably overkill to put this in integers.xml
+        double percentageOfDecreaseApplied;
 
         for (int count = 0; count < loopMax; count++) {
-            if (count < 40) { // Magic number
-                api.flashlightControlFront((count+1)*0.025f);
-            }
-            BinaryBitmap bitmap = getImgBinBitmap(api.getMatNavCam(), api.getDockCamIntrinsics()); // Different cameras?
-            try {
-                qrCodeReader.reset();
-                com.google.zxing.Result result = qrCodeReader.decode(bitmap);
-                if ((contents = result.getText()) != null) {
-                    break;
-                }
-            }
-            catch (NotFoundException | FormatException | ChecksumException e) {
-                Log.d("QR[status]:", e.getMessage());
+
+            // Gradually increasing brightness of flashlight
+            percentageOfDecreaseApplied = (double)(count)/(double)(loopMax-1); // Starts at 0% and increases to 100%
+            api.flashlightControlFront((float)(originalBrightness-(lightDecrease*percentageOfDecreaseApplied)));
+
+            // Getting image from nav cam as bitmap
+            BinaryBitmap bitmap = getImgBinBitmap(api.getMatNavCam(), api.getNavCamIntrinsics());
+
+            if ((contents = readQRCodeFromBitmap(bitmap)) != null) {
+                break;
             }
         }
 
-        api.flashlightControlFront(0f); // Turning flashlight on twice?
+        api.flashlightControlFront((float)0); // Turning flashlight off?
         return contents;
     }
 
-
+    private String readQRCodeFromBitmap(BinaryBitmap bitmap) {
+        try {
+            qrCodeReader.reset();
+            return qrCodeReader.decode(bitmap).getText();
+        } catch (NotFoundException | FormatException | ChecksumException e) { // TODO... Do something with error messages
+            return null;
+        }
+    }
 
 
 }

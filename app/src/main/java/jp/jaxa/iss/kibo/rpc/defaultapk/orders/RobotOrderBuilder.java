@@ -27,6 +27,8 @@ public class RobotOrderBuilder {
     private final Context context;
     private final KiboRpcApi api;
 
+    // Honestly could've all been done in the order constructors..
+
     private final Map<String, RobotOrderType> stringOrderTypeMap;
     private final Pattern moveOrderPattern;
     private final Pattern qrCodeScanResultPattern;
@@ -38,6 +40,7 @@ public class RobotOrderBuilder {
 
     private final String qrCodeScanResultSplitCharacter;
     private final String qrCodeScanResultInnerSplitCharacter;
+    private final double flashlightOriginalBrightnessForScan;
     // Max number of times the move command will loop
     private final int moveLoopMax;
     // Max number of times the scan AR Code command will loop
@@ -56,6 +59,7 @@ public class RobotOrderBuilder {
         this.orderInnerSplitCharacter = context.getString(R.string.order_inner_split_character);
         this.qrCodeScanResultSplitCharacter = context.getString(R.string.qr_code_scan_result_split_character);
         this.qrCodeScanResultInnerSplitCharacter = context.getString(R.string.qr_code_scan_result_inner_split_character);
+        this.flashlightOriginalBrightnessForScan = context.getResources().getInteger(R.integer.flashlight_original_brightness_percent_for_scan)/(double)100;
         this.moveLoopMax = context.getResources().getInteger(R.integer.max_movement_loop_attempts);
         this.scanARCodeLoopMax = context.getResources().getInteger(R.integer.max_scan_ar_code_loop_attempts);
     }
@@ -152,7 +156,8 @@ public class RobotOrderBuilder {
                 this.scanARCodeLoopMax,
                 this.qrCodeScanResultPattern,
                 this.qrCodeScanResultSplitCharacter,
-                this.qrCodeScanResultInnerSplitCharacter
+                this.qrCodeScanResultInnerSplitCharacter,
+                this.flashlightOriginalBrightnessForScan
         );
     }
 

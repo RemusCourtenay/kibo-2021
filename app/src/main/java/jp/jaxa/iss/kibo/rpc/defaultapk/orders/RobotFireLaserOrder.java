@@ -15,18 +15,34 @@ import org.opencv.core.MatOfPoint3f;
 import org.opencv.core.Size;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 class RobotFireLaserOrder extends RobotOrder {
 
 
     private static final int markerDictionaryID = Aruco.DICT_5X5_250;
+    private static final int AMOUNT_TO_ADJUST = 10;
+    private static final int MAX_BOARD_ATTEMPTS = 10;
+
+    private final Map<Integer, int[]> idToDirectionMap;
+
 
     private final ImageHelper imageHelper;
 
     RobotFireLaserOrder(KiboRpcApi api, Context context, ImageHelper imageHelper) {
         super(api);
         this.imageHelper = imageHelper;
+
+
+        idToDirectionMap = new HashMap<>();
+        // 0,0 is bottom left, 1,2,3,4 go clockwise from top right, array values are movements to get tags to enter frame assuming that camera is right way up
+        idToDirectionMap.put(1, new int[]{-AMOUNT_TO_ADJUST,-AMOUNT_TO_ADJUST});
+        idToDirectionMap.put(2, new int[]{-AMOUNT_TO_ADJUST,AMOUNT_TO_ADJUST});
+        idToDirectionMap.put(3, new int[]{AMOUNT_TO_ADJUST,AMOUNT_TO_ADJUST});
+        idToDirectionMap.put(4, new int[]{AMOUNT_TO_ADJUST,+AMOUNT_TO_ADJUST});
+
     }
 
     private void attemptToAlignLaser(double poseAngle, double distance) {
@@ -35,38 +51,46 @@ class RobotFireLaserOrder extends RobotOrder {
 
     @Override
     protected Result attemptOrderImplementation() {
-        Mat image =  imageHelper.undistort(api.getMatNavCam(),api.getNavCamIntrinsics());
-        List<Mat> corners = new ArrayList<Mat>();
-        Mat ids = new Mat();//(4, 1, 0);
-        Aruco.detectMarkers(image, Aruco.getPredefinedDictionary(markerDictionaryID), corners, ids);
-        Board board = Board.create(corners, Aruco.getPredefinedDictionary(markerDictionaryID), ids);
-        /**
-         * Attempt with estimate pose board
-         */
-        // Mat counter = new Mat(4, 1, 0);
-        // Size imageSize = new Size();
-        Mat distCoeffs = new Mat();//4, 1, 0);
-        Mat rvecs = new Mat();
-        Mat tvecs = new Mat();
-        // double vecs = Aruco.calibrateCameraAruco(corners, ids, counter, board, imageSize, image, distCoeffs);
-        int poses = Aruco.estimatePoseBoard(corners, ids, board, image, distCoeffs, rvecs, tvecs);
-        //Mat camMat = cameraMatrix(fc, new Size(frameSize.width / 2, frameSize.height / 2));
-        /**
-         * Attempt with calib3d solvePnP
-         */
-        Mat camMat = image;
-        MatOfDouble coeff = new MatOfDouble(); // dummy
+        List<Mat> cornersOfEachTag = new ArrayList<>(); // Supposedly I can pass these in and the functions will give them values
+        Mat tagIdentifiers = new Mat();
 
-        MatOfPoint2f centers = new MatOfPoint2f();
-        //Size patternSize = new Size(4, 11);
-        //MatOfPoint3f grid = asymmetricalCircleGrid(patternSize);
-        MatOfPoint3f grid = new MatOfPoint3f(image);
-        Mat rvec = new MatOfFloat();
-        Mat tvec = new MatOfFloat();
+        // Handles getting image onto 4 tags
+        Mat image;
+        Board airlockBoard;
 
-        MatOfPoint2f reprojCenters = new MatOfPoint2f();
-        Calib3d.solvePnP(grid, centers, camMat, coeff, rvec, tvec, false);
-        //Calib3d.solvePnP();
+        int numAttempts = 0;
+
+        do { // Moved this out to here so I didn't have to pass image in
+            if (numAttempts < MAX_BOARD_ATTEMPTS) {
+                numAttempts++;
+                image = imageHelper.undistort(api.getMatNavCam(), api.getNavCamIntrinsics());
+            } else {
+                throw new RobotOrderException("Failed to make board, unable to get all four tags?");
+            }
+        } while ((airlockBoard = getBoardData(image, cornersOfEachTag, tagIdentifiers)) != null);
+
+
+
+        Mat distortionCoeffecients = new Mat(); // TODO... Get this from api.getNavCamIntrinsics?? from openCv camera functions??
+        Mat rotationVector = new Mat(); // Output vector corresponding to rotation of board
+        Mat translationVector = new Mat(); // Output vector corresponding to translation of board
+
+        if(Aruco.estimatePoseBoard(
+                cornersOfEachTag,
+                tagIdentifiers,
+                airlockBoard,
+                image,
+                distortionCoeffecients,
+                rotationVector,
+                translationVector
+        ) == 0) {
+            throw new RobotOrderException("Failed to estimate pose");
+        }
+
+        // Do something maths related with rotation and translation vector
+
+        takeTenSnapShots();
+
         return null; // TODO...
     }
 
@@ -86,217 +110,38 @@ class RobotFireLaserOrder extends RobotOrder {
         }
     }
 
-    /**
-     * getBoard makes and returns a board.
-     * @return board
-     */
-    private Board getBoard() {
-        Mat image =  imageHelper.undistort(api.getMatNavCam(),api.getNavCamIntrinsics());
-        List<Mat> corners = new ArrayList<Mat>();
-        Mat ids = new Mat();//(4, 1, 0);
-        Aruco.detectMarkers(image, Aruco.getPredefinedDictionary(markerDictionaryID), corners, ids);
-        while  ((ids.cols() < 2) && (ids.rows() < 2)) {
-            adjustImage(ids);
-            Aruco.detectMarkers(image, Aruco.getPredefinedDictionary(markerDictionaryID), corners, ids);
 
+    private Board getBoardData(Mat image, List<Mat> cornersOfEachTag, Mat tagIdentifiersVector) { // TODO... Comments
+        cornersOfEachTag.clear();
+        // not clearing tagIdentifiersVector, hopefully ok
+        Aruco.detectMarkers(image, Aruco.getPredefinedDictionary(markerDictionaryID), cornersOfEachTag, tagIdentifiersVector);
+        if (tagIdentifiersVector.size().width < 4) {
+            adjustImage(tagIdentifiersVector); // try move to get more tags into image
+            return null; // signal that we need to run again
+        } else {
+            return Board.create(cornersOfEachTag, Aruco.getPredefinedDictionary(markerDictionaryID), tagIdentifiersVector);
         }
-        Board board = Board.create(corners, Aruco.getPredefinedDictionary(markerDictionaryID), ids);
-        return board;
-    }
-
-    /**
-     * adjustImage adjusts the image
-     * @param ids
-     */
-    private void adjustImage(Mat ids) {
-        /*int id1, id2, id3, id4;
-        id1 = 0;
-        id2 = 0;
-        id3 = 0;
-        id4 = 0;
-
-        if (ids.rows()== 0) {
-            if (ids.cols() == 0) {
-
-            }
-            if (ids.cols() == 1) {
-
-            }
-            if (ids.cols() == 2) {
-
-            }
-        }
-         else if (ids.rows()== 1) {
-
-            if (ids.cols() == 0) {
-
-            }
-            if (ids.cols() == 1) {
-
-            }
-            if (ids.cols() == 2) {
-
-            }
-        }
-        else if (ids.rows()== 2) {
-
-            if (ids.cols() == 0) {
-
-            }
-            if (ids.cols() == 1) {
-
-            }
-            if (ids.cols() == 2) {
-
-            }
-        }
-        if (ids.rows()==0) {
-
-        }
-         else if (ids.rows()==1) {
-            if (ids.cols() == 0) {
-
-            }
-             else if (ids.cols() == 1) {
-
-            }
-            else if (ids.cols() == 2) {
-
-            }
-            else if (ids.cols() == 3) {
-
-            }
-            else if (ids.cols() == 4) {
-
-            }
-        }*/
-        List<Integer> id = new ArrayList<Integer>();
-        for (int i = 0; i < ids.cols(); i++) {
-            id.add(((int)(ids.get(1,i))[0]));
-        }
-        if (id.size() == 4) {
-            return;
-        } else if (id.size() == 3) {
-            if (id.contains(1)) {
-                if (id.contains(2)) {
-                    if (id.contains(3)) {
-
-                    } else if (id.contains(4)) {
-
-                    }
-                } else if (id.contains(3)) {
-                    if (id.contains(2)) {
-
-                    } else if (id.contains(4)) {
-
-                    }
-                } else if (id.contains(4)) {
-                    if (id.contains(3)) {
-
-                    } else if (id.contains(2)) {
-
-                    }
-                }
-            } else if (id.contains(2)) {
-                if (id.contains(1)) {
-                    if (id.contains(3)) {
-
-                    } else if (id.contains(4)) {
-
-                    }
-                } else if (id.contains(3)) {
-                    if (id.contains(2)) {
-
-                    } else if (id.contains(4)) {
-
-                    }
-                } else if (id.contains(4)) {
-                    if (id.contains(3)) {
-
-                    } else if (id.contains(4)) {
-
-                    }
-                }
-            } else if (id.contains(3)) {
-                if (id.contains(2)) {
-
-                } else if (id.contains(1)) {
-
-                } else if (id.contains(4)) {
-
-                }
-            } else if (id.contains(4)) {
-                if (id.contains(2)) {
-
-                } else if (id.contains(3)) {
-
-                } else if (id.contains(1)) {
-
-                }
-            }
-        } else if (id.size() == 2) {
-            if (id.contains(1)) {
-                if (id.contains(2)) {
-
-                } else if (id.contains(3)) {
-
-                } else if (id.contains(4)) {
-
-                }
-            } else if (id.contains(2)) {
-                if (id.contains(1)) {
-
-                } else if (id.contains(3)) {
-
-                } else if (id.contains(4)) {
-
-                }
-            } else if (id.contains(3)) {
-                if (id.contains(1)) {
-
-                } else if (id.contains(2)) {
-
-                } else if (id.contains(4)) {
-
-                }
-            } else if (id.contains(4)) {
-                if (id.contains(1)) {
-
-                } else if (id.contains(2)) {
-
-                } else if (id.contains(3)) {
-
-                }
-            }
-        } else if (id.size() == 1) {
-            if (id.contains(1)) {
-
-            } else if (id.contains(2)) {
-
-            } else if (id.contains(3)) {
-
-            } else if (id.contains(4)) {
-
-            }
-        }
-        /*ids.get(0,0);
-        ids.get(0,1);
-        ids.get(1,0);
-        ids.get(1,1);
-        if (ids.rows()<0) {
-            switch (ids.cols()) {
-                case 0:
-
-                    break;
-
-
-            }
-        }
-        switch (ids) {
-            case (ids.cols()<2):
-
-        }*/
     }
 
 
+    private void adjustImage(Mat idsVector) {
+
+        // ordered x,y
+        int[] adjustmentAmounts = new int[]{0,0};
+        int[] specificAdjustment;
+        double[] temp = new double[(int) idsVector.total() * idsVector.channels()];
+
+        for (int i = 0; i < idsVector.size().width; i++) {
+            idsVector.get(0, i, temp); // Assuming this is the right way around
+            specificAdjustment = this.idToDirectionMap.get((int) temp[0]);
+            adjustmentAmounts[0] = adjustmentAmounts[0] + specificAdjustment[0];
+            adjustmentAmounts[1] = adjustmentAmounts[1] + specificAdjustment[1];
+        }
+
+        rotateRobot(adjustmentAmounts);
+    }
+
+    private void rotateRobot(int[] adjustmentAmounts) {
+        // TODO... do maths
+    }
 }

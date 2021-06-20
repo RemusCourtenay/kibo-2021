@@ -2,6 +2,9 @@ package jp.jaxa.iss.kibo.rpc.defaultapk.orders;
 
 
 
+import android.content.Context;
+import android.test.ActivityTestCase;
+
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -12,6 +15,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.util.ArrayList;
 import java.util.List;
 
+import jp.jaxa.iss.kibo.rpc.defaultapk.R;
 import jp.jaxa.iss.kibo.rpc.defaultapk.TestResources;
 
 import static org.junit.Assert.assertEquals;
@@ -19,7 +23,7 @@ import static org.junit.Assert.fail;
 
 
 @RunWith(MockitoJUnitRunner.class)
-public class RobotOrderBuilderTest {
+public class RobotOrderBuilderTest extends ActivityTestCase {
 
     @ClassRule
     public static final TestResources mockResources = new TestResources();
@@ -27,10 +31,132 @@ public class RobotOrderBuilderTest {
     private RobotOrderBuilder orderBuilder;
     private List<RobotOrder> orders;
 
+    private static final String FIRST_ORDER_STRING = "START_MISSION|{[11.21,-9.8,4.79][0,0,-0.707,0.707]}|SCAN_QR_CODE";
+    private static final String OPTION_ONE_ORDER_STRING = "{[10.99,-9.8,4.79][0,0,-0.707,0.707]}|APPROACH_FIRING_POSITION|FIRE_LASER|{[11.21,-9.8,4.79][0,0,-0.707,0.707]}|{[10.51,-9.8,4.79][0,0,-0.707,0.707]}|{[10.51,-8.0,4.79][0,0,-0.707,0.707]}";
+    private static final String OPTION_TWO_ORDER_STRING = "APPROACH_FIRING_POSITION|FIRE_LASER|{[11.21,-9.8,4.79][0,0,-0.707,0.707]}|{[10.51,-9.8,4.79][0,0,-0.707,0.707]}|{[10.51,-8.0,4.79][0,0,-0.707,0.707]}";
+    private static final String OPTION_THREE_ORDER_STRING = "{[10.99,-9.8,4.79][0,0,-0.707,0.707]}|APPROACH_FIRING_POSITION|FIRE_LASER|{[10.99,-9.8,4.79][0,0,-0.707,0.707]}|{[10.51,-9.8,4.79][0,0,-0.707,0.707]}|{[10.51,-8.0,4.79][0,0,-0.707,0.707]}";
+    private static final String OPTION_FOUR_ORDER_STRING = "{[10.99,-9.8,4.79][0,0,-0.707,0.707]}|APPROACH_FIRING_POSITION|FIRE_LASER|{[10.99,-9.8,4.79][0,0,-0.707,0.707]}|{[10.51,-9.8,4.79][0,0,-0.707,0.707]}|{[10.51,-8.0,4.79][0,0,-0.707,0.707]}";
+    private static final String OPTION_FIVE_ORDER_STRING = "{[10.61,-9.8,4.79][0,0,-0.707,0.707]}|{[10.62,-9.8,5.45][0,0,-0.707,0.707]}|APPROACH_FIRING_POSITION|FIRE_LASER|{[10.51,-9.8,5.45][0,0,-0.707,0.707]}|{[10.51,-9.8,4.79][0,0,-0.707,0.707]}|{[10.51,-8.0,4.79][0,0,-0.707,0.707]}";
+    private static final String OPTION_SIX_ORDER_STRING = "{[10.61,-9.8,4.79][0,0,-0.707,0.707]}|{[10.62,-9.8,5.45][0,0,-0.707,0.707]}|APPROACH_FIRING_POSITION|FIRE_LASER|{[10.51,-9.8,4.79][0,0,-0.707,0.707]}|{[10.51,-8.0,4.79][0,0,-0.707,0.707]}";
+    private static final String OPTION_SEVEN_ORDER_STRING = "{[10.62,-9.8,4.79][0,0,-0.707,0.707]}|{[10.62,-9.8,5.45][0,0,-0.707,0.707]}|{[11.21,-9.8,5.45][0,0,-0.707,0.707]}|APPROACH_FIRING_POSITION|FIRE_LASER|{[11.21,-9.8,5.45][0,0,-0.707,0.707]}|{[10.51,-9.8,5.45][0,0,-0.707,0.707]}|{[10.51,-8.0,4.79][0,0,-0.707,0.707]}";
+    private static final String OPTION_EIGHT_ORDER_STRING = "{[10.62,-9.8,4.79][0,0,-0.707,0.707]}|{[10.62,-9.8,5.45][0,0,-0.707,0.707]}|{[11.21,-9.8,5.45][0,0,-0.707,0.707]}|APPROACH_FIRING_POSITION|FIRE_LASER|{[11.21,-9.8,5.45][0,0,-0.707,0.707]}|{[10.51,-9.8,5.45][0,0,-0.707,0.707]}|{[10.51,-8.0,4.79][0,0,-0.707,0.707]}";
+    private static final String FINAL_ORDER_STRING = "{[10.6,-8.0,4.5][0,0,-0.707,0.707]}|FINISH_MISSION";
+
     @Before
     public void before() {
         orderBuilder = new RobotOrderBuilder(mockResources.mockContext, mockResources.nullApi);
         orders = new ArrayList<>();
+    }
+
+    @Test
+    public void testFirstOrderString() {
+        try {
+            orders = orderBuilder.buildOrders(FIRST_ORDER_STRING);
+            assertEquals(3,orders.size());
+        } catch (RobotOrderException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void testOptionOneOrderString() {
+        orderBuilder.setPointADash(0,0,0);
+        try {
+            orders = orderBuilder.buildOrders(OPTION_ONE_ORDER_STRING);
+            assertEquals(6,orders.size());
+        } catch (RobotOrderException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void testOptionTwoOrderString() {
+        orderBuilder.setPointADash(0,0,0);
+        try {
+            orders = orderBuilder.buildOrders(OPTION_TWO_ORDER_STRING);
+            assertEquals(5,orders.size());
+        } catch (RobotOrderException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void testOptionThreeOrderString() {
+        orderBuilder.setPointADash(0,0,0);
+        try {
+            orders = orderBuilder.buildOrders(OPTION_THREE_ORDER_STRING);
+            assertEquals(6,orders.size());
+        } catch (RobotOrderException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void testOptionFourOrderString() {
+        orderBuilder.setPointADash(0,0,0);
+        try {
+            orders = orderBuilder.buildOrders(OPTION_FOUR_ORDER_STRING);
+            assertEquals(6,orders.size());
+        } catch (RobotOrderException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void testOptionFiveOrderString() {
+        orderBuilder.setPointADash(0,0,0);
+        try {
+            orders = orderBuilder.buildOrders(OPTION_FIVE_ORDER_STRING);
+            assertEquals(7,orders.size());
+        } catch (RobotOrderException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void testOptionSixOrderString() {
+        orderBuilder.setPointADash(0,0,0);
+        try {
+            orders = orderBuilder.buildOrders(OPTION_SIX_ORDER_STRING);
+            assertEquals(6,orders.size());
+        } catch (RobotOrderException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void testOptionSevenOrderString() {
+        orderBuilder.setPointADash(0,0,0);
+        try {
+            orders = orderBuilder.buildOrders(OPTION_SEVEN_ORDER_STRING);
+            assertEquals(8,orders.size());
+        } catch (RobotOrderException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void testOptionEightOrderString() {
+        orderBuilder.setPointADash(0,0,0);
+        try {
+            orders = orderBuilder.buildOrders(OPTION_EIGHT_ORDER_STRING);
+            assertEquals(8,orders.size());
+        } catch (RobotOrderException e) {
+            fail(e.getMessage());
+        }
+    }
+
+
+
+
+    @Test
+    public void testFinalOrderString() {
+        try {
+            orders = orderBuilder.buildOrders(FINAL_ORDER_STRING);
+            assertEquals(2,orders.size());
+        } catch (RobotOrderException e) {
+            fail(e.getMessage());
+        }
     }
 
     @Test

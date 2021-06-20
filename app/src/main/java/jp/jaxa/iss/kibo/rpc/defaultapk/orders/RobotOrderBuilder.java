@@ -83,7 +83,7 @@ public class RobotOrderBuilder {
                 // Wish I could use a switch statement.. turns out i could have...
                 if (type == RobotOrderType.START_MISSION_ORDER) {
                     order = buildStartMissionOrder();
-                } else if (type == RobotOrderType.SCAN_AR_CODE_ORDER) {
+                } else if (type == RobotOrderType.SCAN_QR_CODE_ORDER) {
                     order = buildScanARCodeOrder();
                 } else if (type == RobotOrderType.FIRE_LASER_ORDER) {
                     order = buildFireLaserOrder();

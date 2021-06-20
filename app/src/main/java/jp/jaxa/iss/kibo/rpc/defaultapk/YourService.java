@@ -43,18 +43,18 @@ public class YourService extends KiboRpcService {
         double[] scanResults = result.getReturnValue();
 
         // Ignoring result rn while we wait for the scan team to finish their section
-        //int nextPathNum = (int)scanResults[0];
+        int nextPathNum = (int)scanResults[0];
         // Getting which path to follow from the testing variable located in /app/src/main/res/values/integers.xml instead
-        int nextPathNum = context.getResources().getInteger(R.integer.chosen_path_to_test);
+        //int nextPathNum = context.getResources().getInteger(R.integer.chosen_path_to_test);
 
         // Ignoring result rn while we wait for the scan team to finish their section
-        //float pointADashXValue = (float)scanResults[1];
-        //float pointADashYValue = (float)scanResults[2];
-        //float pointADashZValue = (float)scanResults[3];
+        float pointADashXValue = (float)scanResults[1];
+        float pointADashYValue = (float)scanResults[2];
+        float pointADashZValue = (float)scanResults[3];
         // Getting which point A' is in from the testing variable located in /app/src/main/res/values/integers.xml instead
-        float pointADashXValue = (float)context.getResources().getInteger(R.integer.chosen_point_a_dash_x_value);
-        float pointADashYValue = (float)context.getResources().getInteger(R.integer.chosen_point_a_dash_y_value);
-        float pointADashZValue = (float)context.getResources().getInteger(R.integer.chosen_point_a_dash_z_value);
+        //float pointADashXValue = (float)context.getResources().getInteger(R.integer.chosen_point_a_dash_x_value);
+        //float pointADashYValue = (float)context.getResources().getInteger(R.integer.chosen_point_a_dash_y_value);
+        //float pointADashZValue = (float)context.getResources().getInteger(R.integer.chosen_point_a_dash_z_value);
 
         orderBuilder.setPointADash(
                 pointADashXValue,

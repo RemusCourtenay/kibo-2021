@@ -7,7 +7,7 @@
 
     <integer name="kibo_cam_image_height">1280</integer>
     <integer name="kibo_cam_image_width">960</integer>
-    <integer name="percent_of_image_that_crop_removes">40</integer>
+    <integer name="percent_of_image_that_crop_removes">10</integer>
     <integer name="resize_image_height">384</integer> <!-- Chosen randomly -->
     <integer name="resize_image_width">288</integer> <!-- Chosen randomly -->
 

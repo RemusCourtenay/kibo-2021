@@ -2,7 +2,6 @@ package jp.jaxa.iss.kibo.rpc.defaultapk;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.test.mock.MockContext;
 
 import org.junit.rules.ExternalResource;
 
@@ -18,7 +17,7 @@ public class TestResources extends ExternalResource {
     private static final String MOCK_START_MISSION_KEY = "START_MISSION";
     private static final String MOCK_MOVE_KEY = "Do not use this, use the bracket format instead";
     private static final String MOCK_APPROACH_FIRING_POSITION_KEY = "APPROACH_FIRING_POSITION";
-    private static final String MOCK_SCAN_AR_CODE_KEY = "SCAN_AR_CODE";
+    private static final String MOCK_SCAN_AR_CODE_KEY = "SCAN_QR_CODE";
     private static final String MOCK_FIRE_LASER_KEY = "FIRE_LASER";
     private static final String MOCK_FINISH_MISSION_ORDER_KEY = "FINISH_MISSION";
 
@@ -62,7 +61,7 @@ public class TestResources extends ExternalResource {
         when(mockContext.getString(R.string.start_mission_order_key)).thenReturn(MOCK_START_MISSION_KEY);
         when(mockContext.getString(R.string.move_order_key)).thenReturn(MOCK_MOVE_KEY);
         when(mockContext.getString(R.string.approach_firing_position_order_key)).thenReturn(MOCK_APPROACH_FIRING_POSITION_KEY);
-        when(mockContext.getString(R.string.scan_ar_code_order_key)).thenReturn(MOCK_SCAN_AR_CODE_KEY);
+        when(mockContext.getString(R.string.scan_qr_code_order_key)).thenReturn(MOCK_SCAN_AR_CODE_KEY);
         when(mockContext.getString(R.string.fire_laser_order_key)).thenReturn(MOCK_FIRE_LASER_KEY);
         when(mockContext.getString(R.string.finish_mission_order_key)).thenReturn(MOCK_FINISH_MISSION_ORDER_KEY);
 

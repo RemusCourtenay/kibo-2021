@@ -27,7 +27,7 @@ import java.util.List;
 public class YourService extends KiboRpcService {
 
 
-    private static final int markerDictionaryID = Aruco.DICT_5X5_250;
+
 
 
     @Override

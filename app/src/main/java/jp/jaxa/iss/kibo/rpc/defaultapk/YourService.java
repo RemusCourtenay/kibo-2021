@@ -26,6 +26,10 @@ import java.util.List;
 
 public class YourService extends KiboRpcService {
 
+
+    private static final int markerDictionaryID = Aruco.DICT_5X5_250;
+
+
     @Override
     protected void runPlan1(){
 
@@ -82,167 +86,154 @@ public class YourService extends KiboRpcService {
 
 
 
+        // MOVE TO ROBOT ORDER
+        // turn laser on
+        api.laserControl(true);
+
+        // take 10 snapshots at 1-second intervals
+        int num_snaps = 10;
+        int i = 0;
+        while (i < num_snaps) {
+            api.takeSnapshot();
+            wait(1000);
+        }
+
+        // turn laser off
+        api.laserControl(false);
+    }
+
+    @Override
+    protected void runPlan2(){
+    }
+
+    @Override
+    protected void runPlan3(){
+    }
 
 
-//        // ------------------------------- NEW STUFF -------------------------------------- //
-//
-//        // scan QR code
-//        final double[]A_dash = scanQR(40); // Has been moved to RobotScanARCodeOrder
-//
-//        // get position and KOZ pattern
-//        double koz = A_dash[0], A_dash_x = A_dash[1], A_dash_y = A_dash[2], A_dash_z = A_dash[3];
-//
-//        //
-//        // MOVE TO POINT A' WHILE AVOIDING KOZ AND GET ROBOT IN CORRECT ORIENTATION FOR LASER
-//        //
-//
-//        // turn laser on
-//        api.laserControl(true);
-//
-//        // take 10 snapshots at 1-second intervals
-//        int num_snaps = 10;
-//        int i = 0;
-//        while (i < num_snaps) {
-//            api.takeSnapshot();
-//            wait(1000);
-//        }
-//
-//        // turn laser off
-//        api.laserControl(false);
-//    }
-//
-//    @Override
-//    protected void runPlan2(){
-//    }
-//
-//    @Override
-//    protected void runPlan3(){
-//    }
-//
-//
-//    /**
-//     * Intersection is used in AR_event
-//     * @param p
-//     * @return
-//     */
-//    private double[] Intersection(double p[][])
-//    {
-//        /*float AR_diagonal = 0.07071067812f;*/
-//        float AR_diagonal = 0.1199103832f;
-//        double[] center = new double[3];
-//
-//        double a = (p[1][0] - p[0][0]) * (p[3][0] - p[2][0]);
-//        double b = (p[1][0] - p[0][0]) * (p[3][1] - p[2][1]);
-//        double c = (p[3][0] - p[2][0]) * (p[1][1] - p[0][1]);
-//
-//        center[0] = (a * p[0][1] + b * p[2][0] - a * p[2][1] - c * p[0][0]) / (b - c);
-//        center[1] = ((p[1][1] - p[0][1]) * (center[0] - p[0][0]) / (p[1][0] - p[0][0])) + p[0][1];
-//
-//        double x_l1 = Math.pow(p[0][0] - p[1][0], 2);
-//        double y_l1 = Math.pow(p[0][1] - p[1][1], 2);
-//        double x_l2 = Math.pow(p[3][0] - p[2][0], 2);
-//        double y_l2 = Math.pow(p[3][1] - p[2][1], 2);
-//        double avg = (Math.sqrt(x_l1 + y_l1) + Math.sqrt(x_l2 + y_l2)) / 2;
-//
-//        center[2] = avg / AR_diagonal;
-//        Log.d("AR[info]: ", center[0] + ", " + center[1] + ", " + center[2]);
-//        return center;
-//    }
-//
-//    /**
-//     * AR_event used for AR stuff
-//     * @param px
-//     * @param py
-//     * @param pz
-//     * @param qx
-//     * @param qy
-//     * @param qz
-//     * @param qw
-//     * @param count_max
-//     * @return
-//     */
-//    public double[] AR_event(float px, float py, float pz, float qx, float qy, float qz, float qw, int count_max)
-//    {
-//        int contents = 0, count = 0;
-//        double result[] = new double[3];
-//
-//        while (contents == 0 && count < count_max)
-//        {
-//            Log.d("AR[status]:", " start");
-//            long start_time = SystemClock.elapsedRealtime();
-//            //
-//
-//
-//            // COMMENTED OUT BECAUSE METHOD NO LONGER EXISTS
-//            //moveToWrapper(px, py, pz, qx, qy, qz, qw);
-//
-//
-//
-//            //////////////////////////////////////////////////////////////////////////////////////////////////////
-//            Mat source = undistort(api.getMatNavCam(), api.getDockCamIntrinsics());
-//            Kinematics robot = api.getTrustedRobotKinematics();
-//            Mat ids = new Mat();
-//            Dictionary dictionary = Aruco.getPredefinedDictionary(Aruco.DICT_5X5_250);
-//            List<Mat> corners = new ArrayList<>();
-//
-//            try
-//            {
-//                Aruco.detectMarkers(source, dictionary, corners, ids);
-//                contents = (int) ids.get(0, 0)[0];
-//
-//                /*if(sent_AR) api.judgeSendDiscoveredAR(Integer.toString(contents));*/
-//                Log.d("AR[status]:", " Detected");
-//
-//
-//                double[][] AR_corners =
-//                        {
-//                                {(int) corners.get(0).get(0, 0)[0], (int) corners.get(0).get(0, 0)[1]},
-//                                {(int) corners.get(0).get(0, 2)[0], (int) corners.get(0).get(0, 2)[1]},
-//                                {(int) corners.get(0).get(0, 1)[0], (int) corners.get(0).get(0, 1)[1]},
-//                                {(int) corners.get(0).get(0, 3)[0], (int) corners.get(0).get(0, 3)[1]}
-//                        };
-//                double[] AR_info = Intersection(AR_corners);
-//
-//
-//                Point point = new Point(px, py, pz);
-//                if(robot != null)
-//                {
-//                    point = robot.getPosition();
-//                    Log.d("getKinematics[status]:"," Finished");
-//                }
-//                result[0] = point.getX() + (AR_info[0]- NAV_MAX_COL/2) / AR_info[2];
-//                result[1] = point.getY();
-//                result[2] = point.getZ() + (AR_info[1]- NAV_MAX_ROW/2) / AR_info[2];
-//            }
-//            catch (Exception e)
-//            {
-//                Log.d("AR[status]:", " Not detected");
-//            }
-//            //////////////////////////////////////////////////////////////////////////////////////////////////////
-//            Log.d("AR[status]:", " stop");
-//            long stop_time = SystemClock.elapsedRealtime();
-//
-//
-//
-//            Log.d("AR[count]:", " " + count);
-//            Log.d("AR[total_time]:"," "+ (stop_time-start_time)/1000);
-//            count++;
-//        }
-//        return result;
-//    }
-//
-//    /**
-//     * Stops the thread for a second
-//     * @param ms
-//     */
-//    public static void wait(int ms) {
-//        try
-//        {
-//            Thread.sleep(ms);
-//        }
-//        catch(InterruptedException ex)
-//        {
-//            Thread.currentThread().interrupt();
-//        }
+    /**
+     * Intersection is used in AR_event
+     * @param p
+     * @return
+     */
+    private double[] Intersection(double p[][])
+    {
+        /*float AR_diagonal = 0.07071067812f;*/
+        float AR_diagonal = 0.1199103832f;
+        double[] center = new double[3];
+
+        double a = (p[1][0] - p[0][0]) * (p[3][0] - p[2][0]);
+        double b = (p[1][0] - p[0][0]) * (p[3][1] - p[2][1]);
+        double c = (p[3][0] - p[2][0]) * (p[1][1] - p[0][1]);
+
+        center[0] = (a * p[0][1] + b * p[2][0] - a * p[2][1] - c * p[0][0]) / (b - c);
+        center[1] = ((p[1][1] - p[0][1]) * (center[0] - p[0][0]) / (p[1][0] - p[0][0])) + p[0][1];
+
+        double x_l1 = Math.pow(p[0][0] - p[1][0], 2);
+        double y_l1 = Math.pow(p[0][1] - p[1][1], 2);
+        double x_l2 = Math.pow(p[3][0] - p[2][0], 2);
+        double y_l2 = Math.pow(p[3][1] - p[2][1], 2);
+        double avg = (Math.sqrt(x_l1 + y_l1) + Math.sqrt(x_l2 + y_l2)) / 2;
+
+        center[2] = avg / AR_diagonal;
+        Log.d("AR[info]: ", center[0] + ", " + center[1] + ", " + center[2]);
+        return center;
+    }
+
+    /**
+     * AR_event used for AR stuff
+     * @param px
+     * @param py
+     * @param pz
+     * @param qx
+     * @param qy
+     * @param qz
+     * @param qw
+     * @param count_max
+     * @return
+     */
+    public double[] AR_event(float px, float py, float pz, float qx, float qy, float qz, float qw, int count_max)
+    {
+        int contents = 0, count = 0;
+        double result[] = new double[3];
+
+        while (contents == 0 && count < count_max)
+        {
+            Log.d("AR[status]:", " start");
+            long start_time = SystemClock.elapsedRealtime();
+            //
+
+
+            // COMMENTED OUT BECAUSE METHOD NO LONGER EXISTS
+            //moveToWrapper(px, py, pz, qx, qy, qz, qw);
+
+
+
+            //////////////////////////////////////////////////////////////////////////////////////////////////////
+            Mat source = undistort(api.getMatNavCam(), api.getDockCamIntrinsics());
+            Kinematics robot = api.getTrustedRobotKinematics();
+            Mat ids = new Mat();
+            Dictionary dictionary = Aruco.getPredefinedDictionary(Aruco.DICT_5X5_250);
+            List<Mat> corners = new ArrayList<>();
+
+            try
+            {
+                Aruco.detectMarkers(source, dictionary, corners, ids);
+                contents = (int) ids.get(0, 0)[0];
+
+                /*if(sent_AR) api.judgeSendDiscoveredAR(Integer.toString(contents));*/
+                Log.d("AR[status]:", " Detected");
+
+
+                double[][] AR_corners =
+                        {
+                                {(int) corners.get(0).get(0, 0)[0], (int) corners.get(0).get(0, 0)[1]},
+                                {(int) corners.get(0).get(0, 2)[0], (int) corners.get(0).get(0, 2)[1]},
+                                {(int) corners.get(0).get(0, 1)[0], (int) corners.get(0).get(0, 1)[1]},
+                                {(int) corners.get(0).get(0, 3)[0], (int) corners.get(0).get(0, 3)[1]}
+                        };
+                double[] AR_info = Intersection(AR_corners);
+
+
+                Point point = new Point(px, py, pz);
+                if(robot != null)
+                {
+                    point = robot.getPosition();
+                    Log.d("getKinematics[status]:"," Finished");
+                }
+                result[0] = point.getX() + (AR_info[0]- NAV_MAX_COL/2) / AR_info[2];
+                result[1] = point.getY();
+                result[2] = point.getZ() + (AR_info[1]- NAV_MAX_ROW/2) / AR_info[2];
+            }
+            catch (Exception e)
+            {
+                Log.d("AR[status]:", " Not detected");
+            }
+            //////////////////////////////////////////////////////////////////////////////////////////////////////
+            Log.d("AR[status]:", " stop");
+            long stop_time = SystemClock.elapsedRealtime();
+
+
+
+            Log.d("AR[count]:", " " + count);
+            Log.d("AR[total_time]:"," "+ (stop_time-start_time)/1000);
+            count++;
+        }
+        return result;
+    }
+
+    /**
+     * Stops the thread for a second
+     * @param ms
+     */
+    public static void wait(int ms) {
+        try
+        {
+            Thread.sleep(ms);
+        }
+        catch(InterruptedException ex)
+        {
+            Thread.currentThread().interrupt();
+        }
     }
 }

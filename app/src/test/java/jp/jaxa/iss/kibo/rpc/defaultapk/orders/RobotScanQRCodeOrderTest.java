@@ -19,9 +19,6 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class RobotScanQRCodeOrderTest{
 
-
-
-
     @ClassRule
     public static final TestResources testResources = new TestResources();
 

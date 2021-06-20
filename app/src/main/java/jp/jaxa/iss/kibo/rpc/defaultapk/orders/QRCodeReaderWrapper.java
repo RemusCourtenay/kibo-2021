@@ -1,5 +1,7 @@
 package jp.jaxa.iss.kibo.rpc.defaultapk.orders;
 
+import android.content.Context;
+
 import com.google.zxing.BinaryBitmap;
 import com.google.zxing.ChecksumException;
 import com.google.zxing.FormatException;
@@ -7,8 +9,9 @@ import com.google.zxing.NotFoundException;
 import com.google.zxing.qrcode.QRCodeReader;
 
 import jp.jaxa.iss.kibo.rpc.api.KiboRpcApi;
+import jp.jaxa.iss.kibo.rpc.defaultapk.R;
 
-public class QRCodeReaderWrapper {
+class QRCodeReaderWrapper {
 
 
     private final KiboRpcApi api;
@@ -19,15 +22,13 @@ public class QRCodeReaderWrapper {
 
     private final QRCodeReader qrCodeReader;
 
-    QRCodeReaderWrapper(KiboRpcApi api, ImageHelper imageHelper, int loopMax, double flashLightOriginalBrightnessForScan, double flashlightFinalBrightnessForScan) {
-
+    QRCodeReaderWrapper(KiboRpcApi api, ImageHelper imageHelper, QRCodeReader qrCodeReader, Context context) {
         this.api = api;
         this.imageHelper = imageHelper;
-        this.loopMax = loopMax;
-        this.flashlightOriginalBrightnessForScan = flashLightOriginalBrightnessForScan;
-        this.flashlightFinalBrightnessForScan = flashlightFinalBrightnessForScan;
-
-        this.qrCodeReader = new QRCodeReader();
+        this.qrCodeReader = qrCodeReader;
+        this.loopMax = context.getResources().getInteger(R.integer.max_scan_ar_code_loop_attempts);
+        this.flashlightOriginalBrightnessForScan = context.getResources().getInteger(R.integer.flashlight_original_brightness_percent_for_scan);
+        this.flashlightFinalBrightnessForScan = context.getResources().getInteger(R.integer.flashlight_final_brightness_percent_for_scan);
     }
 
     /**

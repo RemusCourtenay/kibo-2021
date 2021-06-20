@@ -2,6 +2,8 @@ package jp.jaxa.iss.kibo.rpc.defaultapk.orders;
 
 import android.content.Context;
 
+import com.google.zxing.qrcode.QRCodeReader;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,27 +28,22 @@ public class RobotOrderBuilder {
 
     private final Context context;
     private final KiboRpcApi api;
-    private final ImageHelper imageHelper;
 
     // Honestly could've all been done in the order constructors..
 
     private final Map<String, RobotOrderType> stringOrderTypeMap;
     private final Pattern moveOrderPattern;
-    private final Pattern qrCodeScanResultPattern;
+
 
     // Character that splits orders
     private final String orderSplitCharacter;
     // Character that splits numbers within the brackets inside move orders
     private final String orderInnerSplitCharacter;
 
-    private final String qrCodeScanResultSplitCharacter;
-    private final String qrCodeScanResultInnerSplitCharacter;
-    private final double flashlightOriginalBrightnessForScan;
-    private final double flashlightFinalBrightnessForScan;
+
     // Max number of times the move command will loop
     private final int moveLoopMax;
-    // Max number of times the scan AR Code command will loop
-    private final int scanARCodeLoopMax;
+
 
     // Should get set by the method setPointADash at some point
     private Point pointADash;
@@ -54,18 +51,12 @@ public class RobotOrderBuilder {
     public RobotOrderBuilder(Context context, KiboRpcApi api) {
         this.context = context;
         this.api = api;
-        this.imageHelper = new ImageHelper(context);
         this.stringOrderTypeMap = buildStringOrderTypeMapFromStringsFile();
         this.moveOrderPattern = Pattern.compile(context.getString(R.string.move_order_regex_pattern));
-        this.qrCodeScanResultPattern = Pattern.compile(context.getString(R.string.qr_code_scan_result_pattern));
         this.orderSplitCharacter = context.getString(R.string.order_split_character);
         this.orderInnerSplitCharacter = context.getString(R.string.order_inner_split_character);
-        this.qrCodeScanResultSplitCharacter = context.getString(R.string.qr_code_scan_result_split_character);
-        this.qrCodeScanResultInnerSplitCharacter = context.getString(R.string.qr_code_scan_result_inner_split_character);
-        this.flashlightOriginalBrightnessForScan = context.getResources().getInteger(R.integer.flashlight_original_brightness_percent_for_scan)/(double)100;
-        this.flashlightFinalBrightnessForScan = context.getResources().getInteger(R.integer.flashlight_final_brightness_percent_for_scan)/(double)100;
         this.moveLoopMax = context.getResources().getInteger(R.integer.max_movement_loop_attempts);
-        this.scanARCodeLoopMax = context.getResources().getInteger(R.integer.max_scan_ar_code_loop_attempts);
+
     }
 
     /**
@@ -156,7 +147,12 @@ public class RobotOrderBuilder {
 
     private RobotScanQRCodeOrder buildScanARCodeOrder() {
 
-        QRCodeReaderWrapper qrCodeReaderWrapper = new QRCodeReaderWrapper(api, this.imageHelper, this.scanARCodeLoopMax, this.flashlightOriginalBrightnessForScan, this.flashlightFinalBrightnessForScan);
+        QRCodeReaderWrapper qrCodeReaderWrapper = new QRCodeReaderWrapper(
+                api,
+                new ImageHelper(context),
+                new QRCodeReader(),
+                this.context);
+
         QRCodeDecoder qrCodeDecoder = new QRCodeDecoder(this.context);
 
         return new RobotScanQRCodeOrder(

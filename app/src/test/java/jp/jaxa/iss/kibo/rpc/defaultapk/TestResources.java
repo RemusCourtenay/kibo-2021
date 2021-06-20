@@ -8,6 +8,7 @@ import org.junit.rules.ExternalResource;
 
 import jp.jaxa.iss.kibo.rpc.api.KiboRpcApi;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -55,6 +56,7 @@ public class TestResources extends ExternalResource {
 
         mockContext = mock(Context.class);
         mockResources = mock(Resources.class);
+        nullApi = mock(KiboRpcApi.class);
 
 
         when(mockContext.getString(R.string.start_mission_order_key)).thenReturn(MOCK_START_MISSION_KEY);
@@ -86,7 +88,12 @@ public class TestResources extends ExternalResource {
         when(mockResources.getInteger(R.integer.resize_image_height)).thenReturn(MOCK_RESIZE_IMAGE_HEIGHT);
         when(mockResources.getInteger(R.integer.resize_image_width)).thenReturn(MOCK_RESIZE_IMAGE_WIDTH);
 
+
+        when(nullApi.getMatNavCam()).thenReturn(null);
+        when(nullApi.getNavCamIntrinsics()).thenReturn(null);
     }
+
+
 
 
 

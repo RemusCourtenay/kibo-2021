@@ -5,6 +5,7 @@ import android.content.Context;
 
 import jp.jaxa.iss.kibo.rpc.api.KiboRpcService;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.RobotOrderBuilder;
+import jp.jaxa.iss.kibo.rpc.defaultapk.orders.RobotOrderException;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.RobotOrderResult;
 
 import gov.nasa.arc.astrobee.Kinematics;
@@ -68,7 +69,7 @@ public class YourService extends KiboRpcService {
             case 6: nextStageOrderString = context.getString(R.string.move_to_laser_order_string_variant_6); break;
             case 7: nextStageOrderString = context.getString(R.string.move_to_laser_order_string_variant_7); break;
             case 8: nextStageOrderString = context.getString(R.string.move_to_laser_order_string_variant_8); break;
-            default: throw new RuntimeException(
+            default: throw new RobotOrderException(
                     "Integer resource 'chosen path to text' set to invalid value: " +
                             context.getResources().getInteger(R.integer.chosen_path_to_test) + "\n" +
                     "Value should be between 1 and 8");

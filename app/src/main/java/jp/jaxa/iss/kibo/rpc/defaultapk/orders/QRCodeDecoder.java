@@ -24,7 +24,7 @@ class QRCodeDecoder { // TODO... Comments
     }
 
     DecodeResult decodeQRCodeString(String scanResultString) {
-        Log.d("Recieved QR Code, Attempting to decode: ", "Code: " + scanResultString);
+        Log.d("Received QR Code, Attempting to decode: ", "Code: " + scanResultString);
         DecodeResult decodeResult = new DecodeResult(isValidQRCodeOutput(scanResultString));
 
         if (decodeResult.wasSuccessful()) {

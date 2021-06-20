@@ -13,6 +13,7 @@ import java.util.stream.Stream;
 
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.RobotOrder;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.RobotOrderBuilder;
+import jp.jaxa.iss.kibo.rpc.defaultapk.orders.RobotOrderException;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.RobotOrderResult;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.RobotOrderType;
 
@@ -65,11 +66,11 @@ public class ExpeditionWrapper {
             result = order.attemptOrder();
         }
 
-        // Added so that the IDE will stop telling me that result might be null...
+        // Added so that the IDE will stop telling me that result might be null... should never happen due to being wrapped in RobotOrderResult
         if (result != null) {
             return result;
         } else {
-            throw new RuntimeException("Order string: \"" + fullOrderString + "\" returned a null result for it's final order");
+            throw new RobotOrderException("Order string: \"" + fullOrderString + "\" returned a null result for it's final order");
         }
     }
 }

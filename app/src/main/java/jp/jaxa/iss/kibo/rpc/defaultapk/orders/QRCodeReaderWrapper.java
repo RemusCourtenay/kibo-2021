@@ -58,6 +58,7 @@ class QRCodeReaderWrapper {
     }
 
     private float getCalculatedBrightness(int loopMax, int count) {
+        Log.d("Calculating brightness for flashlight:", "current count: " + count + " out of " + loopMax);
         double maxCount = (double)(loopMax-1);
 
         // Camera is expected to go from dark to light so here we find the positive difference between the two
@@ -72,6 +73,7 @@ class QRCodeReaderWrapper {
     }
 
     private String readQRCodeFromBitmap(BinaryBitmap bitmap) {
+        Log.d("Attempting to retrieve QR code from binary bitmap","");
         try {
             qrCodeReader.reset();
             return qrCodeReader.decode(bitmap).getText();

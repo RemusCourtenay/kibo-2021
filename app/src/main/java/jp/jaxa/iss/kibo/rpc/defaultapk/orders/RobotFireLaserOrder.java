@@ -13,11 +13,18 @@ import java.util.List;
 
 class RobotFireLaserOrder extends RobotOrder {
 
+
+    private static final int markerDictionaryID = Aruco.DICT_5X5_250;
+
     private final ImageHelper imageHelper;
 
     RobotFireLaserOrder(KiboRpcApi api, Context context, ImageHelper imageHelper) {
         super(api);
         this.imageHelper = imageHelper;
+    }
+
+    private void attemptToAlignLaser(double poseAngle, double distance) {
+
     }
 
     @Override

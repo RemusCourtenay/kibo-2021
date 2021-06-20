@@ -25,6 +25,7 @@ class RobotScanQRCodeOrder extends RobotOrder { // TODO... Comment
         DecodeResult decodeResult = qrCodeDecoder.decodeQRCodeString(scanResultString);
 
 
+
         if (decodeResult.wasSuccessful()) {
             api.sendDiscoveredQR(scanResultString);
             scanResult = decodeResult.getResults();
@@ -34,6 +35,7 @@ class RobotScanQRCodeOrder extends RobotOrder { // TODO... Comment
 
         return null; // TODO... should return a Result
     }
+
 
     @Override
     public String printOrderInfo() {

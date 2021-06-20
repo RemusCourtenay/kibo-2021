@@ -17,6 +17,7 @@ class RobotFireLaserOrder extends RobotOrder {
 
     @Override
     protected Result attemptOrderImplementation() {
+        //Aruco.detectMarkers();
         return null; // TODO...
     }
 
@@ -24,4 +25,16 @@ class RobotFireLaserOrder extends RobotOrder {
     public String printOrderInfo() {
         return null;
     }
+
+    private void takeTenSnapShots() {
+        for (int i = 0; i< 10; i++) {
+            api.takeSnapshot();
+            try {
+                wait(1000);
+            } catch(InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 }

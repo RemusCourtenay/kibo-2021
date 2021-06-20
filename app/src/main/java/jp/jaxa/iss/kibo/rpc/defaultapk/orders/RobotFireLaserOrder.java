@@ -30,7 +30,7 @@ class RobotFireLaserOrder extends RobotOrder {
 
     @Override
     protected Result attemptOrderImplementation() {
-        Mat image =  api.getMatNavCam();
+        Mat image =  imageHelper.undistort(api.getMatNavCam(),api.getNavCamIntrinsics());
         List<Mat> corners = new ArrayList<Mat>();
         Mat ids = new Mat(4, 1, 0);
         Aruco.detectMarkers(image, Aruco.getPredefinedDictionary(markerDictionaryID), corners, ids);

@@ -41,7 +41,7 @@
     Order String section, Order strings consist of multiple robot orders following the formatting
     described above, separated by the order split character
     -->
-    <string name="move_to_scan_order_string">START_MISSION|{[11.21,-9.8,4.79][0,0,-0.707,0.707]}|SCAN_QR_CODE</string>
+    <string name="move_to_scan_order_string">START_MISSION|{[11.25,-9.8,4.87][0,0,-0.707,0.707]}|SCAN_QR_CODE</string>
 
     <string name="move_to_laser_order_string_variant_1">{[10.99,-9.8,4.79][0,0,-0.707,0.707]}|APPROACH_FIRING_POSITION|FIRE_LASER|{[11.21,-9.8,4.79][0,0,-0.707,0.707]}|{[10.51,-9.8,4.79][0,0,-0.707,0.707]}|{[10.51,-8.0,4.79][0,0,-0.707,0.707]}</string>
     <string name="move_to_laser_order_string_variant_2">APPROACH_FIRING_POSITION|FIRE_LASER|{[11.21,-9.8,4.79][0,0,-0.707,0.707]}|{[10.51,-9.8,4.79][0,0,-0.707,0.707]}|{[10.51,-8.0,4.79][0,0,-0.707,0.707]}</string>

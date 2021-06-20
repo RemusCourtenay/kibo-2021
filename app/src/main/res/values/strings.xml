@@ -28,7 +28,7 @@
          {"p":1,"x":10.23,"y":-8.12,"z":5.45}
          Does not allow for spaces!
     -->
-    <string name="qr_code_scan_result_pattern">\\{\"p\":[1–8],\"x\":[+|-]?\\d+(\\.\\d+)?,\"y\":[+|-]?\\d+(\\.\\d+)?,\"z\":[+|-]?\\d+(\\.\\d+)?\\}</string>
+    <string name="qr_code_scan_result_pattern">\\{\"p\":[1-8],\"x\":[+|-]?\\d+(\\.\\d+)?,\"y\":[+|-]?\\d+(\\.\\d+)?,\"z\":[+|-]?\\d+(\\.\\d+)?\\}</string>
 
     <!-- Character used to split the sections of QR code scan results -->
     <string name="qr_code_scan_result_split_character">,</string>

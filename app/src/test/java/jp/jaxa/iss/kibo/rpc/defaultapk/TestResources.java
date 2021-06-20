@@ -26,7 +26,7 @@ public class TestResources extends ExternalResource {
     private static final String MOCK_SPLIT_CHARACTER = "\\|";
     private static final String MOCK_INNER_SPLIT_CHARACTER = ",";
 
-    private static final String MOCK_QR_SCAN_RESULT_PATTERN = "\\{\"p\":[1–8],\"x\":[+|-]?\\d+(\\.\\d+)?,\"y\":[+|-]?\\d+(\\.\\d+)?,\"z\":[+|-]?\\d+(\\.\\d+)?\\}";
+    private static final String MOCK_QR_SCAN_RESULT_PATTERN = "\\{\"p\":[1-8],\"x\":[+|-]?\\d+(\\.\\d+)?,\"y\":[+|-]?\\d+(\\.\\d+)?,\"z\":[+|-]?\\d+(\\.\\d+)?\\}";
     private static final String MOCK_QR_SCAN_RESULT_SPLIT_CHARACTER = ",";
     private static final String MOCK_QR_SCAN_RESULT_INNER_SPLIT_CHARACTER = ":";
 

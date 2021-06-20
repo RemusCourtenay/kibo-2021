@@ -95,8 +95,207 @@ class RobotFireLaserOrder extends RobotOrder {
         List<Mat> corners = new ArrayList<Mat>();
         Mat ids = new Mat();//(4, 1, 0);
         Aruco.detectMarkers(image, Aruco.getPredefinedDictionary(markerDictionaryID), corners, ids);
+        while  ((ids.cols() < 2) && (ids.rows() < 2)) {
+            adjustImage(ids);
+            Aruco.detectMarkers(image, Aruco.getPredefinedDictionary(markerDictionaryID), corners, ids);
+
+        }
         Board board = Board.create(corners, Aruco.getPredefinedDictionary(markerDictionaryID), ids);
         return board;
+    }
+
+    /**
+     * adjustImage adjusts the image
+     * @param ids
+     */
+    private void adjustImage(Mat ids) {
+        /*int id1, id2, id3, id4;
+        id1 = 0;
+        id2 = 0;
+        id3 = 0;
+        id4 = 0;
+
+        if (ids.rows()== 0) {
+            if (ids.cols() == 0) {
+
+            }
+            if (ids.cols() == 1) {
+
+            }
+            if (ids.cols() == 2) {
+
+            }
+        }
+         else if (ids.rows()== 1) {
+
+            if (ids.cols() == 0) {
+
+            }
+            if (ids.cols() == 1) {
+
+            }
+            if (ids.cols() == 2) {
+
+            }
+        }
+        else if (ids.rows()== 2) {
+
+            if (ids.cols() == 0) {
+
+            }
+            if (ids.cols() == 1) {
+
+            }
+            if (ids.cols() == 2) {
+
+            }
+        }
+        if (ids.rows()==0) {
+
+        }
+         else if (ids.rows()==1) {
+            if (ids.cols() == 0) {
+
+            }
+             else if (ids.cols() == 1) {
+
+            }
+            else if (ids.cols() == 2) {
+
+            }
+            else if (ids.cols() == 3) {
+
+            }
+            else if (ids.cols() == 4) {
+
+            }
+        }*/
+        List<Integer> id = new ArrayList<Integer>();
+        for (int i = 0; i < ids.cols(); i++) {
+            id.add(((int)(ids.get(1,i))[0]));
+        }
+        if (id.size() == 4) {
+            return;
+        } else if (id.size() == 3) {
+            if (id.contains(1)) {
+                if (id.contains(2)) {
+                    if (id.contains(3)) {
+
+                    } else if (id.contains(4)) {
+
+                    }
+                } else if (id.contains(3)) {
+                    if (id.contains(2)) {
+
+                    } else if (id.contains(4)) {
+
+                    }
+                } else if (id.contains(4)) {
+                    if (id.contains(3)) {
+
+                    } else if (id.contains(2)) {
+
+                    }
+                }
+            } else if (id.contains(2)) {
+                if (id.contains(1)) {
+                    if (id.contains(3)) {
+
+                    } else if (id.contains(4)) {
+
+                    }
+                } else if (id.contains(3)) {
+                    if (id.contains(2)) {
+
+                    } else if (id.contains(4)) {
+
+                    }
+                } else if (id.contains(4)) {
+                    if (id.contains(3)) {
+
+                    } else if (id.contains(4)) {
+
+                    }
+                }
+            } else if (id.contains(3)) {
+                if (id.contains(2)) {
+
+                } else if (id.contains(1)) {
+
+                } else if (id.contains(4)) {
+
+                }
+            } else if (id.contains(4)) {
+                if (id.contains(2)) {
+
+                } else if (id.contains(3)) {
+
+                } else if (id.contains(1)) {
+
+                }
+            }
+        } else if (id.size() == 2) {
+            if (id.contains(1)) {
+                if (id.contains(2)) {
+
+                } else if (id.contains(3)) {
+
+                } else if (id.contains(4)) {
+
+                }
+            } else if (id.contains(2)) {
+                if (id.contains(1)) {
+
+                } else if (id.contains(3)) {
+
+                } else if (id.contains(4)) {
+
+                }
+            } else if (id.contains(3)) {
+                if (id.contains(1)) {
+
+                } else if (id.contains(2)) {
+
+                } else if (id.contains(4)) {
+
+                }
+            } else if (id.contains(4)) {
+                if (id.contains(1)) {
+
+                } else if (id.contains(2)) {
+
+                } else if (id.contains(3)) {
+
+                }
+            }
+        } else if (id.size() == 1) {
+            if (id.contains(1)) {
+
+            } else if (id.contains(2)) {
+
+            } else if (id.contains(3)) {
+
+            } else if (id.contains(4)) {
+
+            }
+        }
+        /*ids.get(0,0);
+        ids.get(0,1);
+        ids.get(1,0);
+        ids.get(1,1);
+        if (ids.rows()<0) {
+            switch (ids.cols()) {
+                case 0:
+
+                    break;
+
+
+            }
+        }
+        switch (ids) {
+            case (ids.cols()<2):
+
+        }*/
     }
 
 

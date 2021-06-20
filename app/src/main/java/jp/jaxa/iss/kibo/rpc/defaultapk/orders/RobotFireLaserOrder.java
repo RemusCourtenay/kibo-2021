@@ -86,5 +86,18 @@ class RobotFireLaserOrder extends RobotOrder {
         }
     }
 
+    /**
+     * getBoard makes and returns a board.
+     * @return board
+     */
+    private Board getBoard() {
+        Mat image =  imageHelper.undistort(api.getMatNavCam(),api.getNavCamIntrinsics());
+        List<Mat> corners = new ArrayList<Mat>();
+        Mat ids = new Mat();//(4, 1, 0);
+        Aruco.detectMarkers(image, Aruco.getPredefinedDictionary(markerDictionaryID), corners, ids);
+        Board board = Board.create(corners, Aruco.getPredefinedDictionary(markerDictionaryID), ids);
+        return board;
+    }
+
 
 }

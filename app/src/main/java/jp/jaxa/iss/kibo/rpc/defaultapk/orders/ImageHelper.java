@@ -87,7 +87,7 @@ public class ImageHelper {
      */
     public Mat undistort(Mat src, double[][] camIntrinsics) { // Not sure about any of this
         Log.d("Attempting to undistort mat","");
-        Mat dst = new Mat(1280, 960, CvType.CV_8UC1);
+        Mat dst = new Mat(this.kiboCamImageHeight, this.kiboCamImageWidth, CvType.CV_8UC1);
         Mat cameraMatrix = new Mat(3, 3, CvType.CV_32FC1);
         Mat distCoeffs = new Mat(1, 5, CvType.CV_32FC1);
 

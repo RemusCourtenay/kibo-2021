@@ -17,7 +17,7 @@ public class TestResources extends ExternalResource {
     private static final String MOCK_START_MISSION_KEY = "START_MISSION";
     private static final String MOCK_MOVE_KEY = "Do not use this, use the bracket format instead";
     private static final String MOCK_APPROACH_FIRING_POSITION_KEY = "APPROACH_FIRING_POSITION";
-    private static final String MOCK_SCAN_AR_CODE_KEY = "SCAN_AR_CODE";
+    private static final String MOCK_SCAN_AR_CODE_KEY = "SCAN_QR_CODE";
     private static final String MOCK_FIRE_LASER_KEY = "FIRE_LASER";
     private static final String MOCK_FINISH_MISSION_ORDER_KEY = "FINISH_MISSION";
 

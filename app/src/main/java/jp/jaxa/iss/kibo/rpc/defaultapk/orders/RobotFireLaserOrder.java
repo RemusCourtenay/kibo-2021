@@ -35,10 +35,13 @@ class RobotFireLaserOrder extends RobotOrder {
         Mat ids = new Mat(4, 1, 0);
         Aruco.detectMarkers(image, Aruco.getPredefinedDictionary(markerDictionaryID), corners, ids);
         Board board = Board.create(corners, Aruco.getPredefinedDictionary(markerDictionaryID), ids);
-        Mat counter = new Mat(4, 1, 0);
-        Size imageSize = new Size();
+        // Mat counter = new Mat(4, 1, 0);
+        // Size imageSize = new Size();
         Mat distCoeffs = new Mat(4, 1, 0);
-        double vecs = Aruco.calibrateCameraAruco(corners, ids, counter, board, imageSize, image, distCoeffs);
+        Mat rvecs = new Mat(4, 1, 0);
+        Mat tvecs = new Mat(4, 1, 0);
+        // double vecs = Aruco.calibrateCameraAruco(corners, ids, counter, board, imageSize, image, distCoeffs);
+        int poses = Aruco.estimatePoseBoard(corners, ids, board, image, distCoeffs, rvecs, tvecs);
         return null; // TODO...
     }
 

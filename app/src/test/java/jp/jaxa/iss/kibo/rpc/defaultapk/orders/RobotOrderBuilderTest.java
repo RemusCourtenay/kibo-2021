@@ -236,6 +236,16 @@ public class RobotOrderBuilderTest extends ActivityTestCase {
     }
 
     @Test
+    public void testScanQRCodeOrder() {
+        try {
+            orders = orderBuilder.buildOrders("SCAN_QR_CODE");
+            assertEquals("","Scan QR code order:",orders.get(0).printOrderInfo());
+        } catch (RobotOrderException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
     public void testStartMissionOrder() {
         try {
             orders = orderBuilder.buildOrders("START_MISSION");

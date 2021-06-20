@@ -37,7 +37,7 @@ class RobotScanQRCodeOrder extends RobotOrder { // TODO... Comment
 
     @Override
     public String printOrderInfo() {
-        return null;
+        return "Scan QR code order:";
     } // TODO...
 
     /**

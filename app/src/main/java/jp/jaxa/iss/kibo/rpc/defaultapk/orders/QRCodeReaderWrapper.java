@@ -65,7 +65,9 @@ class QRCodeReaderWrapper {
         double percentOfChangeToApply =  count/maxCount;
 
         // Return a float value equal to the initial brightness plus some percentage of the change
-        return (float)(this.flashlightOriginalBrightnessForScan+(totalChangeInBrightness*percentOfChangeToApply));
+        float percentBrightness = (float)(this.flashlightOriginalBrightnessForScan+(totalChangeInBrightness*percentOfChangeToApply));
+        // Returning a value between 0 and 1
+        return percentBrightness/100f;
     }
 
     private String readQRCodeFromBitmap(BinaryBitmap bitmap) {

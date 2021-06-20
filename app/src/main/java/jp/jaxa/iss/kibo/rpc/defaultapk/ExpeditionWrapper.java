@@ -1,6 +1,7 @@
 package jp.jaxa.iss.kibo.rpc.defaultapk;
 
 import android.content.Context;
+import android.util.Log;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,13 +32,14 @@ public class ExpeditionWrapper {
 
     // Builder object for translating order strings into lists of RobotOrders
     private final RobotOrderBuilder orderBuilder;
-
+    private int stageNum;
     /**
      * Sole constructor. Requires the Context of the Activity it's called from to access data
      * stored in the resources folders.
      */
     public ExpeditionWrapper(RobotOrderBuilder orderBuilder) {
         this.orderBuilder = orderBuilder;
+        this.stageNum = 1;
     }
 
     /**
@@ -52,11 +54,14 @@ public class ExpeditionWrapper {
      * @return the RobotOrderResult of the final command in the order string
      */
     public RobotOrderResult attemptExpeditionStage(String fullOrderString) { // Should probably throw a specific exception when an order fails rather than RuntimeException but whatever
+        Log.d("Starting New Expedition Stage: ", "Stage " + stageNum);
+        stageNum++;
         List<RobotOrder> orders = this.orderBuilder.buildOrders(fullOrderString);
 
         RobotOrderResult result = null;
         // Should probably have more going on here but whatever
         for (RobotOrder order: orders) {
+            Log.d("Attempting Order: ", order.printOrderInfo());
             result = order.attemptOrder();
         }
 

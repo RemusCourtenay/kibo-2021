@@ -1,6 +1,7 @@
 package jp.jaxa.iss.kibo.rpc.defaultapk.orders;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.google.zxing.BinaryBitmap;
 import com.google.zxing.ChecksumException;
@@ -39,7 +40,7 @@ class QRCodeReaderWrapper {
         String contents;
 
         for (int count = 0; count < loopMax; count++) {
-
+            Log.d("Read QR Code Attempt Initiated: ","Attempt " + (count+1));
             // Gradually increasing brightness of flashlight
             api.flashlightControlFront(getCalculatedBrightness(loopMax, count));
 

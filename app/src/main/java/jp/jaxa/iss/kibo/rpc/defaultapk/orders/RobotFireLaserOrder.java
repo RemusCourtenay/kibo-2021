@@ -2,6 +2,7 @@ package jp.jaxa.iss.kibo.rpc.defaultapk.orders;
 
 import gov.nasa.arc.astrobee.Result;
 import jp.jaxa.iss.kibo.rpc.api.KiboRpcApi;
+import org.opencv.aruco.Aruco;
 
 class RobotFireLaserOrder extends RobotOrder {
 

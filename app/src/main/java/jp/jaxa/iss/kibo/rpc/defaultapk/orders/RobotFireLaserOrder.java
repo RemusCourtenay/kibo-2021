@@ -1,12 +1,17 @@
 package jp.jaxa.iss.kibo.rpc.defaultapk.orders;
 
+import android.content.Context;
+
 import gov.nasa.arc.astrobee.Result;
 import jp.jaxa.iss.kibo.rpc.api.KiboRpcApi;
 
 class RobotFireLaserOrder extends RobotOrder {
 
-    RobotFireLaserOrder(KiboRpcApi api) {
+    private final ImageHelper imageHelper;
+
+    RobotFireLaserOrder(KiboRpcApi api, Context context, ImageHelper imageHelper) {
         super(api);
+        this.imageHelper = imageHelper;
     }
 
     @Override

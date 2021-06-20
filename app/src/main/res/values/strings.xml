@@ -28,18 +28,18 @@
     Order String section, Order strings consist of multiple robot orders following the formatting
     described above, separated by the order split character
     -->
-    <string name="move_to_scan_order_string">Put order string for first stage of mission here</string>
+    <string name="move_to_scan_order_string">START_MISSION|{[11.21,-9.8,4.79][0,0,-0.707,0.707]}</string>
 
-    <string name="move_to_laser_order_string_variant_1">Order string for variant 1</string>
-    <string name="move_to_laser_order_string_variant_2">Order string for variant 2</string>
-    <string name="move_to_laser_order_string_variant_3">Order string for variant 3</string>
-    <string name="move_to_laser_order_string_variant_4">Order string for variant 4</string>
-    <string name="move_to_laser_order_string_variant_5">Order string for variant 5</string>
-    <string name="move_to_laser_order_string_variant_6">Order string for variant 6</string>
-    <string name="move_to_laser_order_string_variant_7">Order string for variant 7</string>
-    <string name="move_to_laser_order_string_variant_8">Order string for variant 8</string>
+    <string name="move_to_laser_order_string_variant_1">{[10.99,-9.8,4.79][0,0,-0.707,0.707]}|APPROACH_FIRING_POSITION|SCAN_AR_CODE|FIRE_LASER|{[11.21,-9.8,4.79][0,0,-0.707,0.707]}|{[10.51,-9.8,4.79][0,0,-0.707,0.707]}|{[10.51,-8.0,4.79][0,0,-0.707,0.707]}</string>
+    <string name="move_to_laser_order_string_variant_2">APPROACH_FIRING_POSITION|SCAN_AR_CODE|FIRE_LASER|{[11.21,-9.8,4.79][0,0,-0.707,0.707]}|{[10.51,-9.8,4.79][0,0,-0.707,0.707]}|{[10.51,-8.0,4.79][0,0,-0.707,0.707]}</string>
+    <string name="move_to_laser_order_string_variant_3">{[10.99,-9.8,4.79][0,0,-0.707,0.707]}|APPROACH_FIRING_POSITION|SCAN_AR_CODE|FIRE_LASER|{[10.99,-9.8,4.79][0,0,-0.707,0.707]}|{[10.51,-9.8,4.79][0,0,-0.707,0.707]}|{[10.51,-8.0,4.79][0,0,-0.707,0.707]}</string>
+    <string name="move_to_laser_order_string_variant_4">{[10.99,-9.8,4.79][0,0,-0.707,0.707]}|APPROACH_FIRING_POSITION|SCAN_AR_CODE|FIRE_LASER|{[10.99,-9.8,4.79][0,0,-0.707,0.707]}|{[10.51,-9.8,4.79][0,0,-0.707,0.707]}|{[10.51,-8.0,4.79][0,0,-0.707,0.707]}</string>
+    <string name="move_to_laser_order_string_variant_5">{[10.61,-9.8,4.79][0,0,-0.707,0.707]}|{10.62,-9.8,5.45][0,0,-0.707,0.707]}|APPROACH_FIRING_POSITION|SCAN_AR_CODE|FIRE_LASER|{[10.51,-9.8,5.45][0,0,-0.707,0.707]}|{[10.51,-9.8,4.79][0,0,-0.707,0.707]}|{[10.51,-8.0,4.79][0,0,-0.707,0.707]}</string>
+    <string name="move_to_laser_order_string_variant_6">{[10.61,-9.8,4.79][0,0,-0.707,0.707]}|{10.62,-9.8,5.45][0,0,-0.707,0.707]}|APPROACH_FIRING_POSITION|SCAN_AR_CODE|FIRE_LASER|{[10.51,-9.8,4.79][0,0,-0.707,0.707]}|{[10.51,-8.0,4.79][0,0,-0.707,0.707]</string>
+    <string name="move_to_laser_order_string_variant_7">{[10.62,-9.8,4.79][0,0,-0.707,0.707}|{[10.62,-9.8,5.45][0,0,-0.707,0.707}]|{[11.21,-9.8,5.45][0,0,-0.707,0.707}]|APPROACH_FIRING_POSITION|SCAN_AR_CODE|FIRE_LASER|{[11.21,-9.8,5.45][0,0,-0.707,0.707]}|{[10.51,-9.8,5.45][0,0,-0.707,0.707]}|{[10.51,-8.0,4.79][0,0,-0.707,0.707]</string>
+    <string name="move_to_laser_order_string_variant_8">{[10.62,-9.8,4.79][0,0,-0.707,0.707]}|{[10.62,-9.8,5.45][0,0,-0.707,0.707}]|{[11.21,-9.8,5.45][0,0,-0.707,0.707}]|APPROACH_FIRING_POSITION|SCAN_AR_CODE|FIRE_LASER|{[11.21,-9.8,5.45][0,0,-0.707,0.707]}|{[10.51,-9.8,5.45][0,0,-0.707,0.707]}|{[10.51,-8.0,4.79][0,0,-0.707,0.707]</string>
 
-    <string name="move_to_finish_order_string">Put order string for final stage of mission here</string>
+    <string name="move_to_finish_order_string">{[10.6,-8.0,4.5][0,0,-0.707,0.707]}|FINISH_MISSION</string>
 
     <!-- For testing purposes -->
     <string name="test_order_string">START_MISSION|{[11.71,-9.53,5.35][0,0,0,1]}|{[10.275,-10.314,4.295][0,-0.7071068,0,0.7071068]}|FINISH_MISSION</string>

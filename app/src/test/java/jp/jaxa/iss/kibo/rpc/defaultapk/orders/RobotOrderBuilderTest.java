@@ -87,6 +87,29 @@ public class RobotOrderBuilderTest {
     }
 
     @Test
+    public void testApproachFiringPositionBeforeSettingPointADash() {
+        try {
+            orders = orderBuilder.buildOrders("APPROACH_FIRING_POSITION");
+            fail();
+        } catch (RobotOrderException e) {
+            assertEquals("","Attempting to build ApproachFiringPositionOrder but Point A' hasn't been set",e.getMessage());
+        }
+    }
+
+    @Test
+    public void testApproachFiringPositionAfterSettingPointADash() {
+        orderBuilder.setPointADash(0,0,0);
+        try {
+            orders = orderBuilder.buildOrders("APPROACH_FIRING_POSITION");
+            assertEquals("", "Approach firing position order:\n" +
+                    "Target point: [0.0][0.0][0.0]\n" +
+                    "Target quaternion: [0.0][0.0][-0.707][0.707]", orders.get(0).printOrderInfo());
+        } catch (RobotOrderException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
     public void testStartMissionOrder() {
         try {
             orders = orderBuilder.buildOrders("START_MISSION");

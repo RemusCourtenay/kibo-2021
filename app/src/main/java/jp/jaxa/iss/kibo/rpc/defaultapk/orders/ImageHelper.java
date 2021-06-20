@@ -46,12 +46,12 @@ public class ImageHelper {
         Log.d("Attempting to get Bitmap from Mat","");
         Mat undistortedMat = undistort(matFromCam, camIntrinsics);
         Log.d("Attempting to crop mat", "");
-        // Mat croppedMat = new Mat(undistortedMat, getCroppedImageRectangleArea(percentThatCropRemoves, kiboCamImageHeight, kiboCamImageWidth));
+        Mat croppedMat = new Mat(undistortedMat, getCroppedImageRectangleArea(percentThatCropRemoves, kiboCamImageHeight, kiboCamImageWidth));
 
         // Commented out as unsure if needed
         // Mat scaledMat = scaleMatDown(croppedMat, resizeImageWidth, resizeImageHeight);
 
-        Bitmap bitmap = getBitmapFromMat(undistortedMat); // Move this into separate method?
+        Bitmap bitmap = getBitmapFromMat(croppedMat); // Move this into separate method?
 
         Log.d("Attempting to convert bitmap to pixel array","");
         int bitmapWidth = bitmap.getWidth();

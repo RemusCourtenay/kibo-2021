@@ -99,8 +99,11 @@ public class ImageHelper {
     }
 
     // TODO... Javadoc comment
-    public Rect getCroppedImageRectangleArea(double percentRemoved, int numRows, int numColumns) {
-        Log.d("Calculating rectangle for crop: ", "Removing amount: " + percentRemoved);
+    public Rect getCroppedImageRectangleArea(int percentRemovedAsInt, int numRows, int numColumns) {
+        Log.d("Calculating rectangle for crop: ", "Removing amount: " + percentRemovedAsInt);
+        // Converting 0-100 percent to 0-1 double
+        Double percentRemoved = (double)(percentRemovedAsInt)/100.0;
+
         // Ratio of image width:height
         double ratio = (double)numColumns / (double)numRows;
 

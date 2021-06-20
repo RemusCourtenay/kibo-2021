@@ -6,6 +6,7 @@ import gov.nasa.arc.astrobee.Result;
 import jp.jaxa.iss.kibo.rpc.api.KiboRpcApi;
 import org.opencv.aruco.Aruco;
 import org.opencv.aruco.Board;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.calib3d.Calib3d;
 import org.opencv.core.MatOfDouble;
@@ -45,14 +46,10 @@ class RobotFireLaserOrder extends RobotOrder {
 
     }
 
-    private void attemptToAlignLaser(double poseAngle, double distance) {
-
-    }
-
     @Override
     protected Result attemptOrderImplementation() {
         List<Mat> cornersOfEachTag = new ArrayList<>(); // Supposedly I can pass these in and the functions will give them values
-        Mat tagIdentifiers = new Mat();
+        Mat tagIdentifiers = new MatOfDouble();
 
         // Handles getting image onto 4 tags
         Mat image;
@@ -70,8 +67,10 @@ class RobotFireLaserOrder extends RobotOrder {
         } while ((airlockBoard = getBoardData(image, cornersOfEachTag, tagIdentifiers)) != null);
 
 
+        // Why we putting distortion in when we already undistort?? put in no distortion at all?
+        Mat distortionCoefficients = new Mat(1, 5, CvType.CV_32FC1); // stolen from imageHelper, not my code, no idea what cv type is
+        distortionCoefficients.put(0,1, api.getNavCamIntrinsics()[1]); // distortion coefficients are second in array
 
-        Mat distortionCoeffecients = new Mat(); // TODO... Get this from api.getNavCamIntrinsics?? from openCv camera functions??
         Mat rotationVector = new Mat(); // Output vector corresponding to rotation of board
         Mat translationVector = new Mat(); // Output vector corresponding to translation of board
 
@@ -80,7 +79,7 @@ class RobotFireLaserOrder extends RobotOrder {
                 tagIdentifiers,
                 airlockBoard,
                 image,
-                distortionCoeffecients,
+                distortionCoefficients,
                 rotationVector,
                 translationVector
         ) == 0) {
@@ -88,6 +87,8 @@ class RobotFireLaserOrder extends RobotOrder {
         }
 
         // Do something maths related with rotation and translation vector
+
+        attemptToAlignLaser(rotationVector, translationVector);
 
         takeTenSnapShots();
 
@@ -97,6 +98,10 @@ class RobotFireLaserOrder extends RobotOrder {
     @Override
     public String printOrderInfo() {
         return null;
+    }
+
+    private void attemptToAlignLaser(Mat rotationVector, Mat translationVector) {
+
     }
 
     private void takeTenSnapShots() {
@@ -124,7 +129,7 @@ class RobotFireLaserOrder extends RobotOrder {
     }
 
 
-    private void adjustImage(Mat idsVector) {
+    private void adjustImage(Mat idsVector) { // TODO... be smart and get rotation from order of tags
 
         // ordered x,y
         int[] adjustmentAmounts = new int[]{0,0};

@@ -155,15 +155,14 @@ public class RobotOrderBuilder {
     }
 
     private RobotScanQRCodeOrder buildScanARCodeOrder() {
+
+        QRCodeReaderWrapper qrCodeReaderWrapper = new QRCodeReaderWrapper(api, this.imageHelper, this.scanARCodeLoopMax, this.flashlightOriginalBrightnessForScan, this.flashlightFinalBrightnessForScan);
+        QRCodeDecoder qrCodeDecoder = new QRCodeDecoder(this.context);
+
         return new RobotScanQRCodeOrder(
                 this.api,
-                this.imageHelper,
-                this.scanARCodeLoopMax,
-                this.qrCodeScanResultPattern,
-                this.qrCodeScanResultSplitCharacter,
-                this.qrCodeScanResultInnerSplitCharacter,
-                this.flashlightOriginalBrightnessForScan,
-                this.flashlightFinalBrightnessForScan
+                qrCodeReaderWrapper,
+                qrCodeDecoder
         );
     }
 

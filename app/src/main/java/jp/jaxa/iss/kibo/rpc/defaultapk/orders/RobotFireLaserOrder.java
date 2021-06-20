@@ -5,7 +5,6 @@ import android.content.Context;
 import gov.nasa.arc.astrobee.Result;
 import jp.jaxa.iss.kibo.rpc.api.KiboRpcApi;
 import org.opencv.aruco.Aruco;
-import org.opencv.aruco.Dictionary;
 import org.opencv.core.Mat;
 
 import java.util.ArrayList;
@@ -32,9 +31,7 @@ class RobotFireLaserOrder extends RobotOrder {
         Mat image =  api.getMatNavCam();
         List<Mat> corners = new ArrayList<Mat>();
         Mat ids = new Mat(4, 1, 0);
-        Dictionary dictionary = new Dictionary(Aruco.DICT_5X5_250);
-        Aruco.detectMarkers(image, dictionary, corners, ids);
-        //Aruco.detectMarkers();
+        Aruco.detectMarkers(image, Aruco.getPredefinedDictionary(markerDictionaryID), corners, ids);
         return null; // TODO...
     }
 

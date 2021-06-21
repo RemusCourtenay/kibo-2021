@@ -19,7 +19,6 @@ public class ARTag {
      * See the Pose Estimation section here:
      * https://docs.opencv.org/4.5.2/d5/dae/tutorial_aruco_detection.html
      *
-     * TODO... Add some sort of return value
      */
     public void getOrientation() {} // TODO...
 
@@ -48,6 +47,30 @@ public class ARTag {
     public int[] getRelativeMovement() { // TODO...
         return null;
     } // TODO...
+
+    /**
+     * Calculating the x,y coordinates of the tag with respect to the board's coordinate system.
+     * This is done by averaging the x,y coordinates of each corner of the tag.
+     *
+     * @return : A two element double array representing the tag's x,y coordinates.
+     */
+    public double[] getCoordinates() {
+
+        double[] coords = new double[]{0,0};
+        double[] cornerCoords;
+
+        for (int i = 0; i < 4; i++) { // 4 for four corners of square tag
+            cornerCoords = this.corners.get(0, i);
+            coords[0] = coords[0] + cornerCoords[0];
+            coords[1] = coords[1] + cornerCoords[1];
+        }
+
+        // Getting average value
+        coords[0] = coords[0]/4.0;
+        coords[1] = coords[1]/4.0;
+
+        return coords;
+    }
 
     /* ------------ Standard Getter Methods ------------- */
 

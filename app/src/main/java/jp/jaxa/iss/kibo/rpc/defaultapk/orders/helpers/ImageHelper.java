@@ -29,7 +29,7 @@ public class ImageHelper {
 
 
 
-    ImageHelper(Context context) {
+    public ImageHelper(Context context) {
         this.kiboCamImageHeight = context.getResources().getInteger(R.integer.kibo_cam_image_height);
         this.kiboCamImageWidth = context.getResources().getInteger(R.integer.kibo_cam_image_width);
         this.percentThatCropRemoves = context.getResources().getInteger(R.integer.percent_of_image_that_crop_removes);

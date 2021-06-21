@@ -56,13 +56,15 @@ public class ExpeditionWrapper {
         for (RobotOrder order: orders) {
             Log.d("Attempting Order: ", order.printOrderInfo());
             result = order.attemptOrder();
+            if (!result.hasSucceeded()) {
+                Log.d("\n---------PROGRAM CRASH ---------",
+                        "\nResult message: " + result.getMessage() +
+                                "\nResult return value: " + result.getReturnValue() +
+                                "\nResult type: " + result.getType()
+                );
+                return null;
+            }
         }
-
-        // Added so that the IDE will stop telling me that result might be null... should never happen due to being wrapped in RobotOrderResult
-        if (result != null) {
-            return result;
-        } else {
-            throw new RobotOrderException("Order string: \"" + fullOrderString + "\" returned a null result for it's final order");
-        }
+        return result;
     }
 }

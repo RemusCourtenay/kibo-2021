@@ -3,6 +3,8 @@ package jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.ar;
 import android.content.Context;
 
 import org.opencv.aruco.Board;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfDouble;
 import org.opencv.core.Point;
 
 import jp.jaxa.iss.kibo.rpc.api.KiboRpcApi;
@@ -25,11 +27,11 @@ public class LaserGunner {
      *                         from the board's coordinate system to the cameras coordinate system,
      *                         and the collection of tags from the board
      */
-    public RobotOrderResult attemptAcquireTargetLock(HomographyMatrix homographyMatrix) {
+    public RobotOrderResult attemptAcquireTargetLock(HomographyMatrix homographyMatrix, int imageWidth, int imageHeight) { // Not using the standard 1280x960 because the image has probably been cropped
         RobotOrderResult result;
 
         // The calculate distance function decided that we either weren't close enough or some other problem occurred
-        if (!(result = calculateDistanceFromTarget(homographyMatrix)).hasSucceeded()) {
+        if (!(result = calculateDistanceFromTarget(homographyMatrix, imageWidth, imageHeight)).hasSucceeded()) {
             return result;
 
         // We were on target but something has failed while firing the laser
@@ -56,11 +58,29 @@ public class LaserGunner {
      *                         coordinate systems. AR tags are also contained in here for convenience.
      * @return : A result detailing how successful the action was.
      */
-    private RobotOrderResult calculateDistanceFromTarget(HomographyMatrix homographyMatrix, int imageWidth, int imageHeight) {
+    private RobotOrderResult calculateDistanceFromTarget(HomographyMatrix homographyMatrix, int imageWidth, int imageHeight) { // TODO...
 
         Point laserPoint = new Point(imageWidth/2.0, imageHeight/2.0); // Laser fires at the center of the camera (I assume)
 
-        Point targetPoint = getTargetPointInBoardCoordSpace(homographyMatrix.getArTagCollection());
+        Mat targetPoint = getTargetPointInBoardCoordSpaceAsMat(homographyMatrix.getArTagCollection());
+
+        Mat instrinsicsMat = new MatOfDouble(api.getNavCamIntrinsics()[0]); // TODO... FIX THIS
+
+        Mat rotationMatrix = homographyMatrix.getRotationVector();
+        Mat translationMatrix = homographyMatrix.getTranslationVector();
+
+        for (int i = 0; i < 4; i++) { // Assuming that translation matrix is horizontal
+            rotationMatrix.put(3, i, translationMatrix.get(0,i));
+        }
+
+        rotationMatrix.dot(targetPoint);
+        rotationMatrix.dot(instrinsicsMat);
+
+        // Rotation matrix is now equal to target point in other co-ord system
+
+        int newX = (int)rotationMatrix.get(0,0)[0];
+        int newY = (int)rotationMatrix.get(1, 0)[0];
+        int newW = (int)rotationMatrix.get(2, 0)[0]; // SHOULD ALWAYS BE ONE
 
         // Somehow transform target point into picture coords using Homography matrix
 
@@ -69,7 +89,19 @@ public class LaserGunner {
         return null;
     }
 
-    private RobotOrderResult fireLaser() {
+    /**
+     * Attempts to use the API methods to fire the laser and take the snapshots required for the
+     * expedition to succeed.
+     * @return : A result detailing whether or not the use of the API methods worked
+     */
+    private RobotOrderResult fireLaser() { // TODO...
+
+        // turn laser on
+
+        // take pictures
+        takeTenSnapShots();
+
+        // turn laser off
 
         return null;
     }
@@ -85,7 +117,22 @@ public class LaserGunner {
         }
     }
 
-    private Point getTargetPointInBoardCoordSpace(ARTagCollection arTagCollection) {
+    /**
+     * Uses the corner location values of each mat and the defined knowledge about the board shape
+     * and size to locate the x,y coordinates of the center of the target with regards to the board.
+     * The resulting vertical vector should also contain a w value representing scale which should
+     * always be set to 1
+     *
+     * Resulting vector:
+     *      [x]     [x]
+     *      [y]  =  [y]
+     *      [w]     [1]
+     *
+     * @param arTagCollection : The ARTag objects representing the four AR tags situated on the board
+     * @return : A vertical 1x3 vector representing the x,y,w values for the target point with
+     *           respect to the board.
+     */
+    private Mat getTargetPointInBoardCoordSpaceAsMat(ARTagCollection arTagCollection) { // TODO...
         return null;
     }
 

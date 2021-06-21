@@ -17,7 +17,7 @@ public class LaserGunner {
 
     /**
      * Uses the Homography function:
-     * [x1,y2,w2] = [Intrinsics][Homography Matrix][x2,y2,z2,w2]
+     * [x1,y1,w1] = [Intrinsics][Homography Matrix][x2,y2,z2,w2]
      * to find the difference in the value of the target point and the laser firing point with
      * regards to the robot's coordinate system.
      * @param homographyMatrix : The homography matrix that describes the rotation and translation
@@ -41,6 +41,20 @@ public class LaserGunner {
         }
     }
 
+    /**
+     * Attempts to calculate the distance between the spot where the laser will hit the board and
+     * the target itself on the board. This is calculated by using the homography function detailed
+     * above to translate the coordinates of the target on the board to it's location within the
+     * image (i.e. the x,y coordinates of it's pixels in the image).
+     * If the two points are within a certain distance of each other we will return a positive
+     * result, prompting the firing of the laser to start.
+     * If they are not close enough then we return a negative result prompting the program to try
+     * rotate the robot to a more accurate angle.
+     *
+     * @param homographyMatrix : The homography matrix detailing the transformation between the two
+     *                         coordinate systems. AR tags are also contained in here for convenience.
+     * @return : A result detailing how successful the action was.
+     */
     private RobotOrderResult calculateDistanceFromTarget(HomographyMatrix homographyMatrix) {
 
         return null;

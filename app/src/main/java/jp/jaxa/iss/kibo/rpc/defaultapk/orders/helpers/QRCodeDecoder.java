@@ -1,4 +1,4 @@
-package jp.jaxa.iss.kibo.rpc.defaultapk.orders;
+package jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers;
 
 import android.content.Context;
 import android.util.Log;
@@ -8,6 +8,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import jp.jaxa.iss.kibo.rpc.defaultapk.R;
+import jp.jaxa.iss.kibo.rpc.defaultapk.orders.RobotOrderException;
 
 class QRCodeDecoder { // TODO... Comments
 

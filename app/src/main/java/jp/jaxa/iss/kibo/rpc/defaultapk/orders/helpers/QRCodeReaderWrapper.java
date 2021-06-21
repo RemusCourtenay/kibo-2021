@@ -1,4 +1,4 @@
-package jp.jaxa.iss.kibo.rpc.defaultapk.orders;
+package jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers;
 
 import android.content.Context;
 import android.util.Log;
@@ -11,6 +11,8 @@ import com.google.zxing.qrcode.QRCodeReader;
 
 import jp.jaxa.iss.kibo.rpc.api.KiboRpcApi;
 import jp.jaxa.iss.kibo.rpc.defaultapk.R;
+import jp.jaxa.iss.kibo.rpc.defaultapk.orders.RobotOrderException;
+import jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.ImageHelper;
 
 class QRCodeReaderWrapper {
 

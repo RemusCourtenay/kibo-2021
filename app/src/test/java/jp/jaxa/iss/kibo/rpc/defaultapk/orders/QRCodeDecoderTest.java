@@ -8,6 +8,8 @@ import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import jp.jaxa.iss.kibo.rpc.defaultapk.TestResources;
+import jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.DecodeResult;
+import jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.QRCodeDecoder;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;

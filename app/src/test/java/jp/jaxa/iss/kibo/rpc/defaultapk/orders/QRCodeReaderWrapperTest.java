@@ -13,6 +13,8 @@ import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import jp.jaxa.iss.kibo.rpc.defaultapk.TestResources;
+import jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.ImageHelper;
+import jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.QRCodeReaderWrapper;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.fail;

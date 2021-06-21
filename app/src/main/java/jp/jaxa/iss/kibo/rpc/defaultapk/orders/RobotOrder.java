@@ -24,22 +24,11 @@ public abstract class RobotOrder {
     }
 
     /**
-     * Public method for starting the order, wraps the private implementation specific method to
-     * allow for different implementations to return different types of data through the
-     * RobotOrderResult object.
+     * abstract method for implementations to Override.
      *
-     * @return a RobotOrderResult containing information produced by the order.
+     * @return a RobotOrderResult object stating whether or not the order succeeded.
      */
-    public RobotOrderResult attemptOrder() {
-        return new RobotOrderResult(attemptOrderImplementation());
-    }
-
-    /**
-     * Protected abstract method for implementations to Override.
-     *
-     * @return a Result object stating whether or not the order succeeded.
-     */
-    protected abstract Result attemptOrderImplementation();
+    public abstract RobotOrderResult attemptOrder();
 
     public abstract String printOrderInfo();
 }

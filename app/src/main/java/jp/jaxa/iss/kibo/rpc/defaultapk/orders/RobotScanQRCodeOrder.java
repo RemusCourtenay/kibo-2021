@@ -2,6 +2,9 @@ package jp.jaxa.iss.kibo.rpc.defaultapk.orders;
 
 import gov.nasa.arc.astrobee.Result;
 import jp.jaxa.iss.kibo.rpc.api.KiboRpcApi;
+import jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.DecodeResult;
+import jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.QRCodeDecoder;
+import jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.QRCodeReaderWrapper;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.results.RobotOrderResult;
 
 class RobotScanQRCodeOrder extends RobotOrder { // TODO... Comment

@@ -15,6 +15,9 @@ import gov.nasa.arc.astrobee.types.Point;
 import gov.nasa.arc.astrobee.types.Quaternion;
 import jp.jaxa.iss.kibo.rpc.api.KiboRpcApi;
 import jp.jaxa.iss.kibo.rpc.defaultapk.R;
+import jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.ImageHelper;
+import jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.QRCodeDecoder;
+import jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.QRCodeReaderWrapper;
 
 /**
  * Standard builder class for setting up RobotOrder objects. Exists so that specific robot order

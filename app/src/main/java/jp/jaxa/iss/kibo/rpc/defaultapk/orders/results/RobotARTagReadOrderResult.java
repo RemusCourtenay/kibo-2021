@@ -5,7 +5,7 @@ import org.opencv.aruco.Board;
 import java.util.List;
 
 import gov.nasa.arc.astrobee.Result;
-import jp.jaxa.iss.kibo.rpc.defaultapk.orders.ARTag;
+import jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.ARTag;
 
 public class RobotARTagReadOrderResult extends RobotOrderResult {
 

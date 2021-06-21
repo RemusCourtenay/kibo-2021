@@ -1,4 +1,4 @@
-package jp.jaxa.iss.kibo.rpc.defaultapk.orders;
+package jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers;
 
 import android.content.Context;
 import android.graphics.Bitmap;

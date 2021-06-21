@@ -8,7 +8,9 @@ import org.opencv.core.MatOfDouble;
 import org.opencv.core.MatOfInt;
 import org.opencv.core.Point;
 
+import gov.nasa.arc.astrobee.Kinematics;
 import gov.nasa.arc.astrobee.Result;
+import gov.nasa.arc.astrobee.types.Quaternion;
 import jp.jaxa.iss.kibo.rpc.api.KiboRpcApi;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.results.GenericRobotOrderResult;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.results.RobotOrderResult;
@@ -65,7 +67,7 @@ public class LaserGunner {
 
         Point laserPoint = new Point(homographyMatrix.getImageWidth()/2.0, homographyMatrix.getImageHeight()/2.0); // Laser fires at the center of the camera (I assume)
 
-        Mat targetPoint = getTargetPointInBoardCoordSpaceAsMat(homographyMatrix.getArTagCollection());
+        Mat targetPointMat = getTargetPointInBoardCoordSpaceAsMat(homographyMatrix.getArTagCollection());
 
         Mat instrinsicsMat = new MatOfDouble(api.getNavCamIntrinsics()[0]); // TODO... FIX THIS
 
@@ -76,14 +78,40 @@ public class LaserGunner {
             rotationMatrix.put(3, i, translationMatrix.get(0,i));
         }
 
-        rotationMatrix.dot(targetPoint); // TODO... Find out if this works or if we have to do it row by row
+        rotationMatrix.dot(targetPointMat); // TODO... Find out if this works or if we have to do it row by row
         rotationMatrix.dot(instrinsicsMat);
 
         // Rotation matrix is now equal to target point in other co-ord system
 
-        int newX = (int)rotationMatrix.get(0,0)[0];
-        int newY = (int)rotationMatrix.get(1, 0)[0];
-        int newW = (int)rotationMatrix.get(2, 0)[0]; // SHOULD ALWAYS BE ONE
+        Point targetPoint = new Point((int)rotationMatrix.get(0,0)[0],(int)rotationMatrix.get(1, 0)[0]);
+
+        double xDiff = targetPoint.x - laserPoint.x;
+        double yDiff = targetPoint.y - laserPoint.y;
+
+        if (xDiff < DISTANCE_AMOUNT)
+
+        // Straight up vector is [x=0,y=1,z=0]
+        // i.e. 0 + 1i
+        // angle as complex number is xDiff + yDiff(i)
+        // so we multiply them together multiply by i gives xDiff(i) - yDiff
+        // so rotation vector is now [x=-yDiff, y=xDiff, z=0]
+        // quaternion equation is [w=angle, x=xsin(angle/2), y=ysin(angle/2), z=zsin(angle/2)
+
+        double amountToRotate = 10;
+
+        Quaternion rotatedQuaternion = new Quaternion(
+                (float)amountToRotate,
+                (float)(-yDiff*Math.sin(amountToRotate/2)),
+                (float)(xDiff*Math.sin(amountToRotate/2)),
+                (float)0);
+
+        // get current Quaternion
+        Kinematics currentKinematics = api.getRobotKinematics();
+        Quaternion currentQuaternion = currentKinematics.getOrientation();
+
+        // get translated Quaternion
+
+        Quaternion translatedQuaternion;
 
 
         /**
@@ -103,7 +131,7 @@ public class LaserGunner {
 
         // return difference in location
 
-        return null;
+        return new RobotLaserDistanceResult(false, 1, "Not close enough", translatedQuaternion);
     }
 
     /**

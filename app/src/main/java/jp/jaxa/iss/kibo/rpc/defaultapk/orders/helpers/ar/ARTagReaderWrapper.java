@@ -15,7 +15,7 @@ public class ARTagReaderWrapper {
     private static final String FOUND_LESS_THAN_FOUR_TAGS_MESSAGE = ""; // TODO...
     private static final String SUCCESS_MESSAGE = ""; // TODO...
 
-    private List<ARTag> arTags;
+    private ARTagCollection arTagCollection;
     private Board board;
 
     public ARTagReaderWrapper(Context context) { // TODO... get static values from xml files via context
@@ -41,16 +41,16 @@ public class ARTagReaderWrapper {
             return result;
 
         // Found tags but not enough to make a board with, returning the incomplete list of tags and a result detailing the partial success
-        } else if (this.arTags.size() == 4) {
-            return new RobotARTagReadOrderResult(true, 1, FOUND_LESS_THAN_FOUR_TAGS_MESSAGE, this.arTags, null);
+        } else if (this.arTagCollection.getNumTags() == 4) {
+            return new RobotARTagReadOrderResult(true, 1, FOUND_LESS_THAN_FOUR_TAGS_MESSAGE, this.arTagCollection, null);
 
         // Failed to create board, returning the result object created by the getBoardFromTags() method
-        } else if ((result = getBoardFromTags(this.arTags)) != null) {
+        } else if ((result = getBoardFromTags(this.arTagCollection.getARTags())) != null) {
             return result;
 
         // Successfully found both tags and board, returning positive result with bundled tags + board
         } else {
-            return new RobotARTagReadOrderResult(true, 0, SUCCESS_MESSAGE, this.arTags, this.board);
+            return new RobotARTagReadOrderResult(true, 0, SUCCESS_MESSAGE, this.arTagCollection, this.board);
         }
     }
 
@@ -65,7 +65,7 @@ public class ARTagReaderWrapper {
      *           for all other bundled info
      */
     private RobotOrderResult getTagsFromCleanImage(Mat cleanMatImage) { // TODO...
-        this.arTags = null; // set value here
+        this.arTagCollection = null; // set value here
         return null; // Return a result value dictating success (null) or not success (Result value)
     }
 

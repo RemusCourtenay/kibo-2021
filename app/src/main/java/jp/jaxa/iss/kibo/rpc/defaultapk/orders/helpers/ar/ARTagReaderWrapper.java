@@ -10,7 +10,6 @@ import org.opencv.core.Mat;
 import java.util.ArrayList;
 import java.util.List;
 
-import jp.jaxa.iss.kibo.rpc.defaultapk.R;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.results.GenericRobotOrderResult;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.results.RobotARTagReadOrderResult;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.results.RobotOrderResult;
@@ -19,9 +18,9 @@ public class ARTagReaderWrapper {
 
     private static final String FOUND_LESS_THAN_FOUR_TAGS_MESSAGE = ""; // TODO...
     private static final String SUCCESS_MESSAGE = ""; // TODO...
+    private static final int markerDictionaryID = Aruco.DICT_5X5_250;
 
     private ARTagCollection arTagCollection;
-    private Board board;
 
     public ARTagReaderWrapper(Context context) { // TODO... get static values from xml files via context
 
@@ -40,6 +39,7 @@ public class ARTagReaderWrapper {
      */
     public RobotOrderResult attemptReadImageForARTags(Mat cleanMatImage) {
         RobotOrderResult result;
+        Board board;
 
         // Failed to get tags, returning the result object created by the getTagsFromCleanImage() method
         if (!((result = getTagsFromCleanImage(cleanMatImage)).hasSucceeded())) {
@@ -49,13 +49,10 @@ public class ARTagReaderWrapper {
         } else if (this.arTagCollection.getNumTags() == 4) {
             return new RobotARTagReadOrderResult(true, 1, FOUND_LESS_THAN_FOUR_TAGS_MESSAGE, this.arTagCollection, null);
 
-        // Failed to create board, returning the result object created by the getBoardFromTags() method
-        } else if ((result = getBoardFromTags(this.arTagCollection.getARTags())) != null) {
-            return result;
-
         // Successfully found both tags and board, returning positive result with bundled tags + board
         } else {
-            return new RobotARTagReadOrderResult(true, 0, SUCCESS_MESSAGE, this.arTagCollection, this.board);
+            board = getBoardFromTags(this.arTagCollection);
+            return new RobotARTagReadOrderResult(true, 0, SUCCESS_MESSAGE, this.arTagCollection, board);
         }
     }
 
@@ -80,14 +77,15 @@ public class ARTagReaderWrapper {
 
     /**
      * Attempts to use the Aruco Board setup methods to create a board object from the tags.
-     * If this is successful returns null and sets the value of this.board, otherwise returns a
-     * Result object detailing what went wrong.
+     * Returns the setup board.
      *
-     * @param arTagsList : List of AR tags found in image
+     * @param collection : ARTagCollection
      * @return : null if succeeded, otherwise a relevant Result object
      */
-    private RobotOrderResult getBoardFromTags(List<ARTag> arTagsList) {
-        this.board = null; // set value here
-        return null; // Return a result value dictating success (null) or not success (Result value)
+
+    private Board getBoardFromTags(ARTagCollection collection) {
+        Mat ids  = collection.getTagIDsMat();
+        List<Mat> corners = collection.getTagCornersMat();
+        return Board.create(corners, Aruco.getPredefinedDictionary(markerDictionaryID), ids);
     }
 }

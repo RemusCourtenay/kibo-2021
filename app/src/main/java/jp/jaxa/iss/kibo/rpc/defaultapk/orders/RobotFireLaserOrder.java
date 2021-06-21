@@ -31,6 +31,7 @@ class RobotFireLaserOrder extends RobotOrder { // TODO... Javadoc comment
     private final Context context;
     private final int kiboCamImageHeight; // True for both nav and dock cam
     private final int kiboCamImageWidth;
+    private final int percentThatCropRemoves;
 
     private HomographyMatrix homographyMatrix;
     private ARTagCollection arTagCollection;
@@ -42,6 +43,7 @@ class RobotFireLaserOrder extends RobotOrder { // TODO... Javadoc comment
         this.context = context;
         this.kiboCamImageHeight = context.getResources().getInteger(R.integer.kibo_cam_image_height);
         this.kiboCamImageWidth = context.getResources().getInteger(R.integer.kibo_cam_image_width);
+        this.percentThatCropRemoves = context.getResources().getInteger(R.integer.percent_of_image_that_crop_removes);
     }
 
     @Override
@@ -165,8 +167,6 @@ class RobotFireLaserOrder extends RobotOrder { // TODO... Javadoc comment
      */
     private Mat cleanupImage(Mat matImage) {
         ImageHelper iH = new ImageHelper(this.context);
-        int percentThatCropRemoves = 10;
-        // TODO... Not sure how much to crop ^^
         Mat croppedMat = new Mat(matImage, iH.getCroppedImageRectangleArea(percentThatCropRemoves, kiboCamImageHeight, kiboCamImageWidth));
         return croppedMat; // TODO...
     }

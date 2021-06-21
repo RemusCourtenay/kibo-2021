@@ -3,6 +3,7 @@ package jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.ar;
 import android.content.Context;
 
 import org.opencv.aruco.Board;
+import org.opencv.core.Point;
 
 import jp.jaxa.iss.kibo.rpc.api.KiboRpcApi;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.results.RobotOrderResult;
@@ -55,7 +56,15 @@ public class LaserGunner {
      *                         coordinate systems. AR tags are also contained in here for convenience.
      * @return : A result detailing how successful the action was.
      */
-    private RobotOrderResult calculateDistanceFromTarget(HomographyMatrix homographyMatrix) {
+    private RobotOrderResult calculateDistanceFromTarget(HomographyMatrix homographyMatrix, int imageWidth, int imageHeight) {
+
+        Point laserPoint = new Point(imageWidth/2.0, imageHeight/2.0); // Laser fires at the center of the camera (I assume)
+
+        Point targetPoint = getTargetPointInBoardCoordSpace(homographyMatrix.getArTagCollection());
+
+        // Somehow transform target point into picture coords using Homography matrix
+
+        // return difference in location
 
         return null;
     }
@@ -74,6 +83,10 @@ public class LaserGunner {
                 e.printStackTrace();
             }
         }
+    }
+
+    private Point getTargetPointInBoardCoordSpace(ARTagCollection arTagCollection) {
+        return null;
     }
 
 }

@@ -7,6 +7,8 @@ import jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.ar.ARTag;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.ar.ARTagCollection;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.ar.ARTagReaderWrapper;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.ImageHelper;
+import jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.ar.HomographyMatrix;
+import jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.ar.LaserGunner;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.results.RobotARTagReadOrderResult;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.results.RobotOrderResult;
 
@@ -26,13 +28,15 @@ class RobotFireLaserOrder extends RobotOrder { // TODO... Javadoc comment
 
     private final ImageHelper imageHelper;
     private final ARTagReaderWrapper arTagReaderWrapper;
+    private final LaserGunner laserGunner;
 
 
 
-    RobotFireLaserOrder(KiboRpcApi api, Context context, ImageHelper imageHelper, ARTagReaderWrapper arTagReaderWrapper) {
+    RobotFireLaserOrder(KiboRpcApi api, Context context, ImageHelper imageHelper, ARTagReaderWrapper arTagReaderWrapper, LaserGunner laserGunner) {
         super(api);
         this.imageHelper = imageHelper;
         this.arTagReaderWrapper = arTagReaderWrapper;
+        this.laserGunner = laserGunner;
 
     }
 
@@ -75,7 +79,7 @@ class RobotFireLaserOrder extends RobotOrder { // TODO... Javadoc comment
                     // Got tags but there weren't enough to build board (<4)
                 } else if (result.getReturnValue() == 1) {
                     // Move robot and then we'll try again
-                    adjustRobot(arTags.getARTags());
+                    adjustRobotToFindTags(arTags.getARTags());
 
                 // Returned a value that hasn't been implemented yet...
                 } else {
@@ -84,35 +88,15 @@ class RobotFireLaserOrder extends RobotOrder { // TODO... Javadoc comment
             }
         }
 
+        HomographyMatrix homographyMatrix = calculateBoardPose(board, arTags);
 
-
-
-        // Why we putting distortion in when we already undistort?? put in no distortion at all?
-        Mat distortionCoefficients = new Mat(1, 5, CvType.CV_32FC1); // stolen from imageHelper, not my code, no idea what cv type is
-        distortionCoefficients.put(0,1, api.getNavCamIntrinsics()[1]); // distortion coefficients are second in array
-
-        Mat rotationVector = new Mat(); // Output vector corresponding to rotation of board
-        Mat translationVector = new Mat(); // Output vector corresponding to translation of board
-
-        if(Aruco.estimatePoseBoard(
-                cornersOfEachTag,
-                tagIdentifiers,
-                airlockBoard,
-                image,
-                distortionCoefficients,
-                rotationVector,
-                translationVector
-        ) == 0) {
-            throw new RobotOrderException("Failed to estimate pose");
+        if (!(result = laserGunner.attemptAquireTargetLock(homographyMatrix, arTags)).hasSucceeded()) {
+            return result;
+        } else if (!(result = laserGunner.fireLaser()).hasSucceeded()) {
+            return result;
+        } else {
+            return null; // TODO... return successful result instead of null
         }
-
-        // Do something maths related with rotation and translation vector
-
-        attemptToAlignLaser(rotationVector, translationVector);
-
-        takeTenSnapShots();
-
-        return null; // TODO...
     }
 
     @Override
@@ -120,23 +104,20 @@ class RobotFireLaserOrder extends RobotOrder { // TODO... Javadoc comment
         return "Fire laser order:";
     }
 
-
     /**
-     * Uses the Homograph function:
-     * [x1,y2,w2] = [Intrinsics][Rotation Vector][Translation Vector][x2,y2,z2,w2]
-     * to find the difference in the value of the target point and the laser firing point with
-     * regards to the robot's coordinate system.
-     * @param rotationVector
-     * @param translationVector
+     * Uses the Aruco.estimatePoseBoard() function to find the rotation and translation vectors for
+     * the given board. Wraps them in a Homography matrix to return.
+     *
+     * @param board : Board that exists on some separate coordinate system to the image
+     * @param arTagCollection : AR tags found on the board
+     * @return : The homography matrix that describes the translation from one coordinate system to
+     *           the other
      */
-    private void attemptToAlignLaser(Mat rotationVector, Mat translationVector) {
-
+    private HomographyMatrix calculateBoardPose(Board board, ARTagCollection arTagCollection) {
+        return null; // TODO...
     }
 
-
-
-
-    private void adjustRobot(List<ARTag> foundTags) {
+    private void adjustRobotToFindTags(List<ARTag> foundTags) {
 
         // ordered x,y
         int[] adjustmentAmounts = new int[]{0,0};
@@ -169,14 +150,6 @@ class RobotFireLaserOrder extends RobotOrder { // TODO... Javadoc comment
         return null; // TODO...
     }
 
-    private void takeTenSnapShots() {
-        for (int i = 0; i< 10; i++) {
-            api.takeSnapshot();
-            try {
-                wait(1000);
-            } catch(InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+
 }
+

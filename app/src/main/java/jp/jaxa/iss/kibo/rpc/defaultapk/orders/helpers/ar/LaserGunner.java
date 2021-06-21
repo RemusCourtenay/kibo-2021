@@ -13,9 +13,12 @@ import gov.nasa.arc.astrobee.Result;
 import gov.nasa.arc.astrobee.types.Quaternion;
 import jp.jaxa.iss.kibo.rpc.api.KiboRpcApi;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.results.GenericRobotOrderResult;
+import jp.jaxa.iss.kibo.rpc.defaultapk.orders.results.RobotLaserOrderResult;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.results.RobotOrderResult;
 
 public class LaserGunner {
+
+    private static final int DISTANCE_AMOUNT = 10; // TODO....
 
     private final KiboRpcApi api;
 
@@ -88,12 +91,20 @@ public class LaserGunner {
         double xDiff = targetPoint.x - laserPoint.x;
         double yDiff = targetPoint.y - laserPoint.y;
 
-        if (xDiff < DISTANCE_AMOUNT)
+        if (xDiff < DISTANCE_AMOUNT && yDiff < DISTANCE_AMOUNT) {
+
+            RobotOrderResult robotOrderResult;
+            if (!(robotOrderResult = fireLaser()).hasSucceeded()) {
+                return robotOrderResult;
+            } else {
+                return new GenericRobotOrderResult(true, 0, "Laser firing successful");
+            }
+        }
 
         // Straight up vector is [x=0,y=1,z=0]
         // i.e. 0 + 1i
         // angle as complex number is xDiff + yDiff(i)
-        // so we multiply them together multiply by i gives xDiff(i) - yDiff
+        // so we multiply them together, multiply by i gives xDiff(i) - yDiff
         // so rotation vector is now [x=-yDiff, y=xDiff, z=0]
         // quaternion equation is [w=angle, x=xsin(angle/2), y=ysin(angle/2), z=zsin(angle/2)
 
@@ -110,7 +121,6 @@ public class LaserGunner {
         Quaternion currentQuaternion = currentKinematics.getOrientation();
 
         // get translated Quaternion
-
         Quaternion translatedQuaternion;
 
 
@@ -131,7 +141,7 @@ public class LaserGunner {
 
         // return difference in location
 
-        return new RobotLaserDistanceResult(false, 1, "Not close enough", translatedQuaternion);
+        return new RobotLaserOrderResult(false, 1, "Not close enough", translatedQuaternion);
     }
 
     /**

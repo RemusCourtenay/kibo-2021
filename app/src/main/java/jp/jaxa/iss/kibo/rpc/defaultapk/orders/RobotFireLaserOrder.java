@@ -2,6 +2,8 @@ package jp.jaxa.iss.kibo.rpc.defaultapk.orders;
 
 import android.content.Context;
 
+import gov.nasa.arc.astrobee.types.Point;
+import gov.nasa.arc.astrobee.types.Quaternion;
 import jp.jaxa.iss.kibo.rpc.api.KiboRpcApi;
 import jp.jaxa.iss.kibo.rpc.defaultapk.R;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.ar.ARTag;
@@ -12,6 +14,7 @@ import jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.ar.HomographyMatrix;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.ar.LaserGunner;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.results.GenericRobotOrderResult;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.results.RobotARTagReadOrderResult;
+import jp.jaxa.iss.kibo.rpc.defaultapk.orders.results.RobotLaserOrderResult;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.results.RobotOrderResult;
 
 import org.opencv.aruco.Aruco;
@@ -55,9 +58,7 @@ class RobotFireLaserOrder extends RobotOrder { // TODO... Javadoc comment
             if (!(result = attemptGetBoardPose()).hasSucceeded()) {
                 return result;
             } else if (!(result = laserGunner.attemptAcquireTargetLock(homographyMatrix)).hasSucceeded()) {
-
-                // TODO... Handle different types of bad result from LaserGunner
-
+                rotateRobot(((RobotLaserOrderResult)result).getTranslatedQuaternion());
             } else {
                 return new GenericRobotOrderResult(true, 0, ""); // TODO... Return good result
             }
@@ -151,8 +152,8 @@ class RobotFireLaserOrder extends RobotOrder { // TODO... Javadoc comment
         return adjustmentAmounts;
     }
 
-    private void rotateRobot(int[] adjustmentAmounts) {
-        // TODO... do maths
+    private void rotateRobot(Quaternion quaternion) {
+        api.relativeMoveTo(new Point(0.0,0.0, 0.0), quaternion, true);
     }
 
 

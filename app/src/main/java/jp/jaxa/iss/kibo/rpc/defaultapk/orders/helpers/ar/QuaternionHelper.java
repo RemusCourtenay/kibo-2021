@@ -19,7 +19,7 @@ public class QuaternionHelper {
         double xDiff = adjustmentAmounts[0];
         double yDiff = adjustmentAmounts[1];
 
-        double amountToRotate = 10;
+        double amountToRotate = 15;
 
         Quaternion rotatedQuaternion = new Quaternion(
                 (float)amountToRotate,

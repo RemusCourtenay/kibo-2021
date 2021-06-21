@@ -12,7 +12,7 @@ public class HomographyMatrix {
     private final Size imageSize;
 
 
-    HomographyMatrix(Mat rotationVector, Mat translationVector, ARTagCollection arTagCollection, Size imageSize) {
+    public HomographyMatrix(Mat rotationVector, Mat translationVector, ARTagCollection arTagCollection, Size imageSize) {
         this.rotationVector = rotationVector;
         this.translationVector = translationVector;
         this.arTagCollection = arTagCollection;

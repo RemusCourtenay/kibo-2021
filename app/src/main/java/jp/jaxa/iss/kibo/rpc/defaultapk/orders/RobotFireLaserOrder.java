@@ -2,6 +2,7 @@ package jp.jaxa.iss.kibo.rpc.defaultapk.orders;
 
 import android.content.Context;
 
+import gov.nasa.arc.astrobee.Kinematics;
 import gov.nasa.arc.astrobee.types.Point;
 import gov.nasa.arc.astrobee.types.Quaternion;
 import jp.jaxa.iss.kibo.rpc.api.KiboRpcApi;
@@ -20,7 +21,9 @@ import jp.jaxa.iss.kibo.rpc.defaultapk.orders.results.RobotOrderResult;
 
 import org.opencv.aruco.Aruco;
 import org.opencv.aruco.Board;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.Size;
 
 class RobotFireLaserOrder extends RobotOrder { // TODO... Javadoc comment
 
@@ -134,7 +137,21 @@ class RobotFireLaserOrder extends RobotOrder { // TODO... Javadoc comment
      *           the other
      */
     private HomographyMatrix calculateBoardPose(Board board, ARTagCollection arTagCollection) { // TODO...
-        return null;
+
+        double[][] camIntrinsics = api.getNavCamIntrinsics();
+
+        Mat cameraMatrix = new Mat(3, 3, CvType.CV_32FC1);
+        Mat distCoeffs = new Mat(1, 5, CvType.CV_32FC1);
+
+        cameraMatrix.put(0, 0, camIntrinsics[0]);
+        distCoeffs.put(0, 1, camIntrinsics[1]);
+
+        Mat rvec = new Mat();
+        Mat tvec = new Mat();
+
+        Aruco.estimatePoseBoard(arTagCollection.getTagCornersMat(), arTagCollection.getTagIDsMat(), board, cameraMatrix, distCoeffs, rvec, tvec);
+        HomographyMatrix homographyMatrix = new HomographyMatrix(rvec, tvec, arTagCollection, new Size(1280,960));
+        return homographyMatrix;
     }
 
     private Quaternion getAdjustmentNeededToFindTags(ARTagCollection foundTags) {

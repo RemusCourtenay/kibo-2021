@@ -8,7 +8,9 @@ import org.opencv.core.MatOfDouble;
 import org.opencv.core.MatOfInt;
 import org.opencv.core.Point;
 
+import gov.nasa.arc.astrobee.Result;
 import jp.jaxa.iss.kibo.rpc.api.KiboRpcApi;
+import jp.jaxa.iss.kibo.rpc.defaultapk.orders.results.GenericRobotOrderResult;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.results.RobotOrderResult;
 
 public class LaserGunner {
@@ -111,25 +113,37 @@ public class LaserGunner {
      */
     private RobotOrderResult fireLaser() { // TODO...
 
-        // turn laser on
+        Result result;
+        RobotOrderResult orderResult;
 
-        // take pictures
-        takeTenSnapShots();
+        // If fail to turn on laser
+        if (!(result = api.laserControl(true)).hasSucceeded()) {
+            return new GenericRobotOrderResult(result);
 
-        // turn laser off
+        // If fail to take 10 snapshots
+        } else if (!(orderResult = takeTenSnapShots()).hasSucceeded()) {
+            return orderResult;
 
-        return null;
+        // If fail to turn off laser
+        } else if (!(result = api.laserControl(false)).hasSucceeded()) {
+            return new GenericRobotOrderResult(result);
+
+        // If everything works
+        } else {
+            return new GenericRobotOrderResult(true, 0, "");
+        }
     }
 
-    private void takeTenSnapShots() {
+    private RobotOrderResult takeTenSnapShots() {
         for (int i = 0; i< 10; i++) {
             api.takeSnapshot();
             try {
                 wait(1000);
             } catch(InterruptedException e) {
-                e.printStackTrace();
+                return new GenericRobotOrderResult(false, 0, e.getMessage()); // Maybe just not worry about this one?
             }
         }
+        return new GenericRobotOrderResult(true, 0, "");
     }
 
     /**

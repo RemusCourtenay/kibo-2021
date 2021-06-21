@@ -159,7 +159,7 @@ class RobotFireLaserOrder extends RobotOrder { // TODO... Javadoc comment
     private Mat cleanupImage(Mat matImage) {
         ImageHelper iH = new ImageHelper(this.context);
         //Mat undistorted
-        return iH.undistort(matImage, api.getNavCamIntrinsics()); // TODO...
+        return iH.undistort(matImage, api.getNavCamIntrinsics()); // TODO... make this not undistort
     }
 
 

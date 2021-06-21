@@ -12,6 +12,7 @@ import jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.ar.ARTagReaderWrapper;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.ImageHelper;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.ar.HomographyMatrix;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.ar.LaserGunner;
+import jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.ar.QuaternionHelper;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.results.GenericRobotOrderResult;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.results.RobotARTagReadOrderResult;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.results.RobotLaserOrderResult;
@@ -113,9 +114,8 @@ class RobotFireLaserOrder extends RobotOrder { // TODO... Javadoc comment
                     // Got tags but there weren't enough to build board (<4)
                 } else if (result.getReturnValue() == 1) {
                     // Move robot and then we'll try again
-                    getAdjustmentNeededToFindTags(arTags);
-
-                    // Returned a value that hasn't been implemented yet...
+                    Quaternion adjustment = getAdjustmentNeededToFindTags(arTags);
+                    rotateRobot(adjustment);
                 } else {
                     throw new RobotOrderException("Return value for AR Tag reading: " + result.getReturnValue() + " has not been implemented in RobotFireLaserOrder.attemptOrder()");
                 }
@@ -137,10 +137,10 @@ class RobotFireLaserOrder extends RobotOrder { // TODO... Javadoc comment
         return null;
     }
 
-    private int[] getAdjustmentNeededToFindTags(ARTagCollection foundTags) {
+    private Quaternion getAdjustmentNeededToFindTags(ARTagCollection foundTags) {
 
         // ordered x,y
-        int[] adjustmentAmounts = new int[]{0,0};
+        double[] adjustmentAmounts = new double[]{0,0};
         int[] specificAdjustment;
 
         for (ARTag tag: foundTags.getARTags()) { // Possibly a cleaner way of doing this but w/e
@@ -149,7 +149,8 @@ class RobotFireLaserOrder extends RobotOrder { // TODO... Javadoc comment
             adjustmentAmounts[1] = adjustmentAmounts[1] + specificAdjustment[1];
         }
 
-        return adjustmentAmounts;
+
+        return QuaternionHelper.translateAdjustment(api, adjustmentAmounts);
     }
 
     private void rotateRobot(Quaternion quaternion) {

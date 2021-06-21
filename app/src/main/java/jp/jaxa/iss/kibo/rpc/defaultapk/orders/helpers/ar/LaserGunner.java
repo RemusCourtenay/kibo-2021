@@ -72,7 +72,7 @@ public class LaserGunner {
 
         Mat targetPointMat = getTargetPointInBoardCoordSpaceAsMat(homographyMatrix.getArTagCollection());
 
-        Mat instrinsicsMat = new MatOfDouble(api.getNavCamIntrinsics()[0]); // TODO... FIX THIS
+        Mat instrinsicsMat = new MatOfDouble(api.getNavCamIntrinsics()[0]); // TODO... FIX THIS?
 
         Mat rotationMatrix = homographyMatrix.getRotationVector();
         Mat translationMatrix = homographyMatrix.getTranslationVector();
@@ -101,45 +101,9 @@ public class LaserGunner {
             }
         }
 
-        // Straight up vector is [x=0,y=1,z=0]
-        // i.e. 0 + 1i
-        // angle as complex number is xDiff + yDiff(i)
-        // so we multiply them together, multiply by i gives xDiff(i) - yDiff
-        // so rotation vector is now [x=-yDiff, y=xDiff, z=0]
-        // quaternion equation is [w=angle, x=xsin(angle/2), y=ysin(angle/2), z=zsin(angle/2)
+        double[] adjustment = new double[]{xDiff,yDiff};
 
-        double amountToRotate = 10;
-
-        Quaternion rotatedQuaternion = new Quaternion(
-                (float)amountToRotate,
-                (float)(-yDiff*Math.sin(amountToRotate/2)),
-                (float)(xDiff*Math.sin(amountToRotate/2)),
-                (float)0);
-
-        // get current Quaternion
-        Kinematics currentKinematics = api.getRobotKinematics();
-        Quaternion currentQuaternion = currentKinematics.getOrientation();
-
-        // get translated Quaternion
-        Quaternion translatedQuaternion;
-
-
-        /**
-         *
-         *                      y
-         *                    / |
-         *                  /   |
-         *                /     |
-         *              x -------
-         *                 ^
-         *                 |
-         *                Angle
-         *
-         *
-         */
-
-
-        // return difference in location
+        Quaternion translatedQuaternion = QuaternionHelper.translateAdjustment(api, adjustment);
 
         return new RobotLaserOrderResult(false, 1, "Not close enough", translatedQuaternion);
     }

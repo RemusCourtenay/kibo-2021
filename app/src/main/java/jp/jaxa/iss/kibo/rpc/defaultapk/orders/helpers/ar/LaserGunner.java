@@ -130,7 +130,7 @@ public class LaserGunner {
      *
      * @param arTagCollection : The ARTag objects representing the four AR tags situated on the board
      * @return : A vertical 1x3 vector representing the x,y,w values for the target point with
-     *           respect to the board.
+     *           respect to the board. This should be stored as a Mat object even though it's a pain
      */
     private Mat getTargetPointInBoardCoordSpaceAsMat(ARTagCollection arTagCollection) { // TODO...
         return null;

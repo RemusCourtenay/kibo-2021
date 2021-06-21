@@ -10,6 +10,7 @@ import jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.ar.ARTagReaderWrapper;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.ImageHelper;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.ar.HomographyMatrix;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.ar.LaserGunner;
+import jp.jaxa.iss.kibo.rpc.defaultapk.orders.results.GenericRobotOrderResult;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.results.RobotARTagReadOrderResult;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.results.RobotOrderResult;
 
@@ -56,12 +57,12 @@ class RobotFireLaserOrder extends RobotOrder { // TODO... Javadoc comment
                 // TODO... Handle different types of bad result from LaserGunner
 
             } else {
-                return null; // TODO... Return good result
+                return new GenericRobotOrderResult(true, 0, ""); // TODO... Return good result
             }
 
         }
 
-        return null; // TODO... Return bad result
+        return new GenericRobotOrderResult(false, 1, ""); // TODO... Return bad result
     }
 
     @Override
@@ -95,7 +96,9 @@ class RobotFireLaserOrder extends RobotOrder { // TODO... Javadoc comment
 
                 // Didn't completely fail
             } else { // TODO... check that casting is safe here by using result.getType()
-
+                if (!(result.getType() == RobotARTagReadOrderResult.class)) {
+                    throw new RobotOrderException("Incorrect type");
+                }
                 // Getting bundled data out of result
                 arTags = ((RobotARTagReadOrderResult) result).getARTagCollection();
                 board = ((RobotARTagReadOrderResult) result).getBoard();
@@ -103,7 +106,7 @@ class RobotFireLaserOrder extends RobotOrder { // TODO... Javadoc comment
                 // Complete success, both board and tags were returned
                 if (result.getReturnValue() == 0) {
                     this.homographyMatrix = calculateBoardPose(board, arTagCollection); // TODO... pass this through Result instead
-                    return null; // TODO... Pass good result not null
+                    return new GenericRobotOrderResult(true, 0, ""); // TODO... Pass good result not null
                     // Got tags but there weren't enough to build board (<4)
                 } else if (result.getReturnValue() == 1) {
                     // Move robot and then we'll try again
@@ -115,7 +118,7 @@ class RobotFireLaserOrder extends RobotOrder { // TODO... Javadoc comment
                 }
             }
         }
-        return null; // TODO... pass bad result not null
+        return new GenericRobotOrderResult(false, 1, ""); // TODO... pass bad result not null
     }
 
     /**

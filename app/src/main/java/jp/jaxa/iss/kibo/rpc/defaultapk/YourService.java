@@ -6,7 +6,7 @@ import android.content.Context;
 import jp.jaxa.iss.kibo.rpc.api.KiboRpcService;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.RobotOrderBuilder;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.RobotOrderException;
-import jp.jaxa.iss.kibo.rpc.defaultapk.orders.RobotOrderResult;
+import jp.jaxa.iss.kibo.rpc.defaultapk.orders.results.RobotOrderResult;
 
 import gov.nasa.arc.astrobee.Kinematics;
 import gov.nasa.arc.astrobee.types.Point;

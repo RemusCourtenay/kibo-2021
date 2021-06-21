@@ -99,7 +99,7 @@ public class ImageHelper {
     }
 
     // TODO... Javadoc comment
-    public Rect getCroppedImageRectangleArea(int percentRemovedAsInt, int numRows, int numColumns) {
+    public Rect getCroppedImageRectangleArea(int percentRemovedAsInt, int numRows, int numColumns) { // Should probably be getting crop Region Of Interest (ROI) from a function not a random number
         Log.d("Calculating rectangle for crop: ", "Removing amount: " + percentRemovedAsInt);
         // Converting 0-100 percent to 0-1 double
         Double percentRemoved = (double)(percentRemovedAsInt)/100.0;
@@ -123,6 +123,8 @@ public class ImageHelper {
         // Return the specified area to keep after cropping as a Rectangle object
         return new Rect(numColumnsOffset, numRowsOffset, numRemainingColumns, numRemainingRows);
     }
+
+
 
 
 }

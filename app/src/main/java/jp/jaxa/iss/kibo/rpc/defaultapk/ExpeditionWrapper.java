@@ -1,21 +1,13 @@
 package jp.jaxa.iss.kibo.rpc.defaultapk;
 
-import android.content.Context;
 import android.util.Log;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.logging.Logger;
-import java.util.stream.Stream;
 
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.RobotOrder;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.RobotOrderBuilder;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.RobotOrderException;
-import jp.jaxa.iss.kibo.rpc.defaultapk.orders.RobotOrderResult;
-import jp.jaxa.iss.kibo.rpc.defaultapk.orders.RobotOrderType;
+import jp.jaxa.iss.kibo.rpc.defaultapk.orders.results.RobotOrderResult;
 
 
 /**

@@ -8,12 +8,7 @@ import org.opencv.aruco.Aruco;
 import org.opencv.aruco.Board;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
-import org.opencv.calib3d.Calib3d;
 import org.opencv.core.MatOfDouble;
-import org.opencv.core.MatOfFloat;
-import org.opencv.core.MatOfPoint2f;
-import org.opencv.core.MatOfPoint3f;
-import org.opencv.core.Size;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,13 +23,16 @@ class RobotFireLaserOrder extends RobotOrder {
     private static final int MAX_BOARD_ATTEMPTS = 10;
 
     private final Map<Integer, int[]> idToDirectionMap;
-
-
     private final ImageHelper imageHelper;
+    private final ARTagReaderWrapper arTagReaderWrapper;
 
-    RobotFireLaserOrder(KiboRpcApi api, Context context, ImageHelper imageHelper) {
+
+
+
+    RobotFireLaserOrder(KiboRpcApi api, Context context, ImageHelper imageHelper, ARTagReaderWrapper arTagReaderWrapper) {
         super(api);
         this.imageHelper = imageHelper;
+        this.arTagReaderWrapper = arTagReaderWrapper;
 
 
         idToDirectionMap = new HashMap<>();
@@ -97,9 +95,18 @@ class RobotFireLaserOrder extends RobotOrder {
 
     @Override
     public String printOrderInfo() {
-        return null;
+        return "Fire laser order:";
     }
 
+
+    /**
+     * Uses the Homograph function:
+     * [x1,y2,w2] = [Intrinsics][Rotation Vector][Translation Vector][x2,y2,z2,w2]
+     * to find the difference in the value of the target point and the laser firing point with
+     * regards to the robot's coordinate system.
+     * @param rotationVector
+     * @param translationVector
+     */
     private void attemptToAlignLaser(Mat rotationVector, Mat translationVector) {
 
     }
@@ -121,7 +128,7 @@ class RobotFireLaserOrder extends RobotOrder {
         // not clearing tagIdentifiersVector, hopefully ok
         Aruco.detectMarkers(image, Aruco.getPredefinedDictionary(markerDictionaryID), cornersOfEachTag, tagIdentifiersVector);
         if (tagIdentifiersVector.size().width < 4) {
-            adjustImage(tagIdentifiersVector); // try move to get more tags into image
+            adjustRobot(tagIdentifiersVector); // try move to get more tags into image
             return null; // signal that we need to run again
         } else {
             return Board.create(cornersOfEachTag, Aruco.getPredefinedDictionary(markerDictionaryID), tagIdentifiersVector);
@@ -129,7 +136,7 @@ class RobotFireLaserOrder extends RobotOrder {
     }
 
 
-    private void adjustImage(Mat idsVector) { // TODO... be smart and get rotation from order of tags
+    private void adjustRobot(Mat idsVector) { // TODO... be smart and get rotation from order of tags
 
         // ordered x,y
         int[] adjustmentAmounts = new int[]{0,0};
@@ -148,5 +155,19 @@ class RobotFireLaserOrder extends RobotOrder {
 
     private void rotateRobot(int[] adjustmentAmounts) {
         // TODO... do maths
+    }
+
+
+    /**
+     * Handles the cropping and possible scaling of the image by using the methods
+     * from imageHelper. Returns an image with high chance of AR tags being readable.
+     * Does not remove distortion as this is needed to calculate the relative position of the camera
+     * to the tags.
+     *
+     * @param matImage : initial image returned by Kibo robot camera
+     * @return : image that is easy to read AR tags off of
+     */
+    private Mat cleanupImage(Mat matImage) {
+        return null; // TODO...
     }
 }

@@ -2,6 +2,7 @@ package jp.jaxa.iss.kibo.rpc.defaultapk.orders;
 
 import gov.nasa.arc.astrobee.Result;
 import jp.jaxa.iss.kibo.rpc.api.KiboRpcApi;
+import jp.jaxa.iss.kibo.rpc.defaultapk.orders.results.RobotOrderResult;
 
 /**
  * Implementation of RobotOrder concerning the order for the Kibo Robot to announce that it has
@@ -24,7 +25,7 @@ public class RobotFinishMissionOrder extends RobotOrder {
      * method and throws an exception if the order fails.
      */
     @Override
-    protected Result attemptOrderImplementation() {
+    public RobotOrderResult attemptOrder() {
         if (!api.reportMissionCompletion()) {
             throw new RobotOrderException("Failed to report mission completion");
         }

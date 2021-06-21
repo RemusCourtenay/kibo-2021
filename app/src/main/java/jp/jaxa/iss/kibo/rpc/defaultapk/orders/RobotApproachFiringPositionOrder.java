@@ -4,10 +4,12 @@ import gov.nasa.arc.astrobee.Result;
 import gov.nasa.arc.astrobee.types.Point;
 import gov.nasa.arc.astrobee.types.Quaternion;
 import jp.jaxa.iss.kibo.rpc.api.KiboRpcApi;
+import jp.jaxa.iss.kibo.rpc.defaultapk.orders.results.GenericRobotOrderResult;
+import jp.jaxa.iss.kibo.rpc.defaultapk.orders.results.RobotOrderResult;
 
 class RobotApproachFiringPositionOrder extends RobotOrder {
 
-    private static final float POINT_A_QUAT_X = 0;
+    private static final float POINT_A_QUAT_X = 0; // TODO... Move to xml file
     private static final float POINT_A_QUAT_Y = 0;
     private static final float POINT_A_QUAT_Z = (float)-0.707;
     private static final float POINT_A_QUAT_W = (float)0.707;
@@ -24,7 +26,7 @@ class RobotApproachFiringPositionOrder extends RobotOrder {
     }
 
     @Override
-    protected Result attemptOrderImplementation() { // Code copied from moveTo
+    public RobotOrderResult attemptOrder() { // Code copied from moveTo
         Result result = api.moveTo(pointADash, quatADash, true);
 
         for(int i = 0; i < loopMax; i++){
@@ -34,7 +36,7 @@ class RobotApproachFiringPositionOrder extends RobotOrder {
             result = api.moveTo(pointADash, quatADash, true);
         }
 
-        return result;
+        return new GenericRobotOrderResult(result);
     }
 
     @Override

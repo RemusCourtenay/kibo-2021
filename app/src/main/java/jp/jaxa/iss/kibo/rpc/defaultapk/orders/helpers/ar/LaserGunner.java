@@ -27,11 +27,11 @@ public class LaserGunner {
      *                         from the board's coordinate system to the cameras coordinate system,
      *                         and the collection of tags from the board
      */
-    public RobotOrderResult attemptAcquireTargetLock(HomographyMatrix homographyMatrix, int imageWidth, int imageHeight) { // Not using the standard 1280x960 because the image has probably been cropped
+    public RobotOrderResult attemptAcquireTargetLock(HomographyMatrix homographyMatrix) { // Not using the standard 1280x960 because the image has probably been cropped
         RobotOrderResult result;
 
         // The calculate distance function decided that we either weren't close enough or some other problem occurred
-        if (!(result = calculateDistanceFromTarget(homographyMatrix, imageWidth, imageHeight)).hasSucceeded()) {
+        if (!(result = calculateDistanceFromTarget(homographyMatrix)).hasSucceeded()) {
             return result;
 
         // We were on target but something has failed while firing the laser
@@ -58,9 +58,9 @@ public class LaserGunner {
      *                         coordinate systems. AR tags are also contained in here for convenience.
      * @return : A result detailing how successful the action was.
      */
-    private RobotOrderResult calculateDistanceFromTarget(HomographyMatrix homographyMatrix, int imageWidth, int imageHeight) { // TODO...
+    private RobotOrderResult calculateDistanceFromTarget(HomographyMatrix homographyMatrix) { // TODO...
 
-        Point laserPoint = new Point(imageWidth/2.0, imageHeight/2.0); // Laser fires at the center of the camera (I assume)
+        Point laserPoint = new Point(homographyMatrix.getImageWidth()/2.0, homographyMatrix.getImageHeight()/2.0); // Laser fires at the center of the camera (I assume)
 
         Mat targetPoint = getTargetPointInBoardCoordSpaceAsMat(homographyMatrix.getArTagCollection());
 
@@ -73,7 +73,7 @@ public class LaserGunner {
             rotationMatrix.put(3, i, translationMatrix.get(0,i));
         }
 
-        rotationMatrix.dot(targetPoint);
+        rotationMatrix.dot(targetPoint); // TODO... Find out if this works or if we have to do it row by row
         rotationMatrix.dot(instrinsicsMat);
 
         // Rotation matrix is now equal to target point in other co-ord system

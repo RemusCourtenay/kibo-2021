@@ -14,7 +14,7 @@ import jp.jaxa.iss.kibo.rpc.defaultapk.R;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.RobotOrderException;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.ImageHelper;
 
-class QRCodeReaderWrapper {
+public class QRCodeReaderWrapper {
 
 
     private final KiboRpcApi api;
@@ -25,7 +25,7 @@ class QRCodeReaderWrapper {
 
     private final QRCodeReader qrCodeReader;
 
-    QRCodeReaderWrapper(KiboRpcApi api, ImageHelper imageHelper, QRCodeReader qrCodeReader, Context context) {
+    public QRCodeReaderWrapper(KiboRpcApi api, ImageHelper imageHelper, QRCodeReader qrCodeReader, Context context) {
         this.api = api;
         this.imageHelper = imageHelper;
         this.qrCodeReader = qrCodeReader;
@@ -38,7 +38,7 @@ class QRCodeReaderWrapper {
      * readQR is used to read a QR code
      * @return String content of the QR code
      */
-    String readQR() { // TODO... Comment
+    public String readQR() { // TODO... Comment
         String contents;
 
         for (int count = 0; count < loopMax; count++) {

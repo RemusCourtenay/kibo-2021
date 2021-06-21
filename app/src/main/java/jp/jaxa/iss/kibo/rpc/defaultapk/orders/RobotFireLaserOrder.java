@@ -24,16 +24,14 @@ class RobotFireLaserOrder extends RobotOrder { // TODO... Javadoc comment
     private static final int MAX_BOARD_ATTEMPTS = 5;
     private static final int MAX_FIRE_ATTEMPTS = 5;
 
-    private final ImageHelper imageHelper;
     private final ARTagReaderWrapper arTagReaderWrapper;
     private final LaserGunner laserGunner;
 
     private HomographyMatrix homographyMatrix;
     private ARTagCollection arTagCollection;
 
-    RobotFireLaserOrder(KiboRpcApi api, Context context, ImageHelper imageHelper, ARTagReaderWrapper arTagReaderWrapper, LaserGunner laserGunner) {
+    RobotFireLaserOrder(KiboRpcApi api, Context context, ARTagReaderWrapper arTagReaderWrapper, LaserGunner laserGunner) {
         super(api);
-        this.imageHelper = imageHelper;
         this.arTagReaderWrapper = arTagReaderWrapper;
         this.laserGunner = laserGunner;
 

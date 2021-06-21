@@ -9,40 +9,67 @@ import java.util.regex.Pattern;
 
 import jp.jaxa.iss.kibo.rpc.defaultapk.R;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.RobotOrderException;
+import jp.jaxa.iss.kibo.rpc.defaultapk.orders.results.RobotDecodeQRCodeResult;
+import jp.jaxa.iss.kibo.rpc.defaultapk.orders.results.RobotOrderResult;
 
-class QRCodeDecoder { // TODO... Comments
+public class QRCodeDecoder { // TODO... Comments
 
+    // TODO... move to strings.xml and get from context
+    private static final String SUCCESSFUL_MESSAGE = ""; // TODO...
+    private static final String NULL_MESSAGE = ""; // TODO...
     private static final String INVALID_INPUT_ERROR_MESSAGE= "QR scan results didn't fit format described in strings.xml file";
 
     private final Pattern qrCodeScanResultPattern;
     private final String qrCodeScanResultSplitCharacter;
     private final String qrCodeScanResultInnerSplitCharacter;
 
-    QRCodeDecoder(Context context) {
+    public QRCodeDecoder(Context context) {
         qrCodeScanResultPattern = Pattern.compile(context.getString(R.string.qr_code_scan_result_pattern));
         qrCodeScanResultSplitCharacter = context.getString(R.string.qr_code_scan_result_split_character);
         qrCodeScanResultInnerSplitCharacter = context.getString(R.string.qr_code_scan_result_inner_split_character);
     }
 
-    DecodeResult decodeQRCodeString(String scanResultString) {
+    public RobotOrderResult decodeQRCodeString(String scanResultString) {
         Log.d("Received QR Code, Attempting to decode: ", "Code: " + scanResultString);
-        DecodeResult decodeResult = new DecodeResult(isValidQRCodeOutput(scanResultString));
 
-        if (decodeResult.wasSuccessful()) {
-            decodeResult.setResults(splitValidResults(scanResultString));
+        RobotOrderResult result;
+
+        if (!(result = isValidQRCodeOutput(scanResultString)).hasSucceeded()) {
+            return result;
         } else {
-            decodeResult.setException(new RobotOrderException(writeErrorMessage(scanResultString)));
+            return new RobotDecodeQRCodeResult(
+                    true,
+                    0,
+                    SUCCESSFUL_MESSAGE,
+                    splitValidResults(scanResultString));
         }
-
-        return decodeResult;
     }
 
-    private boolean isValidQRCodeOutput(String scanResultString) {  // TODO... Comment
+    private RobotOrderResult isValidQRCodeOutput(String scanResultString) {  // TODO... Comment
+
         if (scanResultString == null) {
-            return false;
+            return new RobotDecodeQRCodeResult(
+                    false,
+                    1,
+                    NULL_MESSAGE,
+                    null);
         }
         Matcher qrCodeScanResultMatcher = this.qrCodeScanResultPattern.matcher(scanResultString);
-        return qrCodeScanResultMatcher.matches();
+        if (qrCodeScanResultMatcher.matches()) {
+            return new RobotDecodeQRCodeResult(
+                    true,
+                    0,
+                    "", // no message needed will get caught immediately
+                    null
+            );
+        } else {
+            return new RobotDecodeQRCodeResult(
+                    false,
+                    2,
+                    writeErrorMessage(scanResultString),
+                    null
+            );
+        }
     }
 
     private double[] splitValidResults(String scanResultString) {
@@ -61,38 +88,5 @@ class QRCodeDecoder { // TODO... Comments
                 "Invalid input for reference: " + scanResultString;
 
     }
-
-}
-
-class DecodeResult {
-
-    private final boolean wasSuccessful;
-    private double[] results;
-    private RobotOrderException exception;
-
-    DecodeResult(boolean wasSuccessful) {
-        this.wasSuccessful = wasSuccessful;
-    }
-
-    void setResults(double[] results) {
-        this.results = results;
-    }
-
-    void setException(RobotOrderException exception) {
-        this.exception = exception;
-    }
-
-    public double[] getResults() {
-        return this.results;
-    }
-
-    public boolean wasSuccessful() {
-        return this.wasSuccessful;
-    }
-
-    public RobotOrderException getException() {
-        return this.exception;
-    }
-
 
 }

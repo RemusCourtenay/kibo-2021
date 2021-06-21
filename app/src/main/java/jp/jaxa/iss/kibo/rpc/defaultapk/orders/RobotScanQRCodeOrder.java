@@ -1,10 +1,8 @@
 package jp.jaxa.iss.kibo.rpc.defaultapk.orders;
 
-import gov.nasa.arc.astrobee.Result;
 import jp.jaxa.iss.kibo.rpc.api.KiboRpcApi;
-import jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.DecodeResult;
-import jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.QRCodeDecoder;
-import jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.QRCodeReaderWrapper;
+import jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.qr.QRCodeDecoder;
+import jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.qr.QRCodeReaderWrapper;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.results.RobotOrderResult;
 
 class RobotScanQRCodeOrder extends RobotOrder { // TODO... Comment
@@ -12,8 +10,6 @@ class RobotScanQRCodeOrder extends RobotOrder { // TODO... Comment
     private final QRCodeReaderWrapper qrCodeReaderWrapper;
     private final QRCodeDecoder qrCodeDecoder;
 
-
-    private double[] scanResult;
 
     RobotScanQRCodeOrder(KiboRpcApi api, QRCodeReaderWrapper qrCodeReaderWrapper, QRCodeDecoder qrCodeDecoder) {
         super(api);
@@ -23,20 +19,14 @@ class RobotScanQRCodeOrder extends RobotOrder { // TODO... Comment
     }
 
     @Override
-    protected Result attemptOrderImplementation() {
+    public RobotOrderResult attemptOrder() {
         String scanResultString = qrCodeReaderWrapper.readQR(); // Get result from other teams code here
-        DecodeResult decodeResult = qrCodeDecoder.decodeQRCodeString(scanResultString);
+        RobotOrderResult decodeResult = qrCodeDecoder.decodeQRCodeString(scanResultString);
 
-
-
-        if (decodeResult.wasSuccessful()) {
+        if (decodeResult.hasSucceeded()) {
             api.sendDiscoveredQR(scanResultString);
-            scanResult = decodeResult.getResults();
-        } else {
-            throw decodeResult.getException();
         }
-
-        return null; // TODO... should return a Result
+        return decodeResult;
     }
 
 
@@ -44,13 +34,4 @@ class RobotScanQRCodeOrder extends RobotOrder { // TODO... Comment
     public String printOrderInfo() {
         return "Scan QR code order:";
     } // TODO...
-
-    /**
-     * Overriding the standard attemptOrder() method to allow for the addition of the scan result
-     * Kinda cursed won't lie
-     */
-    @Override
-    public RobotOrderResult attemptOrder() {
-        return new RobotOrderResult(attemptOrderImplementation(), this.scanResult);
-    }
 }

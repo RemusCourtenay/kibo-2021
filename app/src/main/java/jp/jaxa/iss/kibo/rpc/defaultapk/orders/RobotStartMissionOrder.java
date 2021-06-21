@@ -2,19 +2,32 @@ package jp.jaxa.iss.kibo.rpc.defaultapk.orders;
 
 import gov.nasa.arc.astrobee.Result;
 import jp.jaxa.iss.kibo.rpc.api.KiboRpcApi;
+import jp.jaxa.iss.kibo.rpc.defaultapk.orders.results.GenericRobotOrderResult;
+import jp.jaxa.iss.kibo.rpc.defaultapk.orders.results.RobotOrderResult;
 
 class RobotStartMissionOrder extends RobotOrder {
+
+    private static final String START_ORDER_FAILED_MESSAGE = ""; // TODO...
+    private static final String START_ORDER_SUCCEEDED_MESSAGE = ""; // TODO...
 
     RobotStartMissionOrder(KiboRpcApi api) {
         super(api);
     }
 
     @Override
-    protected Result attemptOrderImplementation() {
+    public RobotOrderResult attemptOrder() {
         if (!api.startMission()) {
-            throw new RobotOrderException("startMission() command failed");
+            return new GenericRobotOrderResult(
+                    false,
+                    1,
+                    START_ORDER_FAILED_MESSAGE
+            );
         }
-        return null; // Kinda cursed, unfortunately startMission returns a bool not a Result
+        return new GenericRobotOrderResult(
+                true,
+                0,
+                START_ORDER_SUCCEEDED_MESSAGE
+        );
     }
 
     @Override

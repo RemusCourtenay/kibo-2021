@@ -5,6 +5,8 @@ import gov.nasa.arc.astrobee.Result;
 import gov.nasa.arc.astrobee.types.Point;
 import gov.nasa.arc.astrobee.types.Quaternion;
 import jp.jaxa.iss.kibo.rpc.api.KiboRpcApi;
+import jp.jaxa.iss.kibo.rpc.defaultapk.orders.results.GenericRobotOrderResult;
+import jp.jaxa.iss.kibo.rpc.defaultapk.orders.results.RobotOrderResult;
 
 class RobotMoveOrder extends RobotOrder {
 
@@ -22,7 +24,7 @@ class RobotMoveOrder extends RobotOrder {
     }
 
     @Override
-    protected Result attemptOrderImplementation() {
+    public RobotOrderResult attemptOrder() {
         Result result = api.moveTo(targetPoint, targetQuaternion, true);
 
         for(int i = 0; i < loopMax; i++){
@@ -32,7 +34,7 @@ class RobotMoveOrder extends RobotOrder {
             result = api.moveTo(targetPoint, targetQuaternion, true);
         }
 
-        return result;
+        return new GenericRobotOrderResult(result);
     }
 
     @Override

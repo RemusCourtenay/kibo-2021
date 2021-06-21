@@ -2,10 +2,10 @@ package jp.jaxa.iss.kibo.rpc.defaultapk.orders;
 
 import android.content.Context;
 
-import gov.nasa.arc.astrobee.Result;
 import jp.jaxa.iss.kibo.rpc.api.KiboRpcApi;
-import jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.ARTag;
-import jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.ARTagReaderWrapper;
+import jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.ar.ARTag;
+import jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.ar.ARTagCollection;
+import jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.ar.ARTagReaderWrapper;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.ImageHelper;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.results.RobotARTagReadOrderResult;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.results.RobotOrderResult;
@@ -43,7 +43,7 @@ class RobotFireLaserOrder extends RobotOrder { // TODO... Javadoc comment
         RobotOrderResult result;
         Mat navCamMatImage;
         Mat cleanedMatImage;
-        List<ARTag> arTags;
+        ARTagCollection arTags;
         Board board;
 
         // Not using infinite loop
@@ -65,7 +65,7 @@ class RobotFireLaserOrder extends RobotOrder { // TODO... Javadoc comment
             } else { // TODO... check that casting is safe here by using result.getType()
 
                 // Getting bundled data out of result
-                arTags = ((RobotARTagReadOrderResult) result).getARTags();
+                arTags = ((RobotARTagReadOrderResult) result).getARTagCollection();
                 board = ((RobotARTagReadOrderResult) result).getBoard();
 
                 // Complete success, both board and tags were returned
@@ -75,7 +75,7 @@ class RobotFireLaserOrder extends RobotOrder { // TODO... Javadoc comment
                     // Got tags but there weren't enough to build board (<4)
                 } else if (result.getReturnValue() == 1) {
                     // Move robot and then we'll try again
-                    adjustRobot(arTags);
+                    adjustRobot(arTags.getARTags());
 
                 // Returned a value that hasn't been implemented yet...
                 } else {

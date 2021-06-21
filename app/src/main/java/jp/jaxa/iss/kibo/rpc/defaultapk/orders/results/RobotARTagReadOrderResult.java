@@ -5,26 +5,27 @@ import org.opencv.aruco.Board;
 import java.util.List;
 
 import gov.nasa.arc.astrobee.Result;
-import jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.ARTag;
+import jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.ar.ARTag;
+import jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.ar.ARTagCollection;
 
 public class RobotARTagReadOrderResult extends RobotOrderResult {
 
-    private final List<ARTag> tags;
+    private final ARTagCollection tags;
     private final Board board;
 
-    public RobotARTagReadOrderResult(Result result, List<ARTag> tags, Board board) {
+    public RobotARTagReadOrderResult(Result result, ARTagCollection tags, Board board) {
         super(result);
         this.tags = tags;
         this.board = board;
     }
 
-    public RobotARTagReadOrderResult(boolean succeeded, int returnValue, String message, List<ARTag> tags, Board board) {
+    public RobotARTagReadOrderResult(boolean succeeded, int returnValue, String message, ARTagCollection tags, Board board) {
         super(succeeded, returnValue, message);
         this.tags = tags;
         this.board = board;
     }
 
-    public List<ARTag> getARTags() {
+    public ARTagCollection getARTagCollection() {
         return this.tags;
     }
 

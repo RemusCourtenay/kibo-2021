@@ -1,4 +1,4 @@
-package jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers;
+package jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.ar;
 
 import org.opencv.core.Mat;
 
@@ -7,7 +7,7 @@ public class ARTag {
     private final int id;
     private final Mat corners;
 
-    public ARTag(int id, Mat corners) {
+    ARTag(int id, Mat corners) {
         this.id = id;
         this.corners = corners;
     }
@@ -47,7 +47,7 @@ public class ARTag {
      */
     public int[] getRelativeMovement() { // TODO...
         return null;
-    }
+    } // TODO...
 
     /* ------------ Standard Getter Methods ------------- */
 

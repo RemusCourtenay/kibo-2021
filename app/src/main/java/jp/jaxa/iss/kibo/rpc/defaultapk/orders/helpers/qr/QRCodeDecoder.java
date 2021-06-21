@@ -1,4 +1,4 @@
-package jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers;
+package jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.qr;
 
 import android.content.Context;
 import android.util.Log;

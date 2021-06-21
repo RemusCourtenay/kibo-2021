@@ -26,6 +26,7 @@ class RobotFireLaserOrder extends RobotOrder { // TODO... Javadoc comment
 
     private final ARTagReaderWrapper arTagReaderWrapper;
     private final LaserGunner laserGunner;
+    private final Context context;
 
     private HomographyMatrix homographyMatrix;
     private ARTagCollection arTagCollection;
@@ -34,6 +35,7 @@ class RobotFireLaserOrder extends RobotOrder { // TODO... Javadoc comment
         super(api);
         this.arTagReaderWrapper = arTagReaderWrapper;
         this.laserGunner = laserGunner;
+        this.context = context;
 
     }
 
@@ -155,7 +157,9 @@ class RobotFireLaserOrder extends RobotOrder { // TODO... Javadoc comment
      * @return : image that is easy to read AR tags off of
      */
     private Mat cleanupImage(Mat matImage) {
-        return null; // TODO...
+        ImageHelper iH = new ImageHelper(this.context);
+        //Mat undistorted
+        return iH.undistort(matImage, api.getNavCamIntrinsics()); // TODO...
     }
 
 

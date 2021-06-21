@@ -8,10 +8,10 @@ import java.util.List;
 public class ARTagCollection {
 
     private final Mat tagIDsMat;
-    private final Mat tagCornersMat;
+    private final List<Mat> tagCornersMat;
     private final List<ARTag> arTags;
 
-    public ARTagCollection(Mat tagIDsMat, Mat tagCornersMat, double[] camIntrinsics) {
+    public ARTagCollection(Mat tagIDsMat, List<Mat> tagCornersMat) {
         this.tagIDsMat = tagIDsMat;
         this.tagCornersMat = tagCornersMat;
         this.arTags = buildListFromMats(tagIDsMat, tagCornersMat);
@@ -21,7 +21,7 @@ public class ARTagCollection {
         return this.tagIDsMat;
     }
 
-    public Mat getTagCornersMat() {
+    public List<Mat> getTagCornersMat() {
         return this.tagCornersMat;
     }
 
@@ -33,7 +33,7 @@ public class ARTagCollection {
         return this.arTags.size();
     }
 
-    private static List<ARTag> buildListFromMats(Mat tagIDsMat, Mat tagCornersMat) {
+    private static List<ARTag> buildListFromMats(Mat tagIDsMat, List<Mat> tagCornersMat) {
         List<ARTag> arTags = new ArrayList<>();
 
         for (int i = 0; i < tagIDsMat.size().width; i++) { // TODO... Check both mats are same width
@@ -49,7 +49,7 @@ public class ARTagCollection {
                     of a specific tag. So we simply pass each column in to the constructor.
                     TODO... check that each column is length 4
                     */
-                    tagCornersMat.col(i))
+                    tagCornersMat.get(i))
             );
         }
         return arTags;

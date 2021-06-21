@@ -2,11 +2,16 @@ package jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.ar;
 
 import android.content.Context;
 
+import org.opencv.aruco.Aruco;
 import org.opencv.aruco.Board;
+import org.opencv.aruco.Dictionary;
 import org.opencv.core.Mat;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import jp.jaxa.iss.kibo.rpc.defaultapk.R;
+import jp.jaxa.iss.kibo.rpc.defaultapk.orders.results.GenericRobotOrderResult;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.results.RobotARTagReadOrderResult;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.results.RobotOrderResult;
 
@@ -37,7 +42,7 @@ public class ARTagReaderWrapper {
         RobotOrderResult result;
 
         // Failed to get tags, returning the result object created by the getTagsFromCleanImage() method
-        if ((result = getTagsFromCleanImage(cleanMatImage)) != null) {
+        if (!((result = getTagsFromCleanImage(cleanMatImage)).hasSucceeded())) {
             return result;
 
         // Found tags but not enough to make a board with, returning the incomplete list of tags and a result detailing the partial success
@@ -65,8 +70,12 @@ public class ARTagReaderWrapper {
      *           for all other bundled info
      */
     private RobotOrderResult getTagsFromCleanImage(Mat cleanMatImage) { // TODO...
-        this.arTagCollection = null; // set value here
-        return null; // Return a result value dictating success (null) or not success (Result value)
+        Mat ids = new Mat();
+        Dictionary dictionary = Aruco.getPredefinedDictionary(Aruco.DICT_5X5_250);
+        List<Mat> corners = new ArrayList<>();
+        Aruco.detectMarkers(cleanMatImage, dictionary, corners, ids);
+        this.arTagCollection = new ARTagCollection(ids, corners); // set value here
+        return new GenericRobotOrderResult(true, 0, ""); // Return a result value dictating success (null) or not success (Result value)
     }
 
     /**

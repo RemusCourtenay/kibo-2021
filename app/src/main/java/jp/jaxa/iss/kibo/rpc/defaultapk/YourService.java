@@ -87,21 +87,21 @@ public class YourService extends KiboRpcService {
         wrapper.attemptExpeditionStage(context.getString(R.string.move_to_finish_order_string));
 
 
-
-        // MOVE TO ROBOT ORDER
-        // turn laser on
-        api.laserControl(true);
-
-        // take 10 snapshots at 1-second intervals
-        int num_snaps = 10;
-        int i = 0;
-        while (i < num_snaps) {
-            api.takeSnapshot();
-            wait(1000);
-        }
-
-        // turn laser off
-        api.laserControl(false);
+//
+//        // MOVE TO ROBOT ORDER
+//        // turn laser on
+//        api.laserControl(true);
+//
+//        // take 10 snapshots at 1-second intervals
+//        int num_snaps = 10;
+//        int i = 0;
+//        while (i < num_snaps) {
+//            api.takeSnapshot();
+//            wait(1000);
+//        }
+//
+//        // turn laser off
+//        api.laserControl(false);
     }
 
     @Override
@@ -110,6 +110,18 @@ public class YourService extends KiboRpcService {
 
     @Override
     protected void runPlan3(){
+    }
+
+
+    /**
+     * I'm hoping this will reduce the waiting time required for the
+     * @param result
+     */
+    private void testSuccess(RobotOrderResult result) {
+        if (!result.hasSucceeded()) {
+            api.reportMissionCompletion();
+            throw new RobotOrderException(result.getMessage());
+        }
     }
 
 

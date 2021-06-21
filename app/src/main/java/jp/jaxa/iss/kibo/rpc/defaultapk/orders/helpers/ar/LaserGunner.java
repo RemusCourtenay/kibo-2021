@@ -21,15 +21,32 @@ public class LaserGunner {
      * to find the difference in the value of the target point and the laser firing point with
      * regards to the robot's coordinate system.
      * @param homographyMatrix : The homography matrix that describes the rotation and translation
-     *                         from the board's coordinate system to the cameras coordinate system
-     * @param arTagCollection : Collection of AR tags from the board for use in finding the location
-     *                        of the target
+     *                         from the board's coordinate system to the cameras coordinate system,
+     *                         and the collection of tags from the board
      */
-    public RobotOrderResult attemptAquireTargetLock(HomographyMatrix homographyMatrix, ARTagCollection arTagCollection) {
+    public RobotOrderResult attemptAcquireTargetLock(HomographyMatrix homographyMatrix) {
+        RobotOrderResult result;
+
+        // The calculate distance function decided that we either weren't close enough or some other problem occurred
+        if (!(result = calculateDistanceFromTarget(homographyMatrix)).hasSucceeded()) {
+            return result;
+
+        // We were on target but something has failed while firing the laser
+        } else if (!(result = fireLaser()).hasSucceeded()) {
+            return result;
+
+        // Everything worked out
+        } else {
+            return null; // TODO... Replace with good result
+        }
+    }
+
+    private RobotOrderResult calculateDistanceFromTarget(HomographyMatrix homographyMatrix) {
+
         return null;
     }
 
-    public RobotOrderResult fireLaser() {
+    private RobotOrderResult fireLaser() {
 
         return null;
     }

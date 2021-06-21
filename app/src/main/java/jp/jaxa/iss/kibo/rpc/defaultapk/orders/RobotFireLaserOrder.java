@@ -14,10 +14,7 @@ import jp.jaxa.iss.kibo.rpc.defaultapk.orders.results.RobotOrderResult;
 
 import org.opencv.aruco.Aruco;
 import org.opencv.aruco.Board;
-import org.opencv.core.CvType;
 import org.opencv.core.Mat;
-
-import java.util.List;
 
 class RobotFireLaserOrder extends RobotOrder { // TODO... Javadoc comment
 
@@ -25,12 +22,14 @@ class RobotFireLaserOrder extends RobotOrder { // TODO... Javadoc comment
     private static final int markerDictionaryID = Aruco.DICT_5X5_250; // TODO... Move to xml file and get via context
     private static final int AMOUNT_TO_ADJUST = 10;
     private static final int MAX_BOARD_ATTEMPTS = 5;
+    private static final int MAX_FIRE_ATTEMPTS = 5;
 
     private final ImageHelper imageHelper;
     private final ARTagReaderWrapper arTagReaderWrapper;
     private final LaserGunner laserGunner;
 
-
+    private HomographyMatrix homographyMatrix;
+    private ARTagCollection arTagCollection;
 
     RobotFireLaserOrder(KiboRpcApi api, Context context, ImageHelper imageHelper, ARTagReaderWrapper arTagReaderWrapper, LaserGunner laserGunner) {
         super(api);
@@ -43,6 +42,31 @@ class RobotFireLaserOrder extends RobotOrder { // TODO... Javadoc comment
     @Override
     public RobotOrderResult attemptOrder() {
 
+        RobotOrderResult result;
+
+        for (int i = 0; i < MAX_FIRE_ATTEMPTS; i++) {
+            if (!(result = attemptGetBoardPose()).hasSucceeded()) {
+                return result;
+            } else if (!(result = laserGunner.attemptAcquireTargetLock(homographyMatrix)).hasSucceeded()) {
+
+                // TODO... Handle different types of bad result from LaserGunner
+
+            } else {
+                return null; // TODO... Return good result
+            }
+
+        }
+
+        return null; // TODO... Return bad result
+    }
+
+    @Override
+    public String printOrderInfo() {
+        return "Fire laser order:";
+    }
+
+
+    private RobotOrderResult attemptGetBoardPose() {
         // Attempting to get the tags and board
         RobotOrderResult result;
         Mat navCamMatImage;
@@ -65,7 +89,7 @@ class RobotFireLaserOrder extends RobotOrder { // TODO... Javadoc comment
             if (!result.hasSucceeded()) {
                 return result;
 
-            // Didn't completely fail
+                // Didn't completely fail
             } else { // TODO... check that casting is safe here by using result.getType()
 
                 // Getting bundled data out of result
@@ -74,34 +98,20 @@ class RobotFireLaserOrder extends RobotOrder { // TODO... Javadoc comment
 
                 // Complete success, both board and tags were returned
                 if (result.getReturnValue() == 0) {
-                    break; // No need to keep trying
-
+                    this.homographyMatrix = calculateBoardPose(board, arTagCollection); // TODO... pass this through Result instead
+                    return null; // TODO... Pass good result not null
                     // Got tags but there weren't enough to build board (<4)
                 } else if (result.getReturnValue() == 1) {
                     // Move robot and then we'll try again
-                    adjustRobotToFindTags(arTags.getARTags());
+                    getAdjustmentNeededToFindTags(arTags);
 
-                // Returned a value that hasn't been implemented yet...
+                    // Returned a value that hasn't been implemented yet...
                 } else {
                     throw new RobotOrderException("Return value for AR Tag reading: " + result.getReturnValue() + " has not been implemented in RobotFireLaserOrder.attemptOrder()");
                 }
             }
         }
-
-        HomographyMatrix homographyMatrix = calculateBoardPose(board, arTags);
-
-        if (!(result = laserGunner.attemptAquireTargetLock(homographyMatrix, arTags)).hasSucceeded()) {
-            return result;
-        } else if (!(result = laserGunner.fireLaser()).hasSucceeded()) {
-            return result;
-        } else {
-            return null; // TODO... return successful result instead of null
-        }
-    }
-
-    @Override
-    public String printOrderInfo() {
-        return "Fire laser order:";
+        return null; // TODO... pass bad result not null
     }
 
     /**
@@ -114,22 +124,22 @@ class RobotFireLaserOrder extends RobotOrder { // TODO... Javadoc comment
      *           the other
      */
     private HomographyMatrix calculateBoardPose(Board board, ARTagCollection arTagCollection) {
-        return null; // TODO...
+        return null;
     }
 
-    private void adjustRobotToFindTags(List<ARTag> foundTags) {
+    private int[] getAdjustmentNeededToFindTags(ARTagCollection foundTags) {
 
         // ordered x,y
         int[] adjustmentAmounts = new int[]{0,0};
         int[] specificAdjustment;
 
-        for (ARTag tag: foundTags) { // Possibly a cleaner way of doing this but w/e
+        for (ARTag tag: foundTags.getARTags()) { // Possibly a cleaner way of doing this but w/e
             specificAdjustment = tag.getRelativeMovement();
             adjustmentAmounts[0] = adjustmentAmounts[0] + specificAdjustment[0];
             adjustmentAmounts[1] = adjustmentAmounts[1] + specificAdjustment[1];
         }
 
-        rotateRobot(adjustmentAmounts);
+        return adjustmentAmounts;
     }
 
     private void rotateRobot(int[] adjustmentAmounts) {

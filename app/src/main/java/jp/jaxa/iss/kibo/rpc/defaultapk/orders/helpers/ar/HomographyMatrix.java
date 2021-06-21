@@ -7,11 +7,13 @@ public class HomographyMatrix {
     // Change these out of mat form?
     private final Mat rotationVector;
     private final Mat translationVector;
+    private final ARTagCollection arTagCollection;
 
 
-    HomographyMatrix(Mat rotationVector, Mat translationVector) {
+    HomographyMatrix(Mat rotationVector, Mat translationVector, ARTagCollection arTagCollection) {
         this.rotationVector = rotationVector;
         this.translationVector = translationVector;
+        this.arTagCollection = arTagCollection;
     }
 
     public Mat getRotationVector() {
@@ -20,5 +22,9 @@ public class HomographyMatrix {
 
     public Mat getTranslationVector() {
         return this.translationVector;
+    }
+
+    public ARTagCollection getArTagCollection() {
+        return this.arTagCollection;
     }
 }

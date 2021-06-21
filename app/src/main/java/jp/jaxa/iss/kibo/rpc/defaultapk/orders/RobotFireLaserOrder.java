@@ -3,6 +3,7 @@ package jp.jaxa.iss.kibo.rpc.defaultapk.orders;
 import android.content.Context;
 
 import jp.jaxa.iss.kibo.rpc.api.KiboRpcApi;
+import jp.jaxa.iss.kibo.rpc.defaultapk.R;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.ar.ARTag;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.ar.ARTagCollection;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.ar.ARTagReaderWrapper;
@@ -27,6 +28,8 @@ class RobotFireLaserOrder extends RobotOrder { // TODO... Javadoc comment
     private final ARTagReaderWrapper arTagReaderWrapper;
     private final LaserGunner laserGunner;
     private final Context context;
+    private final int kiboCamImageHeight; // True for both nav and dock cam
+    private final int kiboCamImageWidth;
 
     private HomographyMatrix homographyMatrix;
     private ARTagCollection arTagCollection;
@@ -36,7 +39,8 @@ class RobotFireLaserOrder extends RobotOrder { // TODO... Javadoc comment
         this.arTagReaderWrapper = arTagReaderWrapper;
         this.laserGunner = laserGunner;
         this.context = context;
-
+        this.kiboCamImageHeight = context.getResources().getInteger(R.integer.kibo_cam_image_height);
+        this.kiboCamImageWidth = context.getResources().getInteger(R.integer.kibo_cam_image_width);
     }
 
     @Override
@@ -158,12 +162,9 @@ class RobotFireLaserOrder extends RobotOrder { // TODO... Javadoc comment
      */
     private Mat cleanupImage(Mat matImage) {
         ImageHelper iH = new ImageHelper(this.context);
-        Mat undist = iH.undistort(matImage, api.getNavCamIntrinsics());
         int percentThatCropRemoves = 10;
-        int kiboCamImageHeight = 960;
-        int kiboCamImageWidth = 1280;
-        // TODO... Not sure how to get the above values ^^
-        Mat croppedMat = new Mat(undist, iH.getCroppedImageRectangleArea(percentThatCropRemoves, kiboCamImageHeight, kiboCamImageWidth));
+        // TODO... Not sure how much to crop ^^
+        Mat croppedMat = new Mat(matImage, iH.getCroppedImageRectangleArea(percentThatCropRemoves, kiboCamImageHeight, kiboCamImageWidth));
         return croppedMat; // TODO...
     }
 

@@ -158,10 +158,14 @@ class RobotFireLaserOrder extends RobotOrder { // TODO... Javadoc comment
      */
     private Mat cleanupImage(Mat matImage) {
         ImageHelper iH = new ImageHelper(this.context);
-        //Mat undistorted
-        return iH.undistort(matImage, api.getNavCamIntrinsics()); // TODO... make this not undistort
+        Mat undist = iH.undistort(matImage, api.getNavCamIntrinsics());
+        int percentThatCropRemoves = 10;
+        int kiboCamImageHeight = 960;
+        int kiboCamImageWidth = 1280;
+        // TODO... Not sure how to get the above values ^^
+        Mat croppedMat = new Mat(undist, iH.getCroppedImageRectangleArea(percentThatCropRemoves, kiboCamImageHeight, kiboCamImageWidth));
+        return croppedMat; // TODO...
     }
 
 
 }
-

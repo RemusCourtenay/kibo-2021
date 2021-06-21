@@ -46,12 +46,12 @@ public class ImageHelper {
         Log.d("Attempting to get Bitmap from Mat","");
         Mat undistortedMat = undistort(matFromCam, camIntrinsics);
         Log.d("Attempting to crop mat", "");
-        // Mat croppedMat = new Mat(undistortedMat, getCroppedImageRectangleArea(percentThatCropRemoves, kiboCamImageHeight, kiboCamImageWidth));
+        Mat croppedMat = new Mat(undistortedMat, getCroppedImageRectangleArea(percentThatCropRemoves, kiboCamImageHeight, kiboCamImageWidth));
 
         // Commented out as unsure if needed
         // Mat scaledMat = scaleMatDown(croppedMat, resizeImageWidth, resizeImageHeight);
 
-        Bitmap bitmap = getBitmapFromMat(undistortedMat); // Move this into separate method?
+        Bitmap bitmap = getBitmapFromMat(croppedMat); // Move this into separate method?
 
         Log.d("Attempting to convert bitmap to pixel array","");
         int bitmapWidth = bitmap.getWidth();
@@ -87,7 +87,7 @@ public class ImageHelper {
      */
     public Mat undistort(Mat src, double[][] camIntrinsics) { // Not sure about any of this
         Log.d("Attempting to undistort mat","");
-        Mat dst = new Mat(1280, 960, CvType.CV_8UC1);
+        Mat dst = new Mat(this.kiboCamImageHeight, this.kiboCamImageWidth, CvType.CV_8UC1);
         Mat cameraMatrix = new Mat(3, 3, CvType.CV_32FC1);
         Mat distCoeffs = new Mat(1, 5, CvType.CV_32FC1);
 
@@ -99,8 +99,11 @@ public class ImageHelper {
     }
 
     // TODO... Javadoc comment
-    public Rect getCroppedImageRectangleArea(double percentRemoved, int numRows, int numColumns) {
-        Log.d("Calculating rectangle for crop: ", "Removing amount: " + percentRemoved);
+    public Rect getCroppedImageRectangleArea(int percentRemovedAsInt, int numRows, int numColumns) {
+        Log.d("Calculating rectangle for crop: ", "Removing amount: " + percentRemovedAsInt);
+        // Converting 0-100 percent to 0-1 double
+        Double percentRemoved = (double)(percentRemovedAsInt)/100.0;
+
         // Ratio of image width:height
         double ratio = (double)numColumns / (double)numRows;
 

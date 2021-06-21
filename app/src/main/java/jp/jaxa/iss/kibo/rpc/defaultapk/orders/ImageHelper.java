@@ -2,6 +2,7 @@ package jp.jaxa.iss.kibo.rpc.defaultapk.orders;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.util.Log;
 
 import com.google.zxing.BinaryBitmap;
 import com.google.zxing.RGBLuminanceSource;
@@ -42,7 +43,9 @@ public class ImageHelper {
      * @return BinaryBitmap for camera image
      */
     public BinaryBitmap getBinaryBitmapFromMatImage(Mat matFromCam, double[][] camIntrinsics) { // TODO... Comment
+        Log.d("Attempting to get Bitmap from Mat","");
         Mat undistortedMat = undistort(matFromCam, camIntrinsics);
+        Log.d("Attempting to crop mat", "");
         Mat croppedMat = new Mat(undistortedMat, getCroppedImageRectangleArea(percentThatCropRemoves, kiboCamImageHeight, kiboCamImageWidth));
 
         // Commented out as unsure if needed
@@ -50,6 +53,7 @@ public class ImageHelper {
 
         Bitmap bitmap = getBitmapFromMat(croppedMat); // Move this into separate method?
 
+        Log.d("Attempting to convert bitmap to pixel array","");
         int bitmapWidth = bitmap.getWidth();
         int bitmapHeight = bitmap.getHeight();
 
@@ -57,6 +61,7 @@ public class ImageHelper {
         bitmap.getPixels(pixelArray, 0, bitmapWidth, 0, 0, bitmapWidth, bitmapHeight);
 
         // Lot of OpenCV stuff that I don't understand
+        Log.d("Attempting to return as Binary Bitmap","");
         return new BinaryBitmap(new HybridBinarizer(new RGBLuminanceSource(bitmapWidth, bitmapHeight, pixelArray)));
     }
 
@@ -71,6 +76,7 @@ public class ImageHelper {
     }
 
     public Bitmap getBitmapFromMat(Mat mat) { // TODO... Comment
+        Log.d("Attempting to convert mat to bitmap", "");
         Bitmap bitmap = Bitmap.createBitmap(mat.width(), mat.height(), Bitmap.Config.ARGB_8888);
         matToBitmap(mat, bitmap, false);
         return bitmap;
@@ -80,7 +86,8 @@ public class ImageHelper {
      * undistorts image to reduce time taken for QR scanning
      */
     public Mat undistort(Mat src, double[][] camIntrinsics) { // Not sure about any of this
-        Mat dst = new Mat(1280, 960, CvType.CV_8UC1);
+        Log.d("Attempting to undistort mat","");
+        Mat dst = new Mat(this.kiboCamImageHeight, this.kiboCamImageWidth, CvType.CV_8UC1);
         Mat cameraMatrix = new Mat(3, 3, CvType.CV_32FC1);
         Mat distCoeffs = new Mat(1, 5, CvType.CV_32FC1);
 
@@ -92,7 +99,11 @@ public class ImageHelper {
     }
 
     // TODO... Javadoc comment
-    public Rect getCroppedImageRectangleArea(double percentRemoved, int numRows, int numColumns) {
+    public Rect getCroppedImageRectangleArea(int percentRemovedAsInt, int numRows, int numColumns) {
+        Log.d("Calculating rectangle for crop: ", "Removing amount: " + percentRemovedAsInt);
+        // Converting 0-100 percent to 0-1 double
+        Double percentRemoved = (double)(percentRemovedAsInt)/100.0;
+
         // Ratio of image width:height
         double ratio = (double)numColumns / (double)numRows;
 

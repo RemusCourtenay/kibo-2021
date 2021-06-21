@@ -66,7 +66,7 @@ public class QRCodeReaderWrapperTest {
             ArgumentCaptor<Float> acFloat  = ArgumentCaptor.forClass(Float.class);
             verify(testResources.nullApi, times(EXPECTED_NUMBER_FLASHLIGHT_CHANGES_FOR_NULL)).flashlightControlFront(acFloat.capture());
 
-            assertArrayEquals(new Float[]{50f,70f,90f,0f}, acFloat.getAllValues().toArray());
+            assertArrayEquals(new Float[]{0.5f,0.7f,0.9f,0f}, acFloat.getAllValues().toArray());
         }
     }
 
@@ -81,7 +81,7 @@ public class QRCodeReaderWrapperTest {
         }
         ArgumentCaptor<Float> acFloat = ArgumentCaptor.forClass(Float.class);
         verify(testResources.nullApi, times(EXPECTED_NUMBER_FLASHLIGHT_CHANGES_FOR_VALID)).flashlightControlFront(acFloat.capture());
-        assertArrayEquals(new Float[]{50f, 0f}, acFloat.getAllValues().toArray());
+        assertArrayEquals(new Float[]{0.5f, 0f}, acFloat.getAllValues().toArray());
     }
 
 

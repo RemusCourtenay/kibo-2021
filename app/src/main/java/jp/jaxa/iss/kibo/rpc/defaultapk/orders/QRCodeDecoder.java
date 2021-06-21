@@ -1,6 +1,7 @@
 package jp.jaxa.iss.kibo.rpc.defaultapk.orders;
 
 import android.content.Context;
+import android.util.Log;
 
 import java.util.Arrays;
 import java.util.regex.Matcher;
@@ -23,6 +24,7 @@ class QRCodeDecoder { // TODO... Comments
     }
 
     DecodeResult decodeQRCodeString(String scanResultString) {
+        Log.d("Received QR Code, Attempting to decode: ", "Code: " + scanResultString);
         DecodeResult decodeResult = new DecodeResult(isValidQRCodeOutput(scanResultString));
 
         if (decodeResult.wasSuccessful()) {

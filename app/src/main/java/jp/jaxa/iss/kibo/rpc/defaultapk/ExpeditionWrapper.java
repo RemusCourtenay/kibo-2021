@@ -1,6 +1,7 @@
 package jp.jaxa.iss.kibo.rpc.defaultapk;
 
 import android.content.Context;
+import android.util.Log;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -12,6 +13,7 @@ import java.util.stream.Stream;
 
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.RobotOrder;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.RobotOrderBuilder;
+import jp.jaxa.iss.kibo.rpc.defaultapk.orders.RobotOrderException;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.RobotOrderResult;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.RobotOrderType;
 
@@ -31,13 +33,14 @@ public class ExpeditionWrapper {
 
     // Builder object for translating order strings into lists of RobotOrders
     private final RobotOrderBuilder orderBuilder;
-
+    private int stageNum;
     /**
      * Sole constructor. Requires the Context of the Activity it's called from to access data
      * stored in the resources folders.
      */
     public ExpeditionWrapper(RobotOrderBuilder orderBuilder) {
         this.orderBuilder = orderBuilder;
+        this.stageNum = 1;
     }
 
     /**
@@ -52,19 +55,22 @@ public class ExpeditionWrapper {
      * @return the RobotOrderResult of the final command in the order string
      */
     public RobotOrderResult attemptExpeditionStage(String fullOrderString) { // Should probably throw a specific exception when an order fails rather than RuntimeException but whatever
+        Log.d("Starting New Expedition Stage: ", "Stage " + stageNum);
+        stageNum++;
         List<RobotOrder> orders = this.orderBuilder.buildOrders(fullOrderString);
 
         RobotOrderResult result = null;
         // Should probably have more going on here but whatever
         for (RobotOrder order: orders) {
+            Log.d("Attempting Order: ", order.printOrderInfo());
             result = order.attemptOrder();
         }
 
-        // Added so that the IDE will stop telling me that result might be null...
+        // Added so that the IDE will stop telling me that result might be null... should never happen due to being wrapped in RobotOrderResult
         if (result != null) {
             return result;
         } else {
-            throw new RuntimeException("Order string: \"" + fullOrderString + "\" returned a null result for it's final order");
+            throw new RobotOrderException("Order string: \"" + fullOrderString + "\" returned a null result for it's final order");
         }
     }
 }

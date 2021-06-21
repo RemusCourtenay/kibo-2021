@@ -28,7 +28,7 @@
          {"p":1,"x":10.23,"y":-8.12,"z":5.45}
          Does not allow for spaces!
     -->
-    <string name="qr_code_scan_result_pattern">\\{\"p\":[1–8],\"x\":[+|-]?\\d+(\\.\\d+)?,\"y\":[+|-]?\\d+(\\.\\d+)?,\"z\":[+|-]?\\d+(\\.\\d+)?\\}</string>
+    <string name="qr_code_scan_result_pattern">\\{\"p\":[1-8],\"x\":[+|-]?\\d+(\\.\\d+)?,\"y\":[+|-]?\\d+(\\.\\d+)?,\"z\":[+|-]?\\d+(\\.\\d+)?\\}</string>
 
     <!-- Character used to split the sections of QR code scan results -->
     <string name="qr_code_scan_result_split_character">,</string>
@@ -41,7 +41,7 @@
     Order String section, Order strings consist of multiple robot orders following the formatting
     described above, separated by the order split character
     -->
-    <string name="move_to_scan_order_string">START_MISSION|{[11.21,-9.8,4.79][0,0,-0.707,0.707]}|SCAN_QR_CODE</string>
+    <string name="move_to_scan_order_string">START_MISSION|{[11.25,-9.8,4.87][0,0,-0.707,0.707]}|SCAN_QR_CODE</string>
 
     <string name="move_to_laser_order_string_variant_1">{[10.99,-9.8,4.79][0,0,-0.707,0.707]}|APPROACH_FIRING_POSITION|FIRE_LASER|{[11.21,-9.8,4.79][0,0,-0.707,0.707]}|{[10.51,-9.8,4.79][0,0,-0.707,0.707]}|{[10.51,-8.0,4.79][0,0,-0.707,0.707]}</string>
     <string name="move_to_laser_order_string_variant_2">APPROACH_FIRING_POSITION|FIRE_LASER|{[11.21,-9.8,4.79][0,0,-0.707,0.707]}|{[10.51,-9.8,4.79][0,0,-0.707,0.707]}|{[10.51,-8.0,4.79][0,0,-0.707,0.707]}</string>

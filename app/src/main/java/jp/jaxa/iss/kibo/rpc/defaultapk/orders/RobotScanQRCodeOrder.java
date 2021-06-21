@@ -21,7 +21,6 @@ class RobotScanQRCodeOrder extends RobotOrder { // TODO... Comment
     @Override
     protected Result attemptOrderImplementation() {
         String scanResultString = qrCodeReaderWrapper.readQR(); // Get result from other teams code here
-
         DecodeResult decodeResult = qrCodeDecoder.decodeQRCodeString(scanResultString);
 
 
@@ -39,7 +38,7 @@ class RobotScanQRCodeOrder extends RobotOrder { // TODO... Comment
 
     @Override
     public String printOrderInfo() {
-        return null;
+        return "Scan QR code order:";
     } // TODO...
 
     /**

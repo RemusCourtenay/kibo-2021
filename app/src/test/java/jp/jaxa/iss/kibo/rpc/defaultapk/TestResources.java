@@ -26,7 +26,7 @@ public class TestResources extends ExternalResource {
     private static final String MOCK_SPLIT_CHARACTER = "\\|";
     private static final String MOCK_INNER_SPLIT_CHARACTER = ",";
 
-    private static final String MOCK_QR_SCAN_RESULT_PATTERN = "\\{\"p\":[1–8],\"x\":[+|-]?\\d+(\\.\\d+)?,\"y\":[+|-]?\\d+(\\.\\d+)?,\"z\":[+|-]?\\d+(\\.\\d+)?\\}";
+    private static final String MOCK_QR_SCAN_RESULT_PATTERN = "\\{\"p\":[1-8],\"x\":[+|-]?\\d+(\\.\\d+)?,\"y\":[+|-]?\\d+(\\.\\d+)?,\"z\":[+|-]?\\d+(\\.\\d+)?\\}";
     private static final String MOCK_QR_SCAN_RESULT_SPLIT_CHARACTER = ",";
     private static final String MOCK_QR_SCAN_RESULT_INNER_SPLIT_CHARACTER = ":";
 
@@ -35,8 +35,8 @@ public class TestResources extends ExternalResource {
     private static final int MOCK_MAX_MOVE_ATTEMPTS = 3;
     private static final int MOCK_MAX_SCAN_ATTEMPTS = 3;
 
-    private static final int MOCK_KIBO_CAM_IMAGE_HEIGHT = 1280;
-    private static final int MOCK_KIBO_CAM_IMAGE_WIDTH = 960;
+    private static final int MOCK_KIBO_CAM_IMAGE_HEIGHT = 960;
+    private static final int MOCK_KIBO_CAM_IMAGE_WIDTH = 1280;
     private static final int MOCK_PERCENT_REMOVED = 40;
     private static final int MOCK_RESIZE_IMAGE_HEIGHT = 384;
     private static final int MOCK_RESIZE_IMAGE_WIDTH = 288;

@@ -31,7 +31,7 @@ public class RobotOrderBuilderTest extends ActivityTestCase {
     private RobotOrderBuilder orderBuilder;
     private List<RobotOrder> orders;
 
-    private static final String FIRST_ORDER_STRING = "START_MISSION|{[11.21,-9.8,4.79][0,0,-0.707,0.707]}|SCAN_QR_CODE";
+    private static final String FIRST_ORDER_STRING = "START_MISSION|{[11.25,-9.8,4.87][0,0,-0.707,0.707]}|SCAN_QR_CODE";
     private static final String OPTION_ONE_ORDER_STRING = "{[10.99,-9.8,4.79][0,0,-0.707,0.707]}|APPROACH_FIRING_POSITION|FIRE_LASER|{[11.21,-9.8,4.79][0,0,-0.707,0.707]}|{[10.51,-9.8,4.79][0,0,-0.707,0.707]}|{[10.51,-8.0,4.79][0,0,-0.707,0.707]}";
     private static final String OPTION_TWO_ORDER_STRING = "APPROACH_FIRING_POSITION|FIRE_LASER|{[11.21,-9.8,4.79][0,0,-0.707,0.707]}|{[10.51,-9.8,4.79][0,0,-0.707,0.707]}|{[10.51,-8.0,4.79][0,0,-0.707,0.707]}";
     private static final String OPTION_THREE_ORDER_STRING = "{[10.99,-9.8,4.79][0,0,-0.707,0.707]}|APPROACH_FIRING_POSITION|FIRE_LASER|{[10.99,-9.8,4.79][0,0,-0.707,0.707]}|{[10.51,-9.8,4.79][0,0,-0.707,0.707]}|{[10.51,-8.0,4.79][0,0,-0.707,0.707]}";
@@ -230,6 +230,16 @@ public class RobotOrderBuilderTest extends ActivityTestCase {
             assertEquals("", "Approach firing position order:\n" +
                     "Target point: [0.0][0.0][0.0]\n" +
                     "Target quaternion: [0.0][0.0][-0.707][0.707]", orders.get(0).printOrderInfo());
+        } catch (RobotOrderException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
+    public void testScanQRCodeOrder() {
+        try {
+            orders = orderBuilder.buildOrders("SCAN_QR_CODE");
+            assertEquals("","Scan QR code order:",orders.get(0).printOrderInfo());
         } catch (RobotOrderException e) {
             fail(e.getMessage());
         }

@@ -1,6 +1,7 @@
 package jp.jaxa.iss.kibo.rpc.defaultapk.orders;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.google.zxing.BinaryBitmap;
 import com.google.zxing.ChecksumException;
@@ -39,7 +40,7 @@ class QRCodeReaderWrapper {
         String contents;
 
         for (int count = 0; count < loopMax; count++) {
-
+            Log.d("Read QR Code Attempt Initiated: ","Attempt " + (count+1));
             // Gradually increasing brightness of flashlight
             api.flashlightControlFront(getCalculatedBrightness(loopMax, count));
 
@@ -57,6 +58,7 @@ class QRCodeReaderWrapper {
     }
 
     private float getCalculatedBrightness(int loopMax, int count) {
+        Log.d("Calculating brightness for flashlight:", "current count: " + count + " out of " + loopMax);
         double maxCount = (double)(loopMax-1);
 
         // Camera is expected to go from dark to light so here we find the positive difference between the two
@@ -65,10 +67,13 @@ class QRCodeReaderWrapper {
         double percentOfChangeToApply =  count/maxCount;
 
         // Return a float value equal to the initial brightness plus some percentage of the change
-        return (float)(this.flashlightOriginalBrightnessForScan+(totalChangeInBrightness*percentOfChangeToApply));
+        float percentBrightness = (float)(this.flashlightOriginalBrightnessForScan+(totalChangeInBrightness*percentOfChangeToApply));
+        // Returning a value between 0 and 1
+        return percentBrightness/100f;
     }
 
     private String readQRCodeFromBitmap(BinaryBitmap bitmap) {
+        Log.d("Attempting to retrieve QR code from binary bitmap","");
         try {
             qrCodeReader.reset();
             return qrCodeReader.decode(bitmap).getText();

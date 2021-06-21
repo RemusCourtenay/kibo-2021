@@ -33,6 +33,9 @@ public class QRCodeDecoderTest {
     private static final String INPUT_WITH_MISSING_SECTION = "{\"p\":9,\"x\":10.23,\"y\":-8.12}";
     private static final String INPUT_WITH_NON_DECIMAL_CHARACTER = "{\"p\":1,\"x\":10.23,\"y\":-8.12,\"z\":a}";
 
+    private static final String ACTUAL_INPUT_THAT_WAS_OUTPUTTED = "{\"p\":5,\"x\":11.07,\"y\":-9.80,\"z\":5.40}";
+    private static final double[] ACTUAL_INPUT_RESULTS = new double[]{5,11.07,-9.8,5.4};
+
     @ClassRule
     public static final TestResources testResources = new TestResources();
 
@@ -77,6 +80,23 @@ public class QRCodeDecoderTest {
         } else {
             fail("QRCodeDecoder threw an exception despite being passed a valid input: "  +
                     EXAMPLE_INPUT + "\n" +
+                    "Thrown error message: " +
+                    result.getException().getMessage());
+        }
+    }
+
+    @Test
+    public void actualInputTest() {
+        DecodeResult result = decoder.decodeQRCodeString(ACTUAL_INPUT_THAT_WAS_OUTPUTTED);
+
+        if (result.wasSuccessful()) {
+            assertArrayEquals("QRCodeDecoder successfully asserted that the input was valid but failed to decode the input correctly\n",
+                    ACTUAL_INPUT_RESULTS,
+                    result.getResults(),
+                    0);
+        } else {
+            fail("QRCodeDecoder threw an exception despite being passed a valid input: "  +
+                    ACTUAL_INPUT_THAT_WAS_OUTPUTTED + "\n" +
                     "Thrown error message: " +
                     result.getException().getMessage());
         }
@@ -209,6 +229,8 @@ public class QRCodeDecoderTest {
 
 
     }
+
+
 
 
 

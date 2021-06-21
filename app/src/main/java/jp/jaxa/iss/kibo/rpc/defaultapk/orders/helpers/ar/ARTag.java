@@ -1,8 +1,11 @@
 package jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.ar;
 
+import org.opencv.aruco.Aruco;
 import org.opencv.core.Mat;
 
 public class ARTag {
+
+    private static final int TAG_SIDE_LENGTH = 5; // in cm
 
     private final int id;
     private final Mat corners;
@@ -20,7 +23,12 @@ public class ARTag {
      * https://docs.opencv.org/4.5.2/d5/dae/tutorial_aruco_detection.html
      *
      */
-    public void getOrientation() {} // TODO...
+    public void getOrientation() {
+
+        Aruco.estimatePoseSingleMarkers(corners, TAG_SIDE_LENGTH, )
+
+
+    } // TODO...
 
 
     /**

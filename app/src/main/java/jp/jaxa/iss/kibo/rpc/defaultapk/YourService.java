@@ -42,6 +42,7 @@ public class YourService extends KiboRpcService {
 
         // Attempting first stage (move to QR Code and scan)
         RobotOrderResult result = wrapper.attemptExpeditionStage(context.getString(R.string.move_to_scan_order_string));
+        testSuccess(result);
         double[] scanResults = ((RobotDecodeQRCodeResult)result).getDecodedResults(); // Should probably check this b4 casting
 
         // Ignoring result rn while we wait for the scan team to finish their section
@@ -81,11 +82,12 @@ public class YourService extends KiboRpcService {
         }
 
         // Attempting the second stage (move to point A' and fire laser)
-        wrapper.attemptExpeditionStage(nextStageOrderString);
+        result = wrapper.attemptExpeditionStage(nextStageOrderString);
+        testSuccess(result);
 
         // Attempting the final stage (move to finish)
-        wrapper.attemptExpeditionStage(context.getString(R.string.move_to_finish_order_string));
-
+        result = wrapper.attemptExpeditionStage(context.getString(R.string.move_to_finish_order_string));
+        testSuccess(result);
 
 //
 //        // MOVE TO ROBOT ORDER
@@ -114,8 +116,8 @@ public class YourService extends KiboRpcService {
 
 
     /**
-     * I'm hoping this will reduce the waiting time required for the
-     * @param result
+     * I'm hoping this will reduce the waiting time required for the simulator to end when things
+     * crash
      */
     private void testSuccess(RobotOrderResult result) {
         if (!result.hasSucceeded()) {

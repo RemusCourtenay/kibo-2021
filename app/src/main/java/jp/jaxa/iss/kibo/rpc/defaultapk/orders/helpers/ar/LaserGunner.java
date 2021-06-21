@@ -5,6 +5,7 @@ import android.content.Context;
 import org.opencv.aruco.Board;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfDouble;
+import org.opencv.core.MatOfInt;
 import org.opencv.core.Point;
 
 import jp.jaxa.iss.kibo.rpc.api.KiboRpcApi;
@@ -82,7 +83,21 @@ public class LaserGunner {
         int newY = (int)rotationMatrix.get(1, 0)[0];
         int newW = (int)rotationMatrix.get(2, 0)[0]; // SHOULD ALWAYS BE ONE
 
-        // Somehow transform target point into picture coords using Homography matrix
+
+        /**
+         *
+         *                      y
+         *                    / |
+         *                  /   |
+         *                /     |
+         *              x -------
+         *                 ^
+         *                 |
+         *                Angle
+         *
+         *
+         */
+
 
         // return difference in location
 
@@ -133,7 +148,22 @@ public class LaserGunner {
      *           respect to the board. This should be stored as a Mat object even though it's a pain
      */
     private Mat getTargetPointInBoardCoordSpaceAsMat(ARTagCollection arTagCollection) { // TODO...
-        return null;
+
+
+        int[] coords = new int[]{0,0};
+        double[] tagCoords;
+
+        for (ARTag tag: arTagCollection.getARTags()) {
+            tagCoords = tag.getCoordinates();
+            coords[0] = (int)tagCoords[0];
+            coords[1] = (int)tagCoords[1];
+        }
+
+        coords[0] = coords[0]/4; // int division but w/e
+        coords[1] = coords[1]/4;
+
+        return new MatOfInt(coords); // Not sure if this is vertical or not
+
     }
 
 }

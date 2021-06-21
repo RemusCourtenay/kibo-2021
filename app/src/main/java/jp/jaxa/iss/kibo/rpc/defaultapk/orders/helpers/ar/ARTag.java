@@ -1,18 +1,29 @@
 package jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.ar;
 
 import org.opencv.aruco.Aruco;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfDouble;
+import org.opencv.utils.Converters;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import jp.jaxa.iss.kibo.rpc.defaultapk.orders.RobotOrderException;
 
 public class ARTag {
 
+    private static final int MOVE_AMOUNT = 10; // Chosen randomly
     private static final int TAG_SIDE_LENGTH = 5; // in cm
 
     private final int id;
     private final Mat corners;
+    // private final double[][] camIntrinsics;
 
     ARTag(int id, Mat corners) {
         this.id = id;
         this.corners = corners;
+        //this.camIntrinsics = camIntrinsics;
     }
 
     /**
@@ -23,10 +34,22 @@ public class ARTag {
      * https://docs.opencv.org/4.5.2/d5/dae/tutorial_aruco_detection.html
      *
      */
-    public void getOrientation() {
+    public void getOrientation() {  // PROBABLY NOT WORTH EFFORT - CAN JUST ASSUME ALWAYS UPRIGHT
 
-        Aruco.estimatePoseSingleMarkers(corners, TAG_SIDE_LENGTH, )
-
+//        Mat cameraMatrix = new Mat(3, 3, CvType.CV_32FC1); // Code copied from imageHelper
+//        Mat distCoeffs = new Mat(1, 5, CvType.CV_32FC1);
+//
+//        cameraMatrix.put(0, 0, camIntrinsics[0]);
+//        distCoeffs.put(0, 1, camIntrinsics[1]);
+//
+//        // Setting up variables for the function to fill
+//        List<Mat> cornersList = new ArrayList<>();
+//        Converters.Mat_to_vector_Mat(corners, cornersList);
+//        Mat rotationMatrix = new Mat();
+//        Mat translationVector = new Mat();
+//        Aruco.estimatePoseSingleMarkers(cornersList, TAG_SIDE_LENGTH, cameraMatrix, distCoeffs, rotationMatrix, translationVector);
+//
+//        Mat rotationDiagonal = rotationMatrix.diag(0);
 
     } // TODO...
 
@@ -52,8 +75,19 @@ public class ARTag {
      * @return : an int array [x,y] detailing the relative rotational movement required to find the
      * other tags.
      */
-    public int[] getRelativeMovement() { // TODO...
-        return null;
+    public int[] getRelativeMovement() {
+        int[] move;
+
+        switch (this.id) {
+            case 1: move = new int[]{-10, 10}; break;
+            case 2: move = new int[]{-10, -10}; break;
+            case 3: move = new int[]{10, -10}; break;
+            case 4: move = new int[]{10, 10}; break;
+            default: throw new RobotOrderException("");
+        }
+
+        return move;
+
     } // TODO...
 
     /**

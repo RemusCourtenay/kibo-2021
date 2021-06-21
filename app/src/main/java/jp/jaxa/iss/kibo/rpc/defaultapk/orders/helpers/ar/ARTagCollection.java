@@ -11,7 +11,7 @@ public class ARTagCollection {
     private final Mat tagCornersMat;
     private final List<ARTag> arTags;
 
-    public ARTagCollection(Mat tagIDsMat, Mat tagCornersMat) {
+    public ARTagCollection(Mat tagIDsMat, Mat tagCornersMat, double[] camIntrinsics) {
         this.tagIDsMat = tagIDsMat;
         this.tagCornersMat = tagCornersMat;
         this.arTags = buildListFromMats(tagIDsMat, tagCornersMat);
@@ -49,7 +49,8 @@ public class ARTagCollection {
                     of a specific tag. So we simply pass each column in to the constructor.
                     TODO... check that each column is length 4
                     */
-                    tagCornersMat.col(i)));
+                    tagCornersMat.col(i))
+            );
         }
         return arTags;
     }

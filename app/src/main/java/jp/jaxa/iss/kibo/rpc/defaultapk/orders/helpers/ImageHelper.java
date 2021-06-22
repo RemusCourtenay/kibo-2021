@@ -24,18 +24,21 @@ public class ImageHelper {
     // TODO... Move all to integers.xml
     private final int kiboCamImageHeight; // True for both nav and dock cam
     private final int kiboCamImageWidth;
-    private final int percentThatCropRemoves;
-    private final int resizeImageHeight;
-    private final int resizeImageWidth;
+    private final int percentWidthCropRemoves;
+    private final int percentHeightTopCropRemoves;
+    private final int percentHeightBottomCropRemoves;
+    private final int scaleFactorAsInt;
+
 
 
 
     public ImageHelper(Context context) {
         this.kiboCamImageHeight = context.getResources().getInteger(R.integer.kibo_cam_image_height);
         this.kiboCamImageWidth = context.getResources().getInteger(R.integer.kibo_cam_image_width);
-        this.percentThatCropRemoves = context.getResources().getInteger(R.integer.percent_of_image_that_crop_removes);
-        this.resizeImageHeight = context.getResources().getInteger(R.integer.resize_image_height);
-        this.resizeImageWidth = context.getResources().getInteger(R.integer.resize_image_width);
+        this.percentWidthCropRemoves = context.getResources().getInteger(R.integer.percent_width_crop_removes);
+        this.percentHeightTopCropRemoves = context.getResources().getInteger(R.integer.percent_height_top_crop_removes);
+        this.percentHeightBottomCropRemoves = context.getResources().getInteger(R.integer.percent_height_bottom_crop_removes);
+        this.scaleFactorAsInt = context.getResources().getInteger(R.integer.scale_factor_as_int);
     }
 
 
@@ -47,7 +50,7 @@ public class ImageHelper {
         Log.d("Attempting to get Bitmap from Mat","");
         Mat undistortedMat = undistortFisheye(matFromCam, camIntrinsics);
         Log.d("Attempting to crop mat", "");
-        Mat croppedMat = new Mat(undistortedMat, getCroppedImageRectangleArea(percentThatCropRemoves, kiboCamImageHeight, kiboCamImageWidth));
+        Mat croppedMat = new Mat(undistortedMat, getCroppedImageRectangleArea(undistortedMat.size()));
 
         // Commented out as unsure if needed
         // Mat scaledMat = scaleMatDown(croppedMat, resizeImageWidth, resizeImageHeight);
@@ -66,13 +69,12 @@ public class ImageHelper {
         return new BinaryBitmap(new HybridBinarizer(new RGBLuminanceSource(bitmapWidth, bitmapHeight, pixelArray)));
     }
 
-    public Mat scaleMatDown(Mat originalMat, int newWidth, int newHeight) { // TODO... Comment
+    public Mat scaleMatDown(Mat originalMat) { // TODO... Comment
+        Log.d("Attempting to scale mat:", "Scale factor as percent int: " + scaleFactorAsInt);
         Mat newMat = new Mat();
+        double scaleFactor = (double)(scaleFactorAsInt)/100.0;
 
-        double widthScale = (double)newWidth/(double)originalMat.width(); // getting width from here rather than static variable because of image cropping
-        double heightScale = (double)newHeight/(double)originalMat.height(); // getting height from here rather than static variable because of image cropping
-
-        Imgproc.resize(originalMat, newMat, new Size(0,0), widthScale, heightScale, Imgproc.INTER_AREA); // Inter area best for decreasing size
+        Imgproc.resize(originalMat, newMat, new Size(0,0), scaleFactor, scaleFactor, Imgproc.INTER_AREA); // Inter area best for decreasing size
         return newMat;
     }
 
@@ -91,41 +93,54 @@ public class ImageHelper {
 
         Mat undistortedImageAsMat = new Mat(this.kiboCamImageHeight, this.kiboCamImageWidth, CvType.CV_8UC1); // Do we need to set the number of pixels here?
 
+        Mat[] cameraIntrinsicsMats = getCameraIntrinsicsAsMats(cameraIntrinsics);
+
+        Calib3d.fisheye_undistortImage(distortedImageAsMat, undistortedImageAsMat, cameraIntrinsicsMats[0], cameraIntrinsicsMats[1]);
+
+        return undistortedImageAsMat;
+    }
+
+    public Mat[] getCameraIntrinsicsAsMats(double[][] cameraIntrinsics) {
         Mat cameraIntrinsicsMatrix = new Mat(3, 3, CvType.CV_32FC1);
         Mat distortionCoefficients = new Mat(1, 5, CvType.CV_32FC1);
 
         cameraIntrinsicsMatrix.put(0, 0, cameraIntrinsics[0]);
         distortionCoefficients.put(0, 1, cameraIntrinsics[1]);
 
-        Calib3d.fisheye_undistortImage(distortedImageAsMat, undistortedImageAsMat, cameraIntrinsicsMatrix, distortionCoefficients);
-
-        return undistortedImageAsMat;
+        return new Mat[]{cameraIntrinsicsMatrix, distortionCoefficients};
     }
 
     // TODO... Javadoc comment
-    public Rect getCroppedImageRectangleArea(int percentRemovedAsInt, int numRows, int numColumns) { // Should probably be getting crop Region Of Interest (ROI) from a function not a random number
-        Log.d("Calculating rectangle for crop: ", "Removing amount: " + percentRemovedAsInt);
+    public Rect getCroppedImageRectangleArea(Size pictureSize) { // Should probably be getting crop Region Of Interest (ROI) from a function not a random number
+        Log.d("Calculating rectangle for crop: ",
+                "\nRemoving percent of width: " + this.percentWidthCropRemoves +
+                "\nRemoving percent of height from top: " + percentHeightTopCropRemoves +
+                "\nRemoving percent of height from bottom: " + percentHeightBottomCropRemoves
+        );
+
+        // Origin of coordinate system is top left
+        int numColumns = (int)pictureSize.width;
+        int numRows = (int)pictureSize.height;
+
         // Converting 0-100 percent to 0-1 double
-        Double percentRemoved = (double)(percentRemovedAsInt)/100.0;
+        double percentWidthRemoved = (double)(percentWidthCropRemoves)/100.0;
+        double percentHeightRemovedFromTop = (double)(percentHeightTopCropRemoves)/100.0;
+        double percentHeightRemovedFromBottom = (double)(percentHeightBottomCropRemoves)/100.0;
 
-        // Ratio of image width:height
-        double ratio = (double)numColumns / (double)numRows;
+        // Percent of columns to offset the start of the cropped image by. Half of total removed as exists on both sides of inner cropped image
+        double percentColumnOffset = percentWidthRemoved/2;
 
-        // Percent of rows to offset the start of the cropped image by. Half of total removed as exists on both sides of inner cropped image
-        double percentRowOffset = percentRemoved/2;
-        // Percent of columns to offset the start of the cropped image by. Calculated from ratio of width:height in order to keep the image aspect ratio
-        double percentColumnOffset = percentRowOffset * ratio;
-
-        // Number of rows/columns to offset the non-cropped area by
-        int numRowsOffset = (int)(numRows * percentRowOffset); // Casting to int to ensure round number
+        // Number of columns/rows to offset the non-cropped area by
         int numColumnsOffset = (int)(numColumns * percentColumnOffset);
+        int numRowsOffsetFromTop = (int)(numRows * percentHeightRemovedFromTop);
+        int numRowsOffsetFromBottom = (int)(numRows * percentHeightRemovedFromBottom);
 
         // Number of rows/columns to keep in the cropped image
-        int numRemainingRows = numRows - (numRowsOffset * 2); // Multiply by two to deal with the divide by 2 done earlier
-        int numRemainingColumns = numColumns - (numColumnsOffset * 2);
+        int numRemainingColumns = numColumns - (numColumnsOffset + numColumnsOffset); // Offset from both sides by same amount
+        int numRemainingRows = numRows - (numRowsOffsetFromTop + numRowsOffsetFromBottom);
 
-        // Return the specified area to keep after cropping as a Rectangle object
-        return new Rect(numColumnsOffset, numRowsOffset, numRemainingColumns, numRemainingRows);
+        // Return the specified area to keep after cropping as a Rectangle object, top left coordinate system so y is calculated from top
+        return new Rect(numColumnsOffset, numRowsOffsetFromTop, numRemainingColumns, numRemainingRows);
     }
 
 

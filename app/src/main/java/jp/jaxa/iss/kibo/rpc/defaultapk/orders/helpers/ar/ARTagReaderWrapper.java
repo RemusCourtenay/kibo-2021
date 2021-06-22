@@ -20,14 +20,13 @@ import jp.jaxa.iss.kibo.rpc.defaultapk.orders.results.RobotOrderResult;
 
 public class ARTagReaderWrapper {
 
-    private static final String FOUND_LESS_THAN_FOUR_TAGS_MESSAGE = ""; // TODO...
-    private static final String SUCCESS_MESSAGE = ""; // TODO...
+    private static final String FOUND_LESS_THAN_FOUR_TAGS_MESSAGE = "Found less than four AR tags in image";
+    private static final String SUCCESS_MESSAGE = "Successfully attempted to read image for AR tags and board";
     private static final int markerDictionaryID = Aruco.DICT_5X5_250;
 
-    private static final double TAG_WIDTH = 5;
-    private static final double TAG_HEIGHT = 5;
+    private static final double TAG_WIDTH = 5; // cm
+    private static final double TAG_HEIGHT = 5; // cm
 
-    private ARTagCollection arTagCollection;
 
     public ARTagReaderWrapper(Context context) { // TODO... get static values from xml files via context
 
@@ -45,21 +44,18 @@ public class ARTagReaderWrapper {
      *           bundled objects
      */
     public RobotOrderResult attemptReadImageForARTags(Mat cleanMatImage) {
-        RobotOrderResult result;
         Board board;
 
-        // Failed to get tags, returning the result object created by the getTagsFromCleanImage() method
-        if (!((result = getTagsFromCleanImage(cleanMatImage)).hasSucceeded())) {
-            return result;
+        ARTagCollection arTagCollection = getTagsFromCleanImage(cleanMatImage);
 
         // Found tags but not enough,returning the incomplete list of tags and a result detailing the partial success
-        } else if (this.arTagCollection.getNumTags() == 4) {
-            return new RobotARTagReadOrderResult(true, 1, FOUND_LESS_THAN_FOUR_TAGS_MESSAGE, this.arTagCollection, null);
+        if (arTagCollection.getNumTags() < 4) {
+            return new RobotARTagReadOrderResult(true, 1, FOUND_LESS_THAN_FOUR_TAGS_MESSAGE, arTagCollection, null);
 
         // Successfully found both tags and board, returning positive result with bundled tags + board
         } else {
             board = getPredefinedBoard();
-            return new RobotARTagReadOrderResult(true, 0, SUCCESS_MESSAGE, this.arTagCollection, board);
+            return new RobotARTagReadOrderResult(true, 0, SUCCESS_MESSAGE, arTagCollection, board);
         }
     }
 
@@ -69,17 +65,13 @@ public class ARTagReaderWrapper {
      * AR tag in the inputted image and returns them in a more functional ARTag object format.
      *
      * @param cleanMatImage : image which contains one to four AR tags
-     * @return : null if the read was successful, otherwise a RobotARTagReadOrderResult with
-     *           false succeeded, relevant error message, non-zero return value and null values
-     *           for all other bundled info
      */
-    private RobotOrderResult getTagsFromCleanImage(Mat cleanMatImage) { // TODO...
+    private ARTagCollection getTagsFromCleanImage(Mat cleanMatImage) { // TODO...
         Mat ids = new Mat();
         Dictionary dictionary = Aruco.getPredefinedDictionary(Aruco.DICT_5X5_250);
         List<Mat> corners = new ArrayList<>();
         Aruco.detectMarkers(cleanMatImage, dictionary, corners, ids);
-        this.arTagCollection = new ARTagCollection(ids, corners); // set value here
-        return new GenericRobotOrderResult(true, 0, ""); // Return a result value dictating success (null) or not success (Result value)
+        return new ARTagCollection(ids, corners);
     }
 
 

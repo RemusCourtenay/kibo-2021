@@ -5,11 +5,12 @@
     <integer name="flashlight_original_brightness_percent_for_scan">50</integer>
     <integer name="flashlight_final_brightness_percent_for_scan">90</integer>
 
-    <integer name="kibo_cam_image_height">960</integer>
     <integer name="kibo_cam_image_width">1280</integer>
-    <integer name="percent_of_image_that_crop_removes">0</integer>
-    <integer name="resize_image_height">384</integer> <!-- Chosen randomly -->
-    <integer name="resize_image_width">288</integer> <!-- Chosen randomly -->
+    <integer name="kibo_cam_image_height">960</integer>
+    <integer name="percent_width_crop_removes">20</integer>
+    <integer name="percent_height_top_crop_removes">50</integer>
+    <integer name="percent_height_bottom_crop_removes">5</integer>
+    <integer name="scale_factor_as_int">50</integer> <!-- Possibly too much -->
 
     <!--
     Temporary variable used to choose which path to test while we wait for QR team to finish

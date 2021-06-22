@@ -2,11 +2,9 @@ package jp.jaxa.iss.kibo.rpc.defaultapk.orders;
 
 import android.content.Context;
 
-import gov.nasa.arc.astrobee.Kinematics;
 import gov.nasa.arc.astrobee.types.Point;
 import gov.nasa.arc.astrobee.types.Quaternion;
 import jp.jaxa.iss.kibo.rpc.api.KiboRpcApi;
-import jp.jaxa.iss.kibo.rpc.defaultapk.R;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.ar.ARTag;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.ar.ARTagCollection;
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.ar.ARTagReaderWrapper;
@@ -21,36 +19,26 @@ import jp.jaxa.iss.kibo.rpc.defaultapk.orders.results.RobotOrderResult;
 
 import org.opencv.aruco.Aruco;
 import org.opencv.aruco.Board;
-import org.opencv.core.CvType;
 import org.opencv.core.Mat;
-import org.opencv.core.Size;
 
 class RobotFireLaserOrder extends RobotOrder { // TODO... Javadoc comment
 
 
     private static final int markerDictionaryID = Aruco.DICT_5X5_250; // TODO... Move to xml file and get via context
-    private static final int AMOUNT_TO_ADJUST = 10;
     private static final int MAX_BOARD_ATTEMPTS = 5;
     private static final int MAX_FIRE_ATTEMPTS = 5;
 
     private final ARTagReaderWrapper arTagReaderWrapper;
     private final LaserGunner laserGunner;
-    private final Context context;
-    private final int kiboCamImageHeight; // True for both nav and dock cam
-    private final int kiboCamImageWidth;
-    private final int percentThatCropRemoves;
+    private final ImageHelper imageHelper;
 
     private HomographyMatrix homographyMatrix;
-    private ARTagCollection arTagCollection;
 
-    RobotFireLaserOrder(KiboRpcApi api, Context context, ARTagReaderWrapper arTagReaderWrapper, LaserGunner laserGunner) {
+    RobotFireLaserOrder(KiboRpcApi api, Context context, ImageHelper imageHelper, ARTagReaderWrapper arTagReaderWrapper, LaserGunner laserGunner) {
         super(api);
         this.arTagReaderWrapper = arTagReaderWrapper;
         this.laserGunner = laserGunner;
-        this.context = context;
-        this.kiboCamImageHeight = context.getResources().getInteger(R.integer.kibo_cam_image_height);
-        this.kiboCamImageWidth = context.getResources().getInteger(R.integer.kibo_cam_image_width);
-        this.percentThatCropRemoves = context.getResources().getInteger(R.integer.percent_of_image_that_crop_removes);
+        this.imageHelper = imageHelper;
     }
 
     @Override
@@ -64,12 +52,12 @@ class RobotFireLaserOrder extends RobotOrder { // TODO... Javadoc comment
             } else if (!(result = laserGunner.attemptAcquireTargetLock(homographyMatrix)).hasSucceeded()) {
                 rotateRobot(((RobotLaserOrderResult)result).getTranslatedQuaternion());
             } else {
-                return new GenericRobotOrderResult(true, 0, ""); // TODO... Return good result
+                return new GenericRobotOrderResult(true, 0, "Fire Laser Order Succeeded");
             }
 
         }
 
-        return new GenericRobotOrderResult(false, 1, ""); // TODO... Return bad result
+        return new GenericRobotOrderResult(false, 1, "Fire Laser Order Failed");
     }
 
     @Override
@@ -112,9 +100,9 @@ class RobotFireLaserOrder extends RobotOrder { // TODO... Javadoc comment
 
                 // Complete success, both board and tags were returned
                 if (result.getReturnValue() == 0) {
-                    this.homographyMatrix = calculateBoardPose(board, arTagCollection, cleanedMatImage); // TODO... pass this through Result instead
-                    return new GenericRobotOrderResult(true, 0, "");
-                    // Got tags but there weren't enough to build board (<4)
+                    this.homographyMatrix = calculateBoardPose(board, arTags, cleanedMatImage); // TODO... pass this through Result instead
+                    return new GenericRobotOrderResult(true, 0, "Successfully attempted to get board pose");
+                    // Got tags but there weren't enough to build board (<4) TODO... this isn't actually correct
                 } else if (result.getReturnValue() == 1) {
                     // Move robot and then we'll try again
                     Quaternion adjustment = getAdjustmentNeededToFindTags(arTags);
@@ -124,7 +112,7 @@ class RobotFireLaserOrder extends RobotOrder { // TODO... Javadoc comment
                 }
             }
         }
-        return new GenericRobotOrderResult(false, 1, "");
+        return new GenericRobotOrderResult(false, 1, "Failed to get board pose");
     }
 
     /**
@@ -134,22 +122,18 @@ class RobotFireLaserOrder extends RobotOrder { // TODO... Javadoc comment
      * @param board : Board that exists on some separate coordinate system to the image
      * @param arTagCollection : AR tags found on the board
      * @return : The homography matrix that describes the translation from one coordinate system to
-     *           the other
+     *           the other        for (int i = 0; i < 4; i++) { // Assuming that translation matrix is horizontal
+     *             rotationMatrix.put(3, i, translationMatrix.get(0,i));
+     *         }
      */
     private HomographyMatrix calculateBoardPose(Board board, ARTagCollection arTagCollection, Mat cleanedMatImage) { // TODO...
 
-        double[][] camIntrinsics = api.getNavCamIntrinsics();
-
-        Mat cameraMatrix = new Mat(3, 3, CvType.CV_32FC1); // CvType has something to do with defining image colour/channel num/more
-        Mat distCoeffs = new Mat(1, 5, CvType.CV_32FC1);
-
-        cameraMatrix.put(0, 0, camIntrinsics[0]);
-        distCoeffs.put(0, 1, camIntrinsics[1]);
+        Mat[] cameraIntrinsics = this.imageHelper.getCameraIntrinsicsAsMats(api.getNavCamIntrinsics());
 
         Mat rvec = new Mat();
         Mat tvec = new Mat();
 
-        Aruco.estimatePoseBoard(arTagCollection.getTagCornersMat(), arTagCollection.getTagIDsMat(), board, cameraMatrix, distCoeffs, rvec, tvec);
+        Aruco.estimatePoseBoard(arTagCollection.getTagCornersMat(), arTagCollection.getTagIDsMat(), board, cameraIntrinsics[0], cameraIntrinsics[1], rvec, tvec);
         return new HomographyMatrix(rvec, tvec, arTagCollection, cleanedMatImage.size());
     }
 
@@ -184,9 +168,9 @@ class RobotFireLaserOrder extends RobotOrder { // TODO... Javadoc comment
      * @return : image that is easy to read AR tags off of
      */
     private Mat cleanupImage(Mat matImage) {
-        ImageHelper iH = new ImageHelper(this.context);
-        Mat croppedMat = new Mat(matImage, iH.getCroppedImageRectangleArea(percentThatCropRemoves, kiboCamImageHeight, kiboCamImageWidth));
-        return croppedMat;
+        Mat croppedMat = new Mat(matImage, this.imageHelper.getCroppedImageRectangleArea(matImage.size()));
+        Mat scaledMat = this.imageHelper.scaleMatDown(croppedMat);
+        return scaledMat;
     }
 
 

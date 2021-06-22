@@ -1,6 +1,7 @@
 package jp.jaxa.iss.kibo.rpc.defaultapk.orders.helpers.ar;
 
 import android.content.Context;
+import android.util.Log;
 
 import org.opencv.aruco.Board;
 import org.opencv.core.Mat;
@@ -77,12 +78,30 @@ public class LaserGunner {
         Mat rotationMatrix = homographyMatrix.getRotationVector();
         Mat translationMatrix = homographyMatrix.getTranslationVector();
 
-        for (int i = 0; i < 4; i++) { // Assuming that translation matrix is horizontal
-            rotationMatrix.put(3, i, translationMatrix.get(0,i));
+
+        if (translationMatrix.rows() != 1) {
+            Log.d("MAT WEIRDNESS CONFIRMED:", "Mat translationMatrix in LaserGunner was supposed to be horizontal but didn't have specifically 1 row");
+
+            for (int i = 0; i < 4; i++) { // Assuming that translation matrix is vertical
+                rotationMatrix.put(3, i, translationMatrix.get(i,0));
+            }
+
+        } else {
+            for (int i = 0; i < 4; i++) { // Assuming that translation matrix is horizontal
+                rotationMatrix.put(3, i, translationMatrix.get(0,i));
+            }
         }
+
+
+
 
         rotationMatrix.dot(targetPointMat); // TODO... Find out if this works or if we have to do it row by row
         rotationMatrix.dot(instrinsicsMat);
+
+        Log.d("MAT WEIRDNESS CHECK", "After dot products, Mat should have 1 column and 3 rows. It has:" +
+                "\nColumns: " + rotationMatrix.cols() +
+                "\nRows: " + rotationMatrix.rows()
+        );
 
         // Rotation matrix is now equal to target point in other co-ord system
 
@@ -133,7 +152,7 @@ public class LaserGunner {
 
         // If everything works
         } else {
-            return new GenericRobotOrderResult(true, 0, "");
+            return new GenericRobotOrderResult(true, 0, "Fired laser");
         }
     }
 
@@ -146,7 +165,7 @@ public class LaserGunner {
                 return new GenericRobotOrderResult(false, 0, e.getMessage()); // Maybe just not worry about this one?
             }
         }
-        return new GenericRobotOrderResult(true, 0, "");
+        return new GenericRobotOrderResult(true, 0, "Took ten snapshots");
     }
 
     /**
@@ -167,7 +186,7 @@ public class LaserGunner {
     private Mat getTargetPointInBoardCoordSpaceAsMat(ARTagCollection arTagCollection) { // TODO...
 
 
-        int[] coords = new int[]{0,0};
+        int[] coords = new int[]{0,0,1}; // third 1 is the w
         double[] tagCoords;
 
         for (ARTag tag: arTagCollection.getARTags()) {
@@ -179,8 +198,18 @@ public class LaserGunner {
         coords[0] = coords[0]/4; // int division but w/e
         coords[1] = coords[1]/4;
 
-        return new MatOfInt(coords); // Not sure if this is vertical or not
+        MatOfInt targetPointMat = new MatOfInt(coords);
 
+        if (targetPointMat.cols() == 1) {
+            return targetPointMat;
+        } else {
+            Log.d("MAT WEIRDNESS CONFIRMED:", "Mat targetPointMat in LaserGunner was supposed to be vertical but it didn't have specifically 1 column");
+            Mat verticalTargetPointMat = new MatOfInt();
+
+            for (int i = 0; i < 3; i++) {
+                verticalTargetPointMat.put(i,0,targetPointMat.get(0,i));
+            }
+            return verticalTargetPointMat;
+        }
     }
-
 }

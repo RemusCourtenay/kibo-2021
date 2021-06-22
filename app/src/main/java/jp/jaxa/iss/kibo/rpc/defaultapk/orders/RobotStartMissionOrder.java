@@ -7,8 +7,8 @@ import jp.jaxa.iss.kibo.rpc.defaultapk.orders.results.RobotOrderResult;
 
 class RobotStartMissionOrder extends RobotOrder {
 
-    private static final String START_ORDER_FAILED_MESSAGE = ""; // TODO...
-    private static final String START_ORDER_SUCCEEDED_MESSAGE = ""; // TODO...
+    private static final String START_ORDER_FAILED_MESSAGE = "Failed to start mission";
+    private static final String START_ORDER_SUCCEEDED_MESSAGE = "Successfully started mission";
 
     RobotStartMissionOrder(KiboRpcApi api) {
         super(api);

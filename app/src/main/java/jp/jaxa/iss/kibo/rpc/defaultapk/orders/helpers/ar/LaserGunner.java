@@ -66,7 +66,7 @@ public class LaserGunner {
      *                         coordinate systems. AR tags are also contained in here for convenience.
      * @return : A result detailing how successful the action was.
      */
-    private RobotOrderResult calculateDistanceFromTarget(HomographyMatrix homographyMatrix) { // TODO...
+    private RobotOrderResult calculateDistanceFromTarget(HomographyMatrix homographyMatrix) { // TODO... convert to dumb Kibo coordinate system
 
         Point laserPoint = new Point(homographyMatrix.getImageWidth()/2.0, homographyMatrix.getImageHeight()/2.0); // Laser fires at the center of the camera (I assume)
 
@@ -102,6 +102,7 @@ public class LaserGunner {
         }
 
         double[] adjustment = new double[]{xDiff,yDiff};
+
 
         Quaternion translatedQuaternion = QuaternionHelper.translateAdjustment(api, adjustment);
 

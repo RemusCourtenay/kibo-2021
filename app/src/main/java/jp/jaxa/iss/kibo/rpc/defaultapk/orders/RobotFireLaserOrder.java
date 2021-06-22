@@ -102,7 +102,7 @@ class RobotFireLaserOrder extends RobotOrder { // TODO... Javadoc comment
                 return result;
 
                 // Didn't completely fail
-            } else { // TODO... check that casting is safe here by using result.getType()
+            } else {
                 if (!(result.getType() == RobotARTagReadOrderResult.class)) {
                     throw new RobotOrderException("Incorrect type");
                 }
@@ -112,8 +112,8 @@ class RobotFireLaserOrder extends RobotOrder { // TODO... Javadoc comment
 
                 // Complete success, both board and tags were returned
                 if (result.getReturnValue() == 0) {
-                    this.homographyMatrix = calculateBoardPose(board, arTagCollection); // TODO... pass this through Result instead
-                    return new GenericRobotOrderResult(true, 0, ""); // TODO... Pass good result not null
+                    this.homographyMatrix = calculateBoardPose(board, arTagCollection, cleanedMatImage); // TODO... pass this through Result instead
+                    return new GenericRobotOrderResult(true, 0, "");
                     // Got tags but there weren't enough to build board (<4)
                 } else if (result.getReturnValue() == 1) {
                     // Move robot and then we'll try again
@@ -124,7 +124,7 @@ class RobotFireLaserOrder extends RobotOrder { // TODO... Javadoc comment
                 }
             }
         }
-        return new GenericRobotOrderResult(false, 1, ""); // TODO... pass bad result not null
+        return new GenericRobotOrderResult(false, 1, "");
     }
 
     /**
@@ -136,11 +136,11 @@ class RobotFireLaserOrder extends RobotOrder { // TODO... Javadoc comment
      * @return : The homography matrix that describes the translation from one coordinate system to
      *           the other
      */
-    private HomographyMatrix calculateBoardPose(Board board, ARTagCollection arTagCollection) { // TODO...
+    private HomographyMatrix calculateBoardPose(Board board, ARTagCollection arTagCollection, Mat cleanedMatImage) { // TODO...
 
         double[][] camIntrinsics = api.getNavCamIntrinsics();
 
-        Mat cameraMatrix = new Mat(3, 3, CvType.CV_32FC1);
+        Mat cameraMatrix = new Mat(3, 3, CvType.CV_32FC1); // CvType has something to do with defining image colour/channel num/more
         Mat distCoeffs = new Mat(1, 5, CvType.CV_32FC1);
 
         cameraMatrix.put(0, 0, camIntrinsics[0]);
@@ -150,8 +150,7 @@ class RobotFireLaserOrder extends RobotOrder { // TODO... Javadoc comment
         Mat tvec = new Mat();
 
         Aruco.estimatePoseBoard(arTagCollection.getTagCornersMat(), arTagCollection.getTagIDsMat(), board, cameraMatrix, distCoeffs, rvec, tvec);
-        HomographyMatrix homographyMatrix = new HomographyMatrix(rvec, tvec, arTagCollection, new Size(1280,960));
-        return homographyMatrix;
+        return new HomographyMatrix(rvec, tvec, arTagCollection, cleanedMatImage.size());
     }
 
     private Quaternion getAdjustmentNeededToFindTags(ARTagCollection foundTags) {
@@ -187,7 +186,7 @@ class RobotFireLaserOrder extends RobotOrder { // TODO... Javadoc comment
     private Mat cleanupImage(Mat matImage) {
         ImageHelper iH = new ImageHelper(this.context);
         Mat croppedMat = new Mat(matImage, iH.getCroppedImageRectangleArea(percentThatCropRemoves, kiboCamImageHeight, kiboCamImageWidth));
-        return croppedMat; // TODO...
+        return croppedMat;
     }
 
 

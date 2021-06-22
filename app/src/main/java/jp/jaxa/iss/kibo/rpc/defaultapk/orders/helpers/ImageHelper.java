@@ -8,6 +8,7 @@ import com.google.zxing.BinaryBitmap;
 import com.google.zxing.RGBLuminanceSource;
 import com.google.zxing.common.HybridBinarizer;
 
+import org.opencv.calib3d.Calib3d;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.Rect;
@@ -44,7 +45,7 @@ public class ImageHelper {
      */
     public BinaryBitmap getBinaryBitmapFromMatImage(Mat matFromCam, double[][] camIntrinsics) { // TODO... Comment
         Log.d("Attempting to get Bitmap from Mat","");
-        Mat undistortedMat = undistort(matFromCam, camIntrinsics);
+        Mat undistortedMat = undistortFisheye(matFromCam, camIntrinsics);
         Log.d("Attempting to crop mat", "");
         Mat croppedMat = new Mat(undistortedMat, getCroppedImageRectangleArea(percentThatCropRemoves, kiboCamImageHeight, kiboCamImageWidth));
 
@@ -75,7 +76,7 @@ public class ImageHelper {
         return newMat;
     }
 
-    public Bitmap getBitmapFromMat(Mat mat) { // TODO... Comment
+    public Bitmap getBitmapFromMat(Mat mat) { // TODO... Figure out why we aren't using the built in function in the api for this
         Log.d("Attempting to convert mat to bitmap", "");
         Bitmap bitmap = Bitmap.createBitmap(mat.width(), mat.height(), Bitmap.Config.ARGB_8888);
         matToBitmap(mat, bitmap, false);
@@ -83,19 +84,22 @@ public class ImageHelper {
     }
 
     /**
-     * undistorts image to reduce time taken for QR scanning
+     * undistorts image to allow for calculations
      */
-    public Mat undistort(Mat src, double[][] camIntrinsics) { // Not sure about any of this
-        Log.d("Attempting to undistort mat","");
-        Mat dst = new Mat(this.kiboCamImageHeight, this.kiboCamImageWidth, CvType.CV_8UC1);
-        Mat cameraMatrix = new Mat(3, 3, CvType.CV_32FC1);
-        Mat distCoeffs = new Mat(1, 5, CvType.CV_32FC1);
+    public Mat undistortFisheye(Mat distortedImageAsMat, double[][] cameraIntrinsics) {
+        Log.d("Attempting to undistortFisheye mat","");
 
-        cameraMatrix.put(0, 0, camIntrinsics[0]);
-        distCoeffs.put(0, 1, camIntrinsics[1]);
+        Mat undistortedImageAsMat = new Mat(this.kiboCamImageHeight, this.kiboCamImageWidth, CvType.CV_8UC1); // Do we need to set the number of pixels here?
 
-        Imgproc.undistort(src, dst, cameraMatrix, distCoeffs);
-        return dst;
+        Mat cameraIntrinsicsMatrix = new Mat(3, 3, CvType.CV_32FC1);
+        Mat distortionCoefficients = new Mat(1, 5, CvType.CV_32FC1);
+
+        cameraIntrinsicsMatrix.put(0, 0, cameraIntrinsics[0]);
+        distortionCoefficients.put(0, 1, cameraIntrinsics[1]);
+
+        Calib3d.fisheye_undistortImage(distortedImageAsMat, undistortedImageAsMat, cameraIntrinsicsMatrix, distortionCoefficients);
+
+        return undistortedImageAsMat;
     }
 
     // TODO... Javadoc comment

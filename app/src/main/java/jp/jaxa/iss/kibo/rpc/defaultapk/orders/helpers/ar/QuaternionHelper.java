@@ -7,7 +7,25 @@ import jp.jaxa.iss.kibo.rpc.api.KiboRpcApi;
 public class QuaternionHelper {
 
 
+    private static final double KIBO_CAM_FOV = 130;
+    private static final double KIBO_CAM_WIDTH_IN_PIXELS = 1280;
+    private static final double DEGREES_PER_PIXEL = KIBO_CAM_FOV/KIBO_CAM_WIDTH_IN_PIXELS;
+
     public static Quaternion translateAdjustment(KiboRpcApi api, double[] adjustmentAmounts) {
+
+        double xDiff = adjustmentAmounts[0];
+        double yDiff = adjustmentAmounts[1];
+
+        double totalDiff = Math.sqrt(xDiff*xDiff + yDiff*yDiff); // length of hypotenuse in pixels;
+
+
+
+        double numDegreesToRotate = totalDiff * DEGREES_PER_PIXEL;
+        if (xDiff < 0) {
+            numDegreesToRotate = -numDegreesToRotate; // have to rotate counter clockwise if target is to the left
+        }
+
+
 
         // Straight up vector is [x=0,y=1,z=0]
         // i.e. 0 + 1i
@@ -16,20 +34,15 @@ public class QuaternionHelper {
         // so rotation vector is now [x=-yDiff, y=xDiff, z=0]
         // quaternion equation is [w=angle, x=xsin(angle/2), y=ysin(angle/2), z=zsin(angle/2)
 
-        double xDiff = adjustmentAmounts[0];
-        double yDiff = adjustmentAmounts[1];
-
-        double amountToRotate = 15;
-
         Quaternion rotatedQuaternion = new Quaternion(
-                (float)amountToRotate,
-                (float)(-yDiff*Math.sin(amountToRotate/2)),
-                (float)(xDiff*Math.sin(amountToRotate/2)),
+                (float)numDegreesToRotate,
+                (float)(-yDiff*Math.sin(numDegreesToRotate/2)),
+                (float)(xDiff*Math.sin(numDegreesToRotate/2)),
                 (float)0);
 
         // get current Quaternion
-        Kinematics currentKinematics = api.getRobotKinematics();
-        Quaternion currentQuaternion = currentKinematics.getOrientation();
+        Kinematics currentKinematics = api.getTrustedRobotKinematics();
+        Quaternion currentQuaternion = currentKinematics.getOrientation(); // TODO... Check this is not failing
 
         // get translated Quaternion
 
@@ -55,7 +68,6 @@ public class QuaternionHelper {
                 (float)y,
                 (float)z);
 
-        // return difference in location
         return translatedQuaternion;
     }
 

@@ -186,7 +186,7 @@ public class YourService extends KiboRpcService {
 //
 //
 //            //////////////////////////////////////////////////////////////////////////////////////////////////////
-//            Mat source = undistort(api.getMatNavCam(), api.getDockCamIntrinsics());
+//            Mat source = undistortFisheye(api.getMatNavCam(), api.getDockCamIntrinsics());
 //            Kinematics robot = api.getTrustedRobotKinematics();
 //            Mat ids = new Mat();
 //            Dictionary dictionary = Aruco.getPredefinedDictionary(Aruco.DICT_5X5_250);

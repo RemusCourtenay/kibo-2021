@@ -6,8 +6,12 @@ import org.opencv.aruco.Aruco;
 import org.opencv.aruco.Board;
 import org.opencv.aruco.Dictionary;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint3f;
+import org.opencv.core.Point3;
+import org.opencv.utils.Converters;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import jp.jaxa.iss.kibo.rpc.defaultapk.orders.results.GenericRobotOrderResult;
@@ -19,6 +23,9 @@ public class ARTagReaderWrapper {
     private static final String FOUND_LESS_THAN_FOUR_TAGS_MESSAGE = ""; // TODO...
     private static final String SUCCESS_MESSAGE = ""; // TODO...
     private static final int markerDictionaryID = Aruco.DICT_5X5_250;
+
+    private static final double TAG_WIDTH = 5;
+    private static final double TAG_HEIGHT = 5;
 
     private ARTagCollection arTagCollection;
 
@@ -45,13 +52,13 @@ public class ARTagReaderWrapper {
         if (!((result = getTagsFromCleanImage(cleanMatImage)).hasSucceeded())) {
             return result;
 
-        // Found tags but not enough to make a board with, returning the incomplete list of tags and a result detailing the partial success
+        // Found tags but not enough,returning the incomplete list of tags and a result detailing the partial success
         } else if (this.arTagCollection.getNumTags() == 4) {
             return new RobotARTagReadOrderResult(true, 1, FOUND_LESS_THAN_FOUR_TAGS_MESSAGE, this.arTagCollection, null);
 
         // Successfully found both tags and board, returning positive result with bundled tags + board
         } else {
-            board = getBoardFromTags(this.arTagCollection);
+            board = getPredefinedBoard();
             return new RobotARTagReadOrderResult(true, 0, SUCCESS_MESSAGE, this.arTagCollection, board);
         }
     }
@@ -75,17 +82,49 @@ public class ARTagReaderWrapper {
         return new GenericRobotOrderResult(true, 0, ""); // Return a result value dictating success (null) or not success (Result value)
     }
 
-    /**
-     * Attempts to use the Aruco Board setup methods to create a board object from the tags.
-     * Returns the setup board.
-     *
-     * @param collection : ARTagCollection
-     * @return : null if succeeded, otherwise a relevant Result object
-     */
 
-    private Board getBoardFromTags(ARTagCollection collection) {
-        Mat ids  = collection.getTagIDsMat();
-        List<Mat> corners = collection.getTagCornersMat();
-        return Board.create(corners, Aruco.getPredefinedDictionary(markerDictionaryID), ids);
+
+    private Board getPredefinedBoard() {
+
+        Mat matTagIDs = Converters.vector_int_to_Mat(Arrays.asList(4,1,2,3)); // Tag ids starting from top left
+
+        /*
+        // TODO... Figure out what coordinate system we're supposed to be using
+        The kibo robot uses a coordinate system that's totally messed up.
+
+        The 0,0,0 point is the top left.
+        The left-right axis is y
+        the up-down axis is z
+        the forward-back axis is x
+
+
+        this is me trying to calculate the points of the tags using this cursed system
+         */
+
+        List<MatOfPoint3f> listOfSpecificTagsCorners = Arrays.asList(
+                getTagCornerPoints(0,0,0), // top left tag (id = 4)
+                getTagCornerPoints(0,20,0), // top right tag (id = 1)
+                getTagCornerPoints(0,20,10), // bottom right tag (id = 2)
+                getTagCornerPoints(0,0,10) // bottom left tag (id = 3)
+        );
+
+        // Not entirely sure about this ngl
+        List<Mat> listOfMatOfSpecificTagsCorners = new ArrayList<>();
+        Converters.vector_vector_Point3f_to_Mat(listOfSpecificTagsCorners, listOfMatOfSpecificTagsCorners);
+
+        return Board.create(listOfMatOfSpecificTagsCorners, Aruco.getPredefinedDictionary(markerDictionaryID), matTagIDs);
+    }
+
+
+    private MatOfPoint3f getTagCornerPoints(double xTopLeft, double yTopLeft, double zTopLeft) {
+        Point3 topLeftPoint = new Point3(xTopLeft, yTopLeft, zTopLeft);
+        Point3 topRightPoint = new Point3(xTopLeft, yTopLeft + TAG_WIDTH, zTopLeft);
+        Point3 bottomRightPoint = new Point3(xTopLeft, yTopLeft + TAG_WIDTH, zTopLeft + TAG_HEIGHT);
+        Point3 bottomLeftPoint = new Point3(xTopLeft, yTopLeft, zTopLeft + TAG_HEIGHT);
+
+        List<Point3> cornerPointsList = Arrays.asList(topLeftPoint, topRightPoint, bottomRightPoint, bottomLeftPoint);
+
+        return (MatOfPoint3f) Converters.vector_Point3f_to_Mat(cornerPointsList);
+
     }
 }
